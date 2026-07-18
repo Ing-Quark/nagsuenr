@@ -431,7 +431,43 @@ function updateAnalyticsDashboard() {
   if (bar300) bar300.style.width = `${lvl300Pct}%`;
   if (bar400) bar400.style.width = `${lvl400Pct}%`;
 
-  // 5. Top represented Hometowns ranking
+  // 5. Academic Level Donut Chart Calculations (Circumference = 219.91)
+  const circ = 219.91;
+  const levelsData = [
+    { id: 'donut-lvl-100', count: lvl100Count, labelId: 'lbl-donut-100' },
+    { id: 'donut-lvl-200', count: lvl200Count, labelId: 'lbl-donut-200' },
+    { id: 'donut-lvl-300', count: lvl300Count, labelId: 'lbl-donut-300' },
+    { id: 'donut-lvl-400', count: lvl400Count, labelId: 'lbl-donut-400' }
+  ];
+
+  let cumulativeAngle = -90; // Start at the top center
+
+  levelsData.forEach(lvl => {
+    const circle = document.getElementById(lvl.id);
+    const label = document.getElementById(lvl.labelId);
+    
+    const pct = total ? lvl.count / total : 0;
+    const pctString = total ? Math.round(pct * 100) : 0;
+
+    if (label) label.textContent = `${pctString}% (${lvl.count})`;
+
+    if (circle) {
+      if (lvl.count === 0) {
+        circle.style.display = 'none';
+      } else {
+        circle.style.display = 'block';
+        const strokeLength = pct * circ;
+        circle.setAttribute('stroke-dasharray', `${strokeLength} ${circ}`);
+        circle.setAttribute('transform', `rotate(${cumulativeAngle} 50 50)`);
+        cumulativeAngle += pct * 360;
+      }
+    }
+  });
+
+  const donutTotal = document.getElementById('donut-total-text');
+  if (donutTotal) donutTotal.textContent = total;
+
+  // 6. Top represented Hometowns ranking
   const hometownCounts = {};
   allMembers.forEach(m => {
     const rawHometown = m.hometown || '';

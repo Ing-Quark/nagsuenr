@@ -373,6 +373,29 @@
             </div>
           </div>
 
+          <!-- Level Donut Chart Card -->
+          <div class="card analytics-card donut-card-wrapper">
+            <div class="card-title">Level Donut Chart</div>
+            <div class="donut-chart-container">
+              <svg width="150" height="150" viewBox="0 0 100 100" class="donut-svg">
+                <circle cx="50" cy="50" r="35" fill="transparent" stroke="rgba(255, 255, 255, 0.05)" stroke-width="12"></circle>
+                <circle id="donut-lvl-100" cx="50" cy="50" r="35" fill="transparent" stroke="var(--gold)" stroke-width="12" stroke-dasharray="219.91" stroke-dashoffset="219.91" transform="rotate(-90 50 50)"></circle>
+                <circle id="donut-lvl-200" cx="50" cy="50" r="35" fill="transparent" stroke="#1a73e8" stroke-width="12" stroke-dasharray="219.91" stroke-dashoffset="219.91" transform="rotate(-90 50 50)"></circle>
+                <circle id="donut-lvl-300" cx="50" cy="50" r="35" fill="transparent" stroke="#2e7d32" stroke-width="12" stroke-dasharray="219.91" stroke-dashoffset="219.91" transform="rotate(-90 50 50)"></circle>
+                <circle id="donut-lvl-400" cx="50" cy="50" r="35" fill="transparent" stroke="#8e24aa" stroke-width="12" stroke-dasharray="219.91" stroke-dashoffset="219.91" transform="rotate(-90 50 50)"></circle>
+                <text x="50" y="52" text-anchor="middle" class="donut-center-text" id="donut-total-text">0</text>
+                <text x="50" y="64" text-anchor="middle" class="donut-center-subtext">Students</text>
+              </svg>
+              
+              <div class="donut-legend">
+                <div class="legend-item"><span class="legend-dot lvl-100"></span> L100: <strong id="lbl-donut-100">0%</strong></div>
+                <div class="legend-item"><span class="legend-dot lvl-200"></span> L200: <strong id="lbl-donut-200">0%</strong></div>
+                <div class="legend-item"><span class="legend-dot lvl-300"></span> L300: <strong id="lbl-donut-300">0%</strong></div>
+                <div class="legend-item"><span class="legend-dot lvl-400"></span> L400: <strong id="lbl-donut-400">0%</strong></div>
+              </div>
+            </div>
+          </div>
+
           <!-- Top Hometowns & Programmes representation -->
           <div class="card analytics-card">
             <div class="card-title">Demographics & Study Fields</div>
@@ -430,8 +453,8 @@
   </section>
 
   <!-- Scripts -->
-  <script src="config.js?v=12"></script>
-  <script src="sms.js?v=12"></script>
-  <script src="admin.js?v=12"></script>
+  <script src="config.js?v=13"></script>
+  <script src="sms.js?v=13"></script>
+  <script src="admin.js?v=13"></script>
 </body>
 </html>
