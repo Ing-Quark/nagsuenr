@@ -467,12 +467,12 @@ function updateAnalyticsDashboard() {
   const donutTotal = document.getElementById('donut-total-text');
   if (donutTotal) donutTotal.textContent = total;
 
-  // 6. Demographics Table (Student | Hometown | Programme)
+  // 6. Demographics Table (Student | Level | Hometown | Programme)
   const demographicsBody = document.getElementById('list-demographics-main');
   if (demographicsBody) {
     demographicsBody.innerHTML = '';
     if (allMembers.length === 0) {
-      demographicsBody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: var(--ink-light);">No student records available</td></tr>';
+      demographicsBody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: var(--ink-light);">No student records available</td></tr>';
     } else {
       // Sort alphabetically by full name
       const sorted = [...allMembers].sort((a, b) => a.full_name.localeCompare(b.full_name));
@@ -481,6 +481,7 @@ function updateAnalyticsDashboard() {
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td>${m.full_name}</td>
+          <td>Level ${m.level}</td>
           <td>${m.hometown || 'Not specified'}</td>
           <td>${m.programme || 'Not specified'}</td>
         `;
