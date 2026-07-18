@@ -478,9 +478,14 @@ function updateAnalyticsDashboard() {
       const sorted = [...allMembers].sort((a, b) => a.full_name.localeCompare(b.full_name));
       
       sorted.forEach(m => {
+        // Normalize to Title Case
+        const cleanName = m.full_name
+          ? m.full_name.toLowerCase().split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+          : '—';
+
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td>${m.full_name}</td>
+          <td>${cleanName}</td>
           <td>Level ${m.level}</td>
           <td>${m.hometown || 'Not specified'}</td>
           <td>${m.programme || 'Not specified'}</td>
@@ -619,9 +624,14 @@ function renderMembersTable(members) {
       ? `<span class="badge badge-green btn-action-wa" onclick="toggleWhatsAppJoined('${member.id}', ${member.whatsapp_joined})">Yes ✓</span>`
       : `<span class="badge badge-grey btn-action-wa" onclick="toggleWhatsAppJoined('${member.id}', ${member.whatsapp_joined})">No</span>`;
 
+    // Normalize to Title Case
+    const cleanName = member.full_name
+      ? member.full_name.toLowerCase().split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+      : '—';
+
     row.innerHTML = `
       <td>${index + 1}</td>
-      <td style="font-weight: bold; color: var(--ink);">${escapeHTML(member.full_name)}</td>
+      <td style="font-family: var(--ui-font); font-weight: 500; color: var(--ink);">${escapeHTML(cleanName)}</td>
       <td>${genderBadge}</td>
       <td>${escapeHTML(member.programme || '—')}</td>
       <td>Level ${member.level}</td>

@@ -809,6 +809,7 @@ footer {
   border-collapse: collapse;
   text-align: left;
   font-size: 13px;
+  min-width: 1100px;
 }
 
 .members-table th {
