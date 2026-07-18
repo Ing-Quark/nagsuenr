@@ -1120,18 +1120,35 @@ function downloadCSV() {
     return;
   }
 
+  // Format YYYY-MM-DD HH:MM in Local Time
+  const formatLocalTimestamp = (isoStr) => {
+    if (!isoStr) return '';
+    try {
+      const d = new Date(isoStr);
+      if (isNaN(d.getTime())) return '';
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      const hours = String(d.getHours()).padStart(2, '0');
+      const mins = String(d.getMinutes()).padStart(2, '0');
+      return `${year}-${month}-${day} ${hours}:${mins}`;
+    } catch (e) {
+      return '';
+    }
+  };
+
   const headers = ['ID', 'Full Name', 'Gender', 'Hometown', 'Programme', 'Level', 'Phone', 'WhatsApp', 'WhatsApp Joined', 'Registered At'];
-  const rows = allMembers.map(m => [
-    m.id,
+  const rows = allMembers.map((m, index) => [
+    index + 1, // Sequential index instead of system UUID
     m.full_name,
     m.gender,
     m.hometown || '',
     m.programme || '',
     m.level,
-    m.phone,
-    m.whatsapp || '',
-    m.whatsapp_joined ? 'TRUE' : 'FALSE',
-    m.created_at ? new Date(m.created_at).toISOString() : ''
+    m.phone ? `="${m.phone}"` : '', // Force text format for Excel to prevent scientific notation
+    m.whatsapp ? `="${m.whatsapp}"` : '', // Force text format for Excel to prevent scientific notation
+    m.whatsapp_joined ? 'Yes' : 'No', // Human-readable Yes/No
+    m.created_at ? formatLocalTimestamp(m.created_at) : '' // YYYY-MM-DD HH:MM Local Time
   ]);
 
   // Convert array to CSV syntax (properly escape fields)
