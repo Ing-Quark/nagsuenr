@@ -168,20 +168,20 @@
       <div id="tab-sms" class="tab-content">
         <div class="section-header">
           <span>SMS Broadcast Panel</span>
-          <span>Arkesel API Gateway</span>
+          <span>SMS Service</span>
         </div>
 
         <p style="margin-bottom: 16px; font-size: 14px; color: var(--ink-mid);">
-          Send a bulk SMS to members via Arkesel. Messages are sent directly to their phone numbers &mdash; no WhatsApp or internet connection is required on the recipient's phone.
+          Send text announcements directly to members' phones. Recipients do not need an internet connection or WhatsApp to receive these messages.
         </p>
 
         <div class="card">
           <form id="sms-form" class="sms-broadcast-form">
             <div class="form-group">
-              <label class="form-label" for="sms-sender-id">Sender ID</label>
+              <label class="form-label" for="sms-sender-id">Sender Name (Sender ID)</label>
               <input type="text" id="sms-sender-id" class="form-input" value="NAGSUENR" max="11" required>
-              <span class="form-note">Must be an approved alpha-numeric Sender ID registered on your Arkesel account (max 11 chars).</span>
-              <span class="form-note" style="color: var(--gold); font-weight: 500; display: block; margin-top: 4px;">⚠️ Warning: Messages sent using an unregistered Sender ID will be accepted by the API but silently blocked by MTN/Telecel networks.</span>
+              <span class="form-note">The name that appears on the recipient's phone. This must be registered and approved on your Arkesel dashboard (maximum 11 characters).</span>
+              <span class="form-note" style="color: var(--gold); font-weight: 500; display: block; margin-top: 4px;">⚠️ Warning: Using a sender name that is not registered and approved will cause telecommunication networks (MTN, Telecel) to block your messages.</span>
             </div>
 
             <div class="form-group">
@@ -189,7 +189,7 @@
               <textarea id="sms-message" class="form-textarea" rows="4" placeholder="Type your announcement here..." required></textarea>
               <div class="sms-char-counter">
                 <span id="sms-chars">0 / 160 characters</span>
-                <span id="sms-units">This will use 0 SMS unit(s) per recipient</span>
+                <span id="sms-units">Uses 0 text credit(s) per recipient</span>
               </div>
             </div>
 
@@ -452,8 +452,8 @@
   </section>
 
   <!-- Scripts -->
-  <script src="config.js?v=25"></script>
-  <script src="sms.js?v=25"></script>
-  <script src="admin.js?v=25"></script>
+  <script src="config.js?v=26"></script>
+  <script src="sms.js?v=26"></script>
+  <script src="admin.js?v=26"></script>
 </body>
 </html>

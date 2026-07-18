@@ -719,7 +719,7 @@ function setupSMSBroadcast() {
       const units = len === 0 ? 0 : Math.ceil(len / 160);
       
       if (charCounter) charCounter.textContent = `${len} / 160 characters`;
-      if (unitCounter) unitCounter.textContent = `This will use ${units} SMS unit(s) per recipient`;
+      if (unitCounter) unitCounter.textContent = `Uses ${units} text credit(s) per recipient`;
     });
   }
 
