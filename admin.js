@@ -3,6 +3,54 @@
 let supabaseClient;
 let allMembers = [];
 
+// Custom Toast Notification system replacing browser alert dialogs
+const Toast = {
+  container: null,
+  init() {
+    if (!this.container) {
+      this.container = document.createElement('div');
+      this.container.className = 'toast-container';
+      document.body.appendChild(this.container);
+    }
+  },
+  show(message, type = 'info', duration = 3500) {
+    this.init();
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    const text = document.createElement('span');
+    text.textContent = message;
+    toast.appendChild(text);
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'toast-close';
+    closeBtn.innerHTML = '&times;';
+    closeBtn.addEventListener('click', () => {
+      this.removeToast(toast);
+    });
+    toast.appendChild(closeBtn);
+    this.container.appendChild(toast);
+    toast.offsetHeight; // trigger reflow
+    toast.classList.add('show');
+    const timeoutId = setTimeout(() => {
+      this.removeToast(toast);
+    }, duration);
+    toast.dataset.timeoutId = timeoutId;
+  },
+  removeToast(toast) {
+    if (toast.dataset.timeoutId) {
+      clearTimeout(parseInt(toast.dataset.timeoutId));
+    }
+    toast.classList.remove('show');
+    toast.addEventListener('transitionend', () => {
+      if (toast.parentNode) {
+        toast.parentNode.removeChild(toast);
+      }
+    });
+  },
+  success(message, duration) { this.show(message, 'success', duration); },
+  error(message, duration) { this.show(message, 'error', duration); },
+  info(message, duration) { this.show(message, 'info', duration); }
+};
+
 // Haptic & Sound Effects Utilities using Web Audio & Vibration APIs
 const HapticEffects = {
   vibrate(pattern) {
@@ -487,18 +535,18 @@ function setupSMSBroadcast() {
       const resultBox = document.getElementById('sms-result-box');
 
       if (!message) {
-        alert('Please enter a message to broadcast.');
+        Toast.error('Please enter a message to broadcast.');
         return;
       }
 
       if (!senderId) {
-        alert('Please specify a Sender ID.');
+        Toast.error('Please specify a Sender ID.');
         return;
       }
 
       const recipients = getSMSRecipients();
       if (recipients.length === 0) {
-        alert('No recipient phone numbers match your selected group.');
+        Toast.error('No recipient phone numbers match your selected group.');
         return;
       }
 
@@ -639,7 +687,7 @@ function initWhatsAppTab() {
       AudioEffects.playClick();
       HapticEffects.tap();
       navigator.clipboard.writeText(waLinkVal.value);
-      alert('WhatsApp invite link copied to clipboard!');
+      Toast.success('WhatsApp invite link copied to clipboard!');
     });
   }
 
@@ -649,7 +697,7 @@ function initWhatsAppTab() {
       AudioEffects.playClick();
       HapticEffects.tap();
       navigator.clipboard.writeText(fbLinkVal.value);
-      alert('Facebook page link copied to clipboard!');
+      Toast.success('Facebook page link copied to clipboard!');
     });
   }
 
@@ -660,11 +708,11 @@ function initWhatsAppTab() {
       const newFbLink = fbLinkInput.value.trim();
 
       if (newWaLink && !newWaLink.startsWith('http://') && !newWaLink.startsWith('https://')) {
-        alert('Please enter a valid WhatsApp URL (starting with https://).');
+        Toast.error('Please enter a valid WhatsApp URL (starting with https://).');
         return;
       }
       if (newFbLink && !newFbLink.startsWith('http://') && !newFbLink.startsWith('https://')) {
-        alert('Please enter a valid Facebook URL (starting with https://).');
+        Toast.error('Please enter a valid Facebook URL (starting with https://).');
         return;
       }
 
@@ -676,7 +724,7 @@ function initWhatsAppTab() {
 
       AudioEffects.playSuccess();
       HapticEffects.success();
-      alert('Social Media links updated successfully!');
+      Toast.success('Social Media links updated successfully!');
       generateQRCode();
     });
   }
@@ -725,7 +773,7 @@ function downloadQRCode() {
   const qrCanvas = document.querySelector('#qrcode canvas');
   
   if (!qrImg && !qrCanvas) {
-    alert('QR Code not generated yet.');
+    Toast.error('QR Code not generated yet.');
     return;
   }
 
@@ -744,7 +792,7 @@ function downloadQRCode() {
 function printQRCode() {
   const qrCanvas = document.querySelector('#qrcode canvas');
   if (!qrCanvas) {
-    alert('QR code not ready for print.');
+    Toast.error('QR code not ready for print.');
     return;
   }
 
@@ -816,7 +864,7 @@ function setupExports() {
 
 function downloadCSV() {
   if (allMembers.length === 0) {
-    alert('No member records to export.');
+    Toast.error('No member records to export.');
     return;
   }
 
@@ -876,10 +924,10 @@ Levels: 100(${lvl100}) 200(${lvl200}) 300(${lvl300}) 400(${lvl400})`;
 
   navigator.clipboard.writeText(summary)
     .then(() => {
-      alert('Summary Report copied to clipboard!');
+      Toast.success('Summary Report copied to clipboard!');
     })
     .catch(err => {
-      alert('Failed to copy report: ' + err.message);
+      Toast.error('Failed to copy report: ' + err.message);
     });
 }
 
@@ -899,7 +947,7 @@ function showError(msg) {
       errorBox.classList.remove('error');
     }, 5000);
   } else {
-    alert(msg);
+    Toast.error(msg);
   }
 }
 

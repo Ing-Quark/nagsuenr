@@ -3,6 +3,54 @@
 let supabaseClient;
 let currentRegisteredPhone = '';
 
+// Custom Toast Notification system replacing browser alert dialogs
+const Toast = {
+  container: null,
+  init() {
+    if (!this.container) {
+      this.container = document.createElement('div');
+      this.container.className = 'toast-container';
+      document.body.appendChild(this.container);
+    }
+  },
+  show(message, type = 'info', duration = 3500) {
+    this.init();
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    const text = document.createElement('span');
+    text.textContent = message;
+    toast.appendChild(text);
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'toast-close';
+    closeBtn.innerHTML = '&times;';
+    closeBtn.addEventListener('click', () => {
+      this.removeToast(toast);
+    });
+    toast.appendChild(closeBtn);
+    this.container.appendChild(toast);
+    toast.offsetHeight; // trigger reflow
+    toast.classList.add('show');
+    const timeoutId = setTimeout(() => {
+      this.removeToast(toast);
+    }, duration);
+    toast.dataset.timeoutId = timeoutId;
+  },
+  removeToast(toast) {
+    if (toast.dataset.timeoutId) {
+      clearTimeout(parseInt(toast.dataset.timeoutId));
+    }
+    toast.classList.remove('show');
+    toast.addEventListener('transitionend', () => {
+      if (toast.parentNode) {
+        toast.parentNode.removeChild(toast);
+      }
+    });
+  },
+  success(message, duration) { this.show(message, 'success', duration); },
+  error(message, duration) { this.show(message, 'error', duration); },
+  info(message, duration) { this.show(message, 'info', duration); }
+};
+
 // Haptic & Sound Effects Utilities using Web Audio & Vibration APIs
 const HapticEffects = {
   vibrate(pattern) {
