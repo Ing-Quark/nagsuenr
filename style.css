@@ -1388,13 +1388,13 @@ footer {
   font-size: 11px;
   font-weight: bold;
   width: 70px;
-  color: #ffffff;
+  color: var(--ink);
 }
 
 .bar-wrapper {
   flex-grow: 1;
   height: 14px;
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: rgba(0, 0, 0, 0.05);
   border-radius: 2px;
   overflow: hidden;
 }
@@ -1412,7 +1412,7 @@ footer {
   font-weight: bold;
   width: 30px;
   text-align: right;
-  color: var(--gold);
+  color: var(--ink);
 }
 
 .lists-split-grid {
@@ -1429,7 +1429,7 @@ footer {
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--ink-light);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
   padding-bottom: 6px;
   margin-bottom: 8px;
 }
@@ -1439,7 +1439,7 @@ footer {
   padding-left: 16px;
   font-family: var(--ui-font);
   font-size: 11px;
-  color: #ffffff;
+  color: var(--ink);
   line-height: 1.8;
 }
 
@@ -1448,7 +1448,7 @@ footer {
 }
 
 .analytics-ranking-list span {
-  color: var(--gold);
+  color: var(--ink);
   font-weight: bold;
 }
 
@@ -1546,16 +1546,13 @@ footer {
 
 .donut-svg {
   flex-shrink: 0;
-  transform: scaleX(-1); /* mirror so slices render clockwise */
 }
 
 .donut-center-text {
   font-family: var(--display-font);
   font-size: 16px;
   font-weight: bold;
-  fill: #ffffff;
-  transform: scaleX(-1);
-  transform-origin: 50% 50%;
+  fill: var(--ink);
 }
 
 .donut-center-subtext {
@@ -1565,8 +1562,6 @@ footer {
   fill: var(--ink-light);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  transform: scaleX(-1);
-  transform-origin: 50% 50%;
 }
 
 .donut-legend {
@@ -1575,7 +1570,7 @@ footer {
   gap: 8px;
   font-family: var(--ui-font);
   font-size: 11px;
-  color: #ffffff;
+  color: var(--ink);
 }
 
 .legend-item {
