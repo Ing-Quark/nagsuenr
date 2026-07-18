@@ -396,46 +396,24 @@
             </div>
           </div>
 
-          <!-- Top Hometowns & Programmes representation -->
-          <div class="card analytics-card">
-            <div class="card-title">Demographics & Study Fields</div>
-            <div class="lists-split-grid">
-              <div>
-                <h4 class="list-subheader">Top Hometowns</h4>
-                <div class="table-scroll-container">
-                  <table class="analytics-table">
-                    <thead>
-                      <tr>
-                        <th>Hometown</th>
-                        <th style="width: 80px; text-align: right;">Students</th>
-                      </tr>
-                    </thead>
-                    <tbody id="list-top-hometowns">
-                      <tr>
-                        <td colspan="2" style="text-align: center; color: var(--ink-light);">No data available</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-              <div>
-                <h4 class="list-subheader">Top Programmes</h4>
-                <div class="table-scroll-container">
-                  <table class="analytics-table">
-                    <thead>
-                      <tr>
-                        <th>Programme</th>
-                        <th style="width: 80px; text-align: right;">Students</th>
-                      </tr>
-                    </thead>
-                    <tbody id="list-top-programmes">
-                      <tr>
-                        <td colspan="2" style="text-align: center; color: var(--ink-light);">No data available</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+          <!-- Demographics & Study Fields representation -->
+          <div class="card analytics-card" style="grid-column: span 2;">
+            <div class="card-title">Demographics &amp; Study Fields</div>
+            <div class="table-scroll-container" style="max-height: 250px;">
+              <table class="analytics-table">
+                <thead>
+                  <tr>
+                    <th>Student</th>
+                    <th>Hometown</th>
+                    <th>Programme</th>
+                  </tr>
+                </thead>
+                <tbody id="list-demographics-main">
+                  <tr>
+                    <td colspan="3" style="text-align: center; color: var(--ink-light);">No student records available</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
@@ -477,8 +455,8 @@
   </section>
 
   <!-- Scripts -->
-  <script src="config.js?v=18"></script>
-  <script src="sms.js?v=18"></script>
-  <script src="admin.js?v=18"></script>
+  <script src="config.js?v=19"></script>
+  <script src="sms.js?v=19"></script>
+  <script src="admin.js?v=19"></script>
 </body>
 </html>

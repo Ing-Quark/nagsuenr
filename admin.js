@@ -467,70 +467,24 @@ function updateAnalyticsDashboard() {
   const donutTotal = document.getElementById('donut-total-text');
   if (donutTotal) donutTotal.textContent = total;
 
-  // 6. Top represented Hometowns ranking
-  const hometownCounts = {};
-  allMembers.forEach(m => {
-    const rawHometown = m.hometown || '';
-    const clean = rawHometown.trim();
-    if (clean) {
-      const key = clean.toLowerCase();
-      if (!hometownCounts[key]) {
-        hometownCounts[key] = { name: clean, count: 0 };
-      }
-      hometownCounts[key].count++;
-    }
-  });
-
-  const sortedHometowns = Object.values(hometownCounts)
-    .sort((a, b) => b.count - a.count);
-
-  const hometownList = document.getElementById('list-top-hometowns');
-  if (hometownList) {
-    hometownList.innerHTML = '';
-    if (sortedHometowns.length === 0) {
-      hometownList.innerHTML = '<tr><td colspan="2" style="text-align: center; color: var(--ink-light);">No data available</td></tr>';
+  // 6. Demographics Table (Student | Hometown | Programme)
+  const demographicsBody = document.getElementById('list-demographics-main');
+  if (demographicsBody) {
+    demographicsBody.innerHTML = '';
+    if (allMembers.length === 0) {
+      demographicsBody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: var(--ink-light);">No student records available</td></tr>';
     } else {
-      sortedHometowns.forEach(item => {
+      // Sort alphabetically by full name
+      const sorted = [...allMembers].sort((a, b) => a.full_name.localeCompare(b.full_name));
+      
+      sorted.forEach(m => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td>${item.name}</td>
-          <td style="text-align: right; font-weight: 500;">${item.count}</td>
+          <td>${m.full_name}</td>
+          <td>${m.hometown || 'Not specified'}</td>
+          <td>${m.programme || 'Not specified'}</td>
         `;
-        hometownList.appendChild(tr);
-      });
-    }
-  }
-
-  // 6. Top represented Programmes ranking
-  const programmeCounts = {};
-  allMembers.forEach(m => {
-    const rawProg = m.programme || '';
-    const clean = rawProg.trim();
-    if (clean) {
-      const key = clean.toLowerCase();
-      if (!programmeCounts[key]) {
-        programmeCounts[key] = { name: clean, count: 0 };
-      }
-      programmeCounts[key].count++;
-    }
-  });
-
-  const sortedProgrammes = Object.values(programmeCounts)
-    .sort((a, b) => b.count - a.count);
-
-  const programmeList = document.getElementById('list-top-programmes');
-  if (programmeList) {
-    programmeList.innerHTML = '';
-    if (sortedProgrammes.length === 0) {
-      programmeList.innerHTML = '<tr><td colspan="2" style="text-align: center; color: var(--ink-light);">No data available</td></tr>';
-    } else {
-      sortedProgrammes.forEach(item => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${item.name}</td>
-          <td style="text-align: right; font-weight: 500;">${item.count}</td>
-        `;
-        programmeList.appendChild(tr);
+        demographicsBody.appendChild(tr);
       });
     }
   }
