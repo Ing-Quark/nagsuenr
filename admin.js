@@ -861,24 +861,51 @@ function generateQRCode() {
 }
 
 function downloadQRCode() {
-  const qrImg = document.querySelector('#qrcode img');
   const qrCanvas = document.querySelector('#qrcode canvas');
-  
-  if (!qrImg && !qrCanvas) {
+  if (!qrCanvas) {
     Toast.error('QR Code not generated yet.');
     return;
   }
 
-  const link = document.createElement('a');
-  link.download = 'NAGS-UENR-Registration-QR.png';
+  // Create an in-memory canvas for the complete flyer sheet
+  const flyer = document.createElement('canvas');
+  flyer.width = 800;
+  flyer.height = 1000;
+  const ctx = flyer.getContext('2d');
 
-  if (qrCanvas) {
-    link.href = qrCanvas.toDataURL('image/png');
-    link.click();
-  } else if (qrImg) {
-    link.href = qrImg.src;
-    link.click();
-  }
+  // Fill Background
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, flyer.width, flyer.height);
+
+  // Draw Header Text
+  ctx.fillStyle = '#1a3f72';
+  ctx.font = 'bold 28px Arial, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('NAGS-UENR REGISTRATION PORTAL', 400, 150);
+
+  // Draw Subtitle / Instruction Text
+  ctx.fillStyle = '#555555';
+  ctx.font = '16px Arial, sans-serif';
+  ctx.fillText('Scan this QR code with your phone camera to open the portal and register instantly.', 400, 210);
+
+  // Draw border frame for the QR Code
+  ctx.strokeStyle = '#1a3f72';
+  ctx.lineWidth = 3;
+  ctx.strokeRect(230, 280, 340, 340);
+
+  // Draw the QR Code image inside the frame
+  ctx.drawImage(qrCanvas, 250, 300, 300, 300);
+
+  // Draw Footer Text
+  ctx.fillStyle = '#888888';
+  ctx.font = '12px Arial, sans-serif';
+  ctx.fillText('National Association of Gonjaland Students · UENR Chapter', 400, 850);
+
+  // Download the flyer canvas as PNG
+  const link = document.createElement('a');
+  link.download = 'NAGS-UENR-Registration-Flyer.png';
+  link.href = flyer.toDataURL('image/png');
+  link.click();
 }
 
 function printQRCode() {
