@@ -182,6 +182,7 @@
               <label class="form-label" for="sms-sender-id">Sender ID</label>
               <input type="text" id="sms-sender-id" class="form-input" value="NAGSUENR" max="11" required>
               <span class="form-note">Must be an approved alpha-numeric Sender ID registered on your Arkesel account (max 11 chars).</span>
+              <span class="form-note" style="color: var(--gold); font-weight: 500; display: block; margin-top: 4px;">⚠️ Warning: Messages sent using an unregistered Sender ID will be accepted by the API but silently blocked by MTN/Telecel networks.</span>
             </div>
 
             <div class="form-group">
@@ -342,8 +343,8 @@
   </section>
 
   <!-- Scripts -->
-  <script src="config.js?v=5"></script>
-  <script src="sms.js?v=5"></script>
-  <script src="admin.js?v=5"></script>
+  <script src="config.js?v=6"></script>
+  <script src="sms.js?v=6"></script>
+  <script src="admin.js?v=6"></script>
 </body>
 </html>

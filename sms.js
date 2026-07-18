@@ -9,21 +9,19 @@ const SMS = {
    */
   formatGhanaNumber(phone) {
     if (!phone) return '';
-    // Remove all non-digits
+    
+    // Check if original had plus, then strip non-digits
     let cleaned = phone.replace(/\D/g, '');
     
     // If it starts with 0 and has 10 digits (e.g. 0244123456), convert leading 0 to 233
     if (cleaned.startsWith('0') && cleaned.length === 10) {
-      return '233' + cleaned.substring(1);
+      cleaned = '233' + cleaned.substring(1);
+    } else if (cleaned.length === 9 && !cleaned.startsWith('0') && !cleaned.startsWith('233')) {
+      cleaned = '233' + cleaned;
     }
     
-    // If it has 9 digits and does not start with 0, prepend 233
-    if (cleaned.length === 9 && !cleaned.startsWith('0')) {
-      return '233' + cleaned;
-    }
-    
-    // If it already has international format, return as is
-    return cleaned;
+    // Return with mandatory '+' prefix for Arkesel SMS API v2 compatibility
+    return '+' + cleaned;
   },
 
   /**
