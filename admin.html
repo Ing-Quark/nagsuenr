@@ -77,8 +77,8 @@
     <nav class="tabs-nav" aria-label="Dashboard Tabs Navigation">
       <button class="tab-btn active" data-tab="members">Members</button>
       <button class="tab-btn" data-tab="sms">SMS Broadcast</button>
-      <button class="tab-btn" data-tab="whatsapp">Socials</button>
-      <button class="tab-btn" data-tab="export">Export</button>
+      <button class="tab-btn" data-tab="whatsapp">Social Links</button>
+      <button class="tab-btn" data-tab="export">Analytics & Export</button>
     </nav>
 
     <!-- Dashboard Container -->
@@ -137,8 +137,11 @@
         </div>
 
         <!-- Table Loading Indicator -->
-        <div id="table-loader" class="text-center hidden" style="padding: 20px; font-style: italic; color: #888;">
-          Fetching records from Supabase...
+        <div id="table-loader" class="text-center hidden" style="padding: 30px 10px; color: var(--ink-light); font-size: 13px;">
+          <svg class="btn-spinner" viewBox="0 0 50 50" style="width: 20px; height: 20px; color: var(--gold); margin-right: 8px; display: inline-block;">
+            <circle class="path" cx="25" cy="25" r="20" fill="none" stroke="currentColor" stroke-width="5"></circle>
+          </svg>
+          Retrieving member directory...
         </div>
 
         <!-- Table responsive box -->
@@ -301,20 +304,104 @@
       </div>
 
       <!-- TAB D: EXPORT -->
+      <!-- TAB D: ANALYTICS & REPORTS -->
       <div id="tab-export" class="tab-content">
         <div class="section-header">
-          <span>Export &amp; Statistics Reporting</span>
-          <span>Data Utilities</span>
+          <span>Association Analytics & Reports</span>
+          <span>Member Statistics</span>
         </div>
 
-        <div class="export-cards-grid">
+        <!-- Metric Summary Cards -->
+        <div class="analytics-metrics-grid">
+          <div class="metric-card">
+            <div class="metric-label">Total Registered Members</div>
+            <div id="analytics-total" class="metric-value">0</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">WhatsApp Onboarding Rate</div>
+            <div id="analytics-wa-rate" class="metric-value">0%</div>
+            <div class="progress-bar-container">
+              <div id="analytics-wa-progress" class="progress-bar" style="width: 0%;"></div>
+            </div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Gender Distribution</div>
+            <div class="gender-split-container">
+              <span id="analytics-male-pct">0% Male</span>
+              <span id="analytics-female-pct">0% Female</span>
+            </div>
+            <div class="gender-progress-bar">
+              <div id="analytics-male-bar" class="gender-bar male" style="width: 0%;"></div>
+              <div id="analytics-female-bar" class="gender-bar female" style="width: 0%;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="analytics-visuals-grid">
+          <!-- Academic Levels representation -->
+          <div class="card analytics-card">
+            <div class="card-title">Academic Level Breakdown</div>
+            <div class="level-stats-list">
+              <div class="level-stat-row">
+                <span class="level-label">Level 100</span>
+                <div class="bar-wrapper">
+                  <div id="bar-lvl-100" class="stat-bar" style="width: 0%;"></div>
+                </div>
+                <span id="val-lvl-100" class="stat-count">0</span>
+              </div>
+              <div class="level-stat-row">
+                <span class="level-label">Level 200</span>
+                <div class="bar-wrapper">
+                  <div id="bar-lvl-200" class="stat-bar" style="width: 0%;"></div>
+                </div>
+                <span id="val-lvl-200" class="stat-count">0</span>
+              </div>
+              <div class="level-stat-row">
+                <span class="level-label">Level 300</span>
+                <div class="bar-wrapper">
+                  <div id="bar-lvl-300" class="stat-bar" style="width: 0%;"></div>
+                </div>
+                <span id="val-lvl-300" class="stat-count">0</span>
+              </div>
+              <div class="level-stat-row">
+                <span class="level-label">Level 400</span>
+                <div class="bar-wrapper">
+                  <div id="bar-lvl-400" class="stat-bar" style="width: 0%;"></div>
+                </div>
+                <span id="val-lvl-400" class="stat-count">0</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Top Hometowns & Programmes representation -->
+          <div class="card analytics-card">
+            <div class="card-title">Demographics & Study Fields</div>
+            <div class="lists-split-grid">
+              <div>
+                <h4 class="list-subheader">Top Hometowns</h4>
+                <ol id="list-top-hometowns" class="analytics-ranking-list">
+                  <li>No data available</li>
+                </ol>
+              </div>
+              <div>
+                <h4 class="list-subheader">Top Programmes</h4>
+                <ol id="list-top-programmes" class="analytics-ranking-list">
+                  <li>No data available</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Export controls cards -->
+        <div class="export-cards-grid" style="margin-top: 24px;">
           <!-- CSV Card -->
           <div class="export-card">
             <div>
               <div class="export-icon" aria-hidden="true">📊</div>
-              <h3 class="export-card-title">Export to CSV</h3>
+              <h3 class="export-card-title">Export Directory</h3>
               <p class="export-card-desc">
-                Download the entire registered student database as a standard CSV spreadsheet file. Compatible with Microsoft Excel, Google Sheets, or Numbers.
+                Download the complete registered student database as a standard CSV spreadsheet file. Compatible with Microsoft Excel, Google Sheets, or Numbers.
               </p>
             </div>
             <button type="button" id="btn-export-csv" class="btn btn-green">Download CSV File</button>
@@ -343,8 +430,8 @@
   </section>
 
   <!-- Scripts -->
-  <script src="config.js?v=11"></script>
-  <script src="sms.js?v=11"></script>
-  <script src="admin.js?v=11"></script>
+  <script src="config.js?v=12"></script>
+  <script src="sms.js?v=12"></script>
+  <script src="admin.js?v=12"></script>
 </body>
 </html>

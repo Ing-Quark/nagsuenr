@@ -207,15 +207,15 @@ const Modal = {
   }
 };
 
-// Initialize Supabase
+// Initialize Database Client
 function initSupabase() {
   if (typeof CONFIG === 'undefined') {
-    showError('Config file (config.js) is missing or not loaded.');
+    showError('System Configuration Error: Configuration files are missing.');
     return;
   }
   
   if (CONFIG.SUPABASE_URL === 'https://your-project.supabase.co' || CONFIG.SUPABASE_ANON_KEY === 'your-anon-key') {
-    showError('Supabase is not configured. Please set your credentials in config.js.');
+    showError('Database Connection Offline: Please check your configuration settings.');
     return;
   }
 
@@ -223,10 +223,10 @@ function initSupabase() {
     if (window.supabase) {
       supabaseClient = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
     } else {
-      showError('Supabase library failed to load.');
+      showError('System Offline: Please verify your internet connection.');
     }
   } catch (e) {
-    showError('Failed to initialize Supabase: ' + e.message);
+    showError('Database Connection Error: Service temporarily unavailable.');
   }
 }
 
@@ -362,6 +362,138 @@ function updateStatsBar() {
   if (miniMale) miniMale.textContent = male;
   if (miniFemale) miniFemale.textContent = female;
   if (miniWA) miniWA.textContent = waJoined;
+
+  // Update dynamic visual charts and ranking analytics
+  updateAnalyticsDashboard();
+}
+
+function updateAnalyticsDashboard() {
+  const total = allMembers.length;
+  
+  // 1. Total Registered
+  const totalEl = document.getElementById('analytics-total');
+  if (totalEl) totalEl.textContent = total;
+
+  // 2. WhatsApp Onboarding
+  const waJoinedCount = allMembers.filter(m => m.whatsapp_joined).length;
+  const waRate = total ? Math.round((waJoinedCount / total) * 100) : 0;
+  const waRateEl = document.getElementById('analytics-wa-rate');
+  const waProgressEl = document.getElementById('analytics-wa-progress');
+  if (waRateEl) waRateEl.textContent = `${waRate}%`;
+  if (waProgressEl) waProgressEl.style.width = `${waRate}%`;
+
+  // 3. Gender Distribution
+  const maleCount = allMembers.filter(m => m.gender === 'Male').length;
+  const femaleCount = allMembers.filter(m => m.gender === 'Female').length;
+  const malePct = total ? Math.round((maleCount / total) * 100) : 0;
+  const femalePct = total ? Math.round((femaleCount / total) * 100) : 0;
+  
+  const malePctEl = document.getElementById('analytics-male-pct');
+  const femalePctEl = document.getElementById('analytics-female-pct');
+  const maleBar = document.getElementById('analytics-male-bar');
+  const femaleBar = document.getElementById('analytics-female-bar');
+  
+  if (malePctEl) malePctEl.textContent = `${malePct}% Male (${maleCount})`;
+  if (femalePctEl) femalePctEl.textContent = `${femalePct}% Female (${femaleCount})`;
+  if (maleBar) maleBar.style.width = `${malePct}%`;
+  if (femaleBar) femaleBar.style.width = `${femalePct}%`;
+
+  // 4. Academic Level Breakdown
+  const lvl100Count = allMembers.filter(m => m.level === '100').length;
+  const lvl200Count = allMembers.filter(m => m.level === '200').length;
+  const lvl300Count = allMembers.filter(m => m.level === '300').length;
+  const lvl400Count = allMembers.filter(m => m.level === '400').length;
+
+  const lvl100Pct = total ? Math.round((lvl100Count / total) * 100) : 0;
+  const lvl200Pct = total ? Math.round((lvl200Count / total) * 100) : 0;
+  const lvl300Pct = total ? Math.round((lvl300Count / total) * 100) : 0;
+  const lvl400Pct = total ? Math.round((lvl400Count / total) * 100) : 0;
+
+  // Set counts
+  const val100 = document.getElementById('val-lvl-100');
+  const val200 = document.getElementById('val-lvl-200');
+  const val300 = document.getElementById('val-lvl-300');
+  const val400 = document.getElementById('val-lvl-400');
+  
+  if (val100) val100.textContent = lvl100Count;
+  if (val200) val200.textContent = lvl200Count;
+  if (val300) val300.textContent = lvl300Count;
+  if (val400) val400.textContent = lvl400Count;
+
+  // Set bar widths
+  const bar100 = document.getElementById('bar-lvl-100');
+  const bar200 = document.getElementById('bar-lvl-200');
+  const bar300 = document.getElementById('bar-lvl-300');
+  const bar400 = document.getElementById('bar-lvl-400');
+  
+  if (bar100) bar100.style.width = `${lvl100Pct}%`;
+  if (bar200) bar200.style.width = `${lvl200Pct}%`;
+  if (bar300) bar300.style.width = `${lvl300Pct}%`;
+  if (bar400) bar400.style.width = `${lvl400Pct}%`;
+
+  // 5. Top represented Hometowns ranking
+  const hometownCounts = {};
+  allMembers.forEach(m => {
+    const rawHometown = m.hometown || '';
+    const clean = rawHometown.trim();
+    if (clean) {
+      const key = clean.toLowerCase();
+      if (!hometownCounts[key]) {
+        hometownCounts[key] = { name: clean, count: 0 };
+      }
+      hometownCounts[key].count++;
+    }
+  });
+
+  const sortedHometowns = Object.values(hometownCounts)
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 5);
+
+  const hometownList = document.getElementById('list-top-hometowns');
+  if (hometownList) {
+    hometownList.innerHTML = '';
+    if (sortedHometowns.length === 0) {
+      hometownList.innerHTML = '<li>No hometown data available</li>';
+    } else {
+      sortedHometowns.forEach(item => {
+        const li = document.createElement('li');
+        li.innerHTML = `${item.name} &middot; <span>${item.count}</span>`;
+        hometownList.appendChild(li);
+      });
+    }
+  }
+
+  // 6. Top represented Programmes ranking
+  const programmeCounts = {};
+  allMembers.forEach(m => {
+    const rawProg = m.programme || '';
+    const clean = rawProg.trim();
+    if (clean) {
+      const key = clean.toLowerCase();
+      if (!programmeCounts[key]) {
+        programmeCounts[key] = { name: clean, count: 0 };
+      }
+      programmeCounts[key].count++;
+    }
+  });
+
+  const sortedProgrammes = Object.values(programmeCounts)
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 5);
+
+  const programmeList = document.getElementById('list-top-programmes');
+  if (programmeList) {
+    programmeList.innerHTML = '';
+    if (sortedProgrammes.length === 0) {
+      programmeList.innerHTML = '<li>No programme data available</li>';
+    } else {
+      sortedProgrammes.forEach(item => {
+        const li = document.createElement('li');
+        li.innerHTML = `${item.name} &middot; <span>${item.count}</span>`;
+        programmeList.appendChild(li);
+      });
+    }
+  }
 }
 
 // Tab Navigation
@@ -649,9 +781,9 @@ function setupSMSBroadcast() {
                 const dataInfo = rawData.data ? JSON.stringify(rawData.data) : JSON.stringify(rawData);
                 resultBox.innerHTML = `
                   <strong>&check; Broadcast sent successfully!</strong><br>
-                  Successfully transmitted to ${recipients.length} phone numbers via Arkesel gateway.<br>
+                  Successfully transmitted to ${recipients.length} phone numbers.<br>
                   <span style="font-size: 10px; font-family: monospace; display: block; margin-top: 8px; opacity: 0.85; word-break: break-all;">
-                    Gateway Response: ${dataInfo}
+                    Network Delivery Report: ${dataInfo}
                   </span>
                 `;
                 resultBox.className = 'message-box success';
@@ -739,9 +871,15 @@ function setSMSSendingState(sending) {
   const text = document.getElementById('sms-message');
   if (!btn) return;
 
+  const spinnerHtml = `
+    <svg class="btn-spinner" viewBox="0 0 50 50">
+      <circle class="path" cx="25" cy="25" r="20" fill="none" stroke="currentColor" stroke-width="5"></circle>
+    </svg>
+  `;
+
   if (sending) {
     btn.disabled = true;
-    btn.textContent = 'Sending SMS...';
+    btn.innerHTML = spinnerHtml + 'Sending Broadcast...';
     if (text) text.disabled = true;
   } else {
     btn.disabled = false;

@@ -1275,6 +1275,263 @@ footer {
   color: var(--blue-dark);
 }
 
+/* Analytics Dashboard Styles */
+.analytics-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.metric-card {
+  background-color: var(--blue-dark);
+  border: 1px solid var(--gold);
+  border-radius: 4px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.metric-label {
+  font-family: var(--ui-font);
+  font-size: 10px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-light);
+  margin-bottom: 8px;
+}
+
+.metric-value {
+  font-family: var(--display-font);
+  font-size: 32px;
+  font-weight: bold;
+  color: var(--gold);
+  line-height: 1.2;
+}
+
+.progress-bar-container {
+  width: 100%;
+  height: 6px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  margin-top: 12px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background-color: var(--gold);
+  transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.gender-split-container {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--ui-font);
+  font-size: 11px;
+  font-weight: bold;
+  margin-top: 8px;
+  color: #ffffff;
+}
+
+.gender-progress-bar {
+  display: flex;
+  width: 100%;
+  height: 8px;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 8px;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.gender-bar {
+  height: 100%;
+  transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.gender-bar.male {
+  background-color: #1a73e8;
+}
+
+.gender-bar.female {
+  background-color: #e91e63;
+}
+
+.analytics-visuals-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.analytics-card {
+  padding: 20px;
+}
+
+.level-stats-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.level-stat-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.level-label {
+  font-family: var(--ui-font);
+  font-size: 11px;
+  font-weight: bold;
+  width: 70px;
+  color: #ffffff;
+}
+
+.bar-wrapper {
+  flex-grow: 1;
+  height: 14px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.stat-bar {
+  height: 100%;
+  background-color: var(--gold);
+  opacity: 0.85;
+  transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.stat-count {
+  font-family: var(--ui-font);
+  font-size: 11px;
+  font-weight: bold;
+  width: 30px;
+  text-align: right;
+  color: var(--gold);
+}
+
+.lists-split-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.list-subheader {
+  font-family: var(--ui-font);
+  font-size: 9px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-light);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 6px;
+  margin-bottom: 8px;
+}
+
+.analytics-ranking-list {
+  margin: 0;
+  padding-left: 16px;
+  font-family: var(--ui-font);
+  font-size: 11px;
+  color: #ffffff;
+  line-height: 1.8;
+}
+
+.analytics-ranking-list li {
+  margin-bottom: 4px;
+}
+
+.analytics-ranking-list span {
+  color: var(--gold);
+  font-weight: bold;
+}
+
+/* Modern hardware-accelerated SVG Spinner Loader */
+.btn-spinner {
+  animation: rotate 2s linear infinite;
+  width: 14px;
+  height: 14px;
+  margin-right: 8px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.btn-spinner .path {
+  stroke: currentColor;
+  stroke-linecap: round;
+  animation: dash 1.5s ease-in-out infinite;
+}
+
+@keyframes rotate {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes dash {
+  0% {
+    stroke-dasharray: 1, 150;
+    stroke-dashoffset: 0;
+  }
+  50% {
+    stroke-dasharray: 90, 150;
+    stroke-dashoffset: -35;
+  }
+  100% {
+    stroke-dasharray: 90, 150;
+    stroke-dashoffset: -124;
+  }
+}
+
+/* iOS-Style Step Sliding Transitions */
+.step-section {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.35s;
+  visibility: visible;
+  position: relative;
+  width: 100%;
+}
+
+.step-section.hidden {
+  display: block; /* override standard display: none */
+  opacity: 0;
+  transform: translate3d(40px, 0, 0);
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  visibility: hidden;
+  height: 0;
+  overflow: hidden;
+}
+
+/* iOS Tab Transitions */
+.tab-content {
+  display: block;
+  opacity: 0;
+  transform: translate3d(0, 15px, 0);
+  transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.35s;
+  visibility: hidden;
+  height: 0;
+  overflow: hidden;
+}
+
+.tab-content.active {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  visibility: visible;
+  height: auto;
+  overflow: visible;
+}
+
+
 
 
 

@@ -144,15 +144,15 @@ const AudioEffects = {
   }
 };
 
-// Initialize Supabase Client
+// Initialize Database Client
 function initSupabase() {
   if (typeof CONFIG === 'undefined') {
-    showErrorBanner('Config file (config.js) is missing or not loaded.');
+    showErrorBanner('System Configuration Error: Configuration files are missing.');
     return;
   }
   
   if (CONFIG.SUPABASE_URL === 'https://your-project.supabase.co' || CONFIG.SUPABASE_ANON_KEY === 'your-anon-key') {
-    showErrorBanner('Supabase is not configured. Please set your credentials in config.js.');
+    showErrorBanner('Database Connection Offline: Please check your configuration settings.');
     return;
   }
 
@@ -160,10 +160,10 @@ function initSupabase() {
     if (window.supabase) {
       supabaseClient = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
     } else {
-      showErrorBanner('Supabase library failed to load. Check your internet connection.');
+      showErrorBanner('System Offline: Please verify your internet connection.');
     }
   } catch (e) {
-    showErrorBanner('Failed to initialize Supabase: ' + e.message);
+    showErrorBanner('Database Connection Error: Service temporarily unavailable.');
   }
 }
 
@@ -553,24 +553,30 @@ function showLoader(show, text = 'Checking...') {
   const btn = document.getElementById('btn-continue');
   const btnConfirm = document.getElementById('btn-confirm');
   
+  const spinnerHtml = `
+    <svg class="btn-spinner" viewBox="0 0 50 50">
+      <circle class="path" cx="25" cy="25" r="20" fill="none" stroke="currentColor" stroke-width="5"></circle>
+    </svg>
+  `;
+
   if (show) {
     if (currentStep === 1 && btn) {
       btn.disabled = true;
-      btn.dataset.originalText = btn.textContent;
-      btn.textContent = text;
+      btn.dataset.originalText = btn.innerHTML;
+      btn.innerHTML = spinnerHtml + text;
     } else if (currentStep === 2 && btnConfirm) {
       btnConfirm.disabled = true;
-      btnConfirm.dataset.originalText = btnConfirm.textContent;
-      btnConfirm.textContent = text;
+      btnConfirm.dataset.originalText = btnConfirm.innerHTML;
+      btnConfirm.innerHTML = spinnerHtml + text;
     }
   } else {
     if (btn && btn.disabled) {
       btn.disabled = false;
-      btn.textContent = btn.dataset.originalText || 'Continue →';
+      btn.innerHTML = btn.dataset.originalText || 'Continue &rarr;';
     }
     if (btnConfirm && btnConfirm.disabled) {
       btnConfirm.disabled = false;
-      btnConfirm.textContent = btnConfirm.dataset.originalText || 'Confirm & Register →';
+      btnConfirm.innerHTML = btnConfirm.dataset.originalText || 'Confirm &amp; Register &rarr;';
     }
   }
 }
