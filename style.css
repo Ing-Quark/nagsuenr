@@ -1435,7 +1435,7 @@ footer {
 }
 
 .table-scroll-container {
-  max-height: 200px;
+  max-height: 210px;
   overflow-y: auto;
   border: 1px solid var(--rule);
   border-radius: 4px;
