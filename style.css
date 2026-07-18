@@ -1168,5 +1168,113 @@ footer {
   color: var(--ink);
 }
 
+/* Custom Confirmation Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(6, 12, 34, 0.85);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  opacity: 0;
+  transition: opacity 0.2s ease-out;
+}
+
+.modal-overlay.show {
+  opacity: 1;
+}
+
+.modal-box {
+  background-color: var(--blue-dark);
+  border: 1px solid var(--gold);
+  border-radius: 4px;
+  width: 90%;
+  max-width: 400px;
+  padding: 24px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  transform: scale(0.95);
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.2);
+}
+
+.modal-overlay.show .modal-box {
+  transform: scale(1);
+}
+
+.modal-title {
+  font-family: var(--display-font);
+  color: var(--gold);
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.modal-message {
+  font-family: var(--ui-font);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 13px;
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.modal-btn {
+  padding: 8px 16px;
+  font-family: var(--ui-font);
+  font-size: 10px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.modal-btn-cancel {
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.modal-btn-cancel:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+  color: #ffffff;
+}
+
+.modal-btn-confirm {
+  background-color: #c62828;
+  border: 1px solid #c62828;
+  color: #ffffff;
+}
+
+.modal-btn-confirm:hover {
+  background-color: #b71c1c;
+  border-color: #b71c1c;
+}
+
+.modal-btn-primary {
+  background-color: var(--gold);
+  border: 1px solid var(--gold);
+  color: var(--blue-dark);
+}
+
+.modal-btn-primary:hover {
+  background-color: #e0ac1c;
+  border-color: #e0ac1c;
+  color: var(--blue-dark);
+}
+
+
 
 

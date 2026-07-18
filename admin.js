@@ -144,6 +144,69 @@ const AudioEffects = {
   }
 };
 
+// Custom Confirmation Modal replacing native confirm dialogs
+const Modal = {
+  confirm(title, message, onConfirm, isDestructive = true) {
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+
+    const box = document.createElement('div');
+    box.className = 'modal-box';
+
+    const titleEl = document.createElement('div');
+    titleEl.className = 'modal-title';
+    titleEl.textContent = title;
+    box.appendChild(titleEl);
+
+    const msgEl = document.createElement('div');
+    msgEl.className = 'modal-message';
+    msgEl.textContent = message;
+    box.appendChild(msgEl);
+
+    const btnContainer = document.createElement('div');
+    btnContainer.className = 'modal-buttons';
+
+    const cancelBtn = document.createElement('button');
+    cancelBtn.className = 'modal-btn modal-btn-cancel';
+    cancelBtn.textContent = 'Cancel';
+
+    const confirmBtn = document.createElement('button');
+    confirmBtn.className = `modal-btn ${isDestructive ? 'modal-btn-confirm' : 'modal-btn-primary'}`;
+    confirmBtn.textContent = 'Confirm';
+
+    btnContainer.appendChild(cancelBtn);
+    btnContainer.appendChild(confirmBtn);
+    box.appendChild(btnContainer);
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
+
+    overlay.offsetHeight; // trigger reflow
+    overlay.classList.add('show');
+
+    cancelBtn.addEventListener('click', () => {
+      AudioEffects.playClick();
+      HapticEffects.tap();
+      this.close(overlay);
+    });
+
+    confirmBtn.addEventListener('click', () => {
+      AudioEffects.playClick();
+      HapticEffects.tap();
+      this.close(overlay);
+      if (onConfirm) onConfirm();
+    });
+  },
+
+  close(overlay) {
+    overlay.classList.remove('show');
+    overlay.addEventListener('transitionend', () => {
+      if (overlay.parentNode) {
+        overlay.parentNode.removeChild(overlay);
+      }
+    });
+  }
+};
+
 // Initialize Supabase
 function initSupabase() {
   if (typeof CONFIG === 'undefined') {
@@ -481,28 +544,33 @@ async function deleteMember(id, name) {
 
   AudioEffects.playClick();
   HapticEffects.tap();
-  if (confirm(`Are you sure you want to delete member: "${name}"? This action cannot be undone.`)) {
-    try {
-      const { error } = await supabaseClient
-        .from('nags_members')
-        .delete()
-        .eq('id', id);
+  Modal.confirm(
+    'Delete Member',
+    `Are you sure you want to delete member: "${name}"? This action cannot be undone.`,
+    async () => {
+      try {
+        const { error } = await supabaseClient
+          .from('nags_members')
+          .delete()
+          .eq('id', id);
 
-      if (error) {
-        showError('Failed to delete member: ' + error.message);
-      } else {
-        // Remove locally
-        AudioEffects.playSuccess();
-        HapticEffects.success();
-        allMembers = allMembers.filter(m => m.id !== id);
-        updateStatsBar();
-        updateSMSRecipientCounts();
-        applyFilters();
+        if (error) {
+          showError('Failed to delete member: ' + error.message);
+        } else {
+          // Remove locally
+          AudioEffects.playSuccess();
+          HapticEffects.success();
+          allMembers = allMembers.filter(m => m.id !== id);
+          updateStatsBar();
+          updateSMSRecipientCounts();
+          applyFilters();
+        }
+      } catch (err) {
+        showError('Error deleting member: ' + err.message);
       }
-    } catch (err) {
-      showError('Error deleting member: ' + err.message);
-    }
-  }
+    },
+    true
+  );
 }
 
 // TAB B: SMS BROADCAST
@@ -562,37 +630,42 @@ function setupSMSBroadcast() {
       }
 
       const confirmMsg = `Send SMS broadcast via Arkesel to ${recipients.length} members using Sender ID "${senderId}"?`;
-      if (!confirm(confirmMsg)) return;
+      Modal.confirm(
+        'Confirm Broadcast',
+        confirmMsg,
+        async () => {
+          setSMSSendingState(true);
+          if (resultBox) resultBox.style.display = 'none';
 
-      setSMSSendingState(true);
-      if (resultBox) resultBox.style.display = 'none';
+          try {
+            const res = await SMS.sendSMS(recipients, message, senderId);
+            setSMSSendingState(false);
 
-      try {
-        const res = await SMS.sendSMS(recipients, message, senderId);
-        setSMSSendingState(false);
-
-        if (res.success) {
-          AudioEffects.playSuccess();
-          HapticEffects.success();
-          if (resultBox) {
-            resultBox.innerHTML = `<strong>&check; Broadcast sent successfully!</strong><br>Successfully transmitted to ${recipients.length} phone numbers via Arkesel gateway.`;
-            resultBox.className = 'message-box success';
-            resultBox.style.display = 'block';
-            smsTextarea.value = '';
-            if (charCounter) charCounter.textContent = '0 / 160 characters';
-            if (unitCounter) unitCounter.textContent = 'This will use 0 SMS unit(s) per recipient';
+            if (res.success) {
+              AudioEffects.playSuccess();
+              HapticEffects.success();
+              if (resultBox) {
+                resultBox.innerHTML = `<strong>&check; Broadcast sent successfully!</strong><br>Successfully transmitted to ${recipients.length} phone numbers via Arkesel gateway.`;
+                resultBox.className = 'message-box success';
+                resultBox.style.display = 'block';
+                smsTextarea.value = '';
+                if (charCounter) charCounter.textContent = '0 / 160 characters';
+                if (unitCounter) unitCounter.textContent = 'This will use 0 SMS unit(s) per recipient';
+              }
+            }
+          } catch (err) {
+            setSMSSendingState(false);
+            AudioEffects.playError();
+            HapticEffects.error();
+            if (resultBox) {
+              resultBox.innerHTML = `<strong>&times; Broadcast Failed:</strong><br>${err.message}`;
+              resultBox.className = 'message-box error';
+              resultBox.style.display = 'block';
+            }
           }
-        }
-      } catch (err) {
-        setSMSSendingState(false);
-        AudioEffects.playError();
-        HapticEffects.error();
-        if (resultBox) {
-          resultBox.innerHTML = `<strong>&times; Broadcast Failed:</strong><br>${err.message}`;
-          resultBox.className = 'message-box error';
-          resultBox.style.display = 'block';
-        }
-      }
+        },
+        false // not destructive, use primary gold theme button
+      );
     });
   }
 }
