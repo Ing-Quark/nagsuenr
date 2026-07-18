@@ -57,6 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setupGenderToggles();
   setupPhoneSync();
   setupNavigation();
+  loadAutocompleteData();
 });
 
 // Gender Toggles (Male/Female buttons)
@@ -373,4 +374,46 @@ function showLoader(show, text = 'Checking...') {
       btnConfirm.textContent = btnConfirm.dataset.originalText || 'Confirm & Register →';
     }
   }
+}
+
+// Dynamic Autocomplete Loader from Supabase
+async function loadAutocompleteData() {
+  if (!supabaseClient) return;
+  
+  try {
+    const { data, error } = await supabaseClient
+      .from('nags_members')
+      .select('hometown, programme');
+
+    if (error) {
+      console.warn('Failed to load dynamic autocomplete suggestions:', error.message);
+      return;
+    }
+
+    if (data && data.length > 0) {
+      const uniqueHometowns = [...new Set(data.map(item => item.hometown).filter(Boolean))];
+      const uniqueProgrammes = [...new Set(data.map(item => item.programme).filter(Boolean))];
+
+      updateDatalist('hometown-list', uniqueHometowns);
+      updateDatalist('programme-list', uniqueProgrammes);
+    }
+  } catch (err) {
+    console.warn('Error loading dynamic autocomplete suggestions:', err);
+  }
+}
+
+function updateDatalist(listId, values) {
+  const datalist = document.getElementById(listId);
+  if (!datalist) return;
+
+  const existingOptions = new Set(Array.from(datalist.options).map(opt => opt.value.toLowerCase().trim()));
+
+  values.forEach(val => {
+    const trimmedVal = val.trim();
+    if (trimmedVal && !existingOptions.has(trimmedVal.toLowerCase())) {
+      const option = document.createElement('option');
+      option.value = trimmedVal;
+      datalist.appendChild(option);
+    }
+  });
 }
