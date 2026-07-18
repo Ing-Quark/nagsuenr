@@ -922,8 +922,8 @@ function printQRCode() {
         </style>
       </head>
       <body onload="window.print(); window.close();">
-        <h1>NAGS-UENR Official WhatsApp Group</h1>
-        <p>Scan this QR code with your phone camera or WhatsApp scan feature to join the group instantly.</p>
+        <h1>NAGS-UENR Registration Portal</h1>
+        <p>Scan this QR code with your phone camera to open the portal and register instantly.</p>
         <div class="qr-box">
           <img src="${dataUrl}" width="250" height="250" />
         </div>
