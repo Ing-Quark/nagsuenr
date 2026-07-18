@@ -198,7 +198,64 @@ document.addEventListener('DOMContentLoaded', () => {
   setupGenderToggles();
   setupPhoneSync();
   setupNavigation();
+  setupAdminPortalEasterEgg();
 });
+
+// Easter Egg shortcut to Admin Portal: Triple-tap or Long-press the site logo
+function setupAdminPortalEasterEgg() {
+  const logo = document.getElementById('logo-container');
+  if (!logo) return;
+
+  // 1. Triple tap listener (taps within 600ms)
+  let logoClickCount = 0;
+  let logoClickTimeout;
+  logo.addEventListener('click', () => {
+    logoClickCount++;
+    clearTimeout(logoClickTimeout);
+    logoClickTimeout = setTimeout(() => {
+      logoClickCount = 0;
+    }, 600);
+
+    if (logoClickCount === 3) {
+      logoClickCount = 0;
+      if (window.navigator && window.navigator.vibrate) {
+        window.navigator.vibrate([80, 50, 80]); // Triple haptic vibration
+      }
+      window.location.href = '/admin';
+    }
+  });
+
+  // 2. Long press listener (1.5 seconds hold)
+  let logoPressTimer;
+  const startPress = () => {
+    logoPressTimer = setTimeout(() => {
+      if (window.navigator && window.navigator.vibrate) {
+        window.navigator.vibrate(120); // Single long vibration confirmation
+      }
+      window.location.href = '/admin';
+    }, 1500);
+  };
+  const endPress = () => {
+    clearTimeout(logoPressTimer);
+  };
+
+  // Mouse holds
+  logo.addEventListener('mousedown', startPress);
+  logo.addEventListener('mouseup', endPress);
+  logo.addEventListener('mouseleave', endPress);
+
+  // Touch holds (mobile)
+  logo.addEventListener('touchstart', startPress, { passive: true });
+  logo.addEventListener('touchend', endPress, { passive: true });
+  logo.addEventListener('touchcancel', endPress, { passive: true });
+
+  // Disable dragging on the logo image to prevent hold interference
+  const logoImg = logo.querySelector('img');
+  if (logoImg) {
+    logoImg.setAttribute('draggable', 'false');
+  }
+  logo.style.cursor = 'pointer';
+}
 
 // Gender Toggles (Male/Female buttons)
 function setupGenderToggles() {
