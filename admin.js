@@ -3,6 +3,99 @@
 let supabaseClient;
 let allMembers = [];
 
+// Haptic & Sound Effects Utilities using Web Audio & Vibration APIs
+const HapticEffects = {
+  vibrate(pattern) {
+    if (navigator.vibrate) {
+      try {
+        navigator.vibrate(pattern);
+      } catch (e) {
+        console.log('Haptic vibration failed:', e);
+      }
+    }
+  },
+  tap() {
+    this.vibrate(15);
+  },
+  success() {
+    this.vibrate([20, 50, 40]);
+  },
+  error() {
+    this.vibrate([60, 50, 60]);
+  }
+};
+
+const AudioEffects = {
+  ctx: null,
+  init() {
+    if (!this.ctx) {
+      this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+  },
+  playClick() {
+    try {
+      this.init();
+      if (this.ctx.state === 'suspended') this.ctx.resume();
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      
+      osc.frequency.setValueAtTime(600, this.ctx.currentTime);
+      gain.gain.setValueAtTime(0.08, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.05);
+      
+      osc.start();
+      osc.stop(this.ctx.currentTime + 0.05);
+    } catch (e) {
+      console.log('Audio click error:', e);
+    }
+  },
+  playSuccess() {
+    try {
+      this.init();
+      if (this.ctx.state === 'suspended') this.ctx.resume();
+      const now = this.ctx.currentTime;
+      const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6 (Ascending arpeggio)
+      notes.forEach((freq, idx) => {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        
+        osc.frequency.setValueAtTime(freq, now + idx * 0.07);
+        gain.gain.setValueAtTime(0.06, now + idx * 0.07);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.07 + 0.2);
+        
+        osc.start(now + idx * 0.07);
+        osc.stop(now + idx * 0.07 + 0.2);
+      });
+    } catch (e) {
+      console.log('Audio success error:', e);
+    }
+  },
+  playError() {
+    try {
+      this.init();
+      if (this.ctx.state === 'suspended') this.ctx.resume();
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      
+      osc.frequency.setValueAtTime(150, this.ctx.currentTime);
+      gain.gain.setValueAtTime(0.12, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.25);
+      
+      osc.start();
+      osc.stop(this.ctx.currentTime + 0.25);
+    } catch (e) {
+      console.log('Audio error error:', e);
+    }
+  }
+};
+
 // Initialize Supabase
 function initSupabase() {
   if (typeof CONFIG === 'undefined') {
@@ -53,10 +146,14 @@ function setupLogin() {
     const password = passwordInput.value;
     if (password === CONFIG.ADMIN_PASSWORD) {
       sessionStorage.setItem('nags_admin_logged_in', 'true');
+      AudioEffects.playSuccess();
+      HapticEffects.success();
       if (errorMsg) errorMsg.classList.add('hidden');
       passwordInput.value = '';
       checkAuth();
     } else {
+      AudioEffects.playError();
+      HapticEffects.error();
       if (errorMsg) {
         errorMsg.textContent = 'Incorrect password.';
         errorMsg.classList.remove('hidden');
@@ -80,6 +177,8 @@ function setupLogin() {
   const logoutBtn = document.getElementById('btn-logout');
   if (logoutBtn) {
     logoutBtn.addEventListener('click', () => {
+      AudioEffects.playClick();
+      HapticEffects.tap();
       sessionStorage.removeItem('nags_admin_logged_in');
       checkAuth();
     });
@@ -148,6 +247,8 @@ function setupTabs() {
   const tabs = document.querySelectorAll('.tab-btn');
   tabs.forEach(tab => {
     tab.addEventListener('click', () => {
+      AudioEffects.playClick();
+      HapticEffects.tap();
       // Deactivate all
       document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
       document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
@@ -291,6 +392,8 @@ function renderMembersTable(members) {
 async function toggleWhatsAppJoined(id, currentStatus) {
   if (!supabaseClient) return;
 
+  AudioEffects.playClick();
+  HapticEffects.tap();
   try {
     const { error } = await supabaseClient
       .from('nags_members')
@@ -317,6 +420,8 @@ async function toggleWhatsAppJoined(id, currentStatus) {
 async function deleteMember(id, name) {
   if (!supabaseClient) return;
 
+  AudioEffects.playClick();
+  HapticEffects.tap();
   if (confirm(`Are you sure you want to delete member: "${name}"? This action cannot be undone.`)) {
     try {
       const { error } = await supabaseClient
@@ -328,6 +433,8 @@ async function deleteMember(id, name) {
         showError('Failed to delete member: ' + error.message);
       } else {
         // Remove locally
+        AudioEffects.playSuccess();
+        HapticEffects.success();
         allMembers = allMembers.filter(m => m.id !== id);
         updateStatsBar();
         updateSMSRecipientCounts();
@@ -406,6 +513,8 @@ function setupSMSBroadcast() {
         setSMSSendingState(false);
 
         if (res.success) {
+          AudioEffects.playSuccess();
+          HapticEffects.success();
           if (resultBox) {
             resultBox.innerHTML = `<strong>&check; Broadcast sent successfully!</strong><br>Successfully transmitted to ${recipients.length} phone numbers via Arkesel gateway.`;
             resultBox.className = 'message-box success';
@@ -417,6 +526,8 @@ function setupSMSBroadcast() {
         }
       } catch (err) {
         setSMSSendingState(false);
+        AudioEffects.playError();
+        HapticEffects.error();
         if (resultBox) {
           resultBox.innerHTML = `<strong>&times; Broadcast Failed:</strong><br>${err.message}`;
           resultBox.className = 'message-box error';
@@ -525,6 +636,8 @@ function initWhatsAppTab() {
   // Copy WhatsApp link handler
   if (waCopyBtn) {
     waCopyBtn.addEventListener('click', () => {
+      AudioEffects.playClick();
+      HapticEffects.tap();
       navigator.clipboard.writeText(waLinkVal.value);
       alert('WhatsApp invite link copied to clipboard!');
     });
@@ -533,6 +646,8 @@ function initWhatsAppTab() {
   // Copy Facebook link handler
   if (fbCopyBtn) {
     fbCopyBtn.addEventListener('click', () => {
+      AudioEffects.playClick();
+      HapticEffects.tap();
       navigator.clipboard.writeText(fbLinkVal.value);
       alert('Facebook page link copied to clipboard!');
     });
@@ -559,6 +674,8 @@ function initWhatsAppTab() {
       if (waLinkVal) waLinkVal.value = newWaLink;
       if (fbLinkVal) fbLinkVal.value = newFbLink;
 
+      AudioEffects.playSuccess();
+      HapticEffects.success();
       alert('Social Media links updated successfully!');
       generateQRCode();
     });
@@ -768,6 +885,8 @@ Levels: 100(${lvl100}) 200(${lvl200}) 300(${lvl300}) 400(${lvl400})`;
 
 // Utility functions
 function showError(msg) {
+  AudioEffects.playError();
+  HapticEffects.error();
   const errorBox = document.getElementById('admin-error-box');
   if (errorBox) {
     errorBox.textContent = msg;

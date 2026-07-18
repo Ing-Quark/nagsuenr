@@ -3,6 +3,99 @@
 let supabaseClient;
 let currentRegisteredPhone = '';
 
+// Haptic & Sound Effects Utilities using Web Audio & Vibration APIs
+const HapticEffects = {
+  vibrate(pattern) {
+    if (navigator.vibrate) {
+      try {
+        navigator.vibrate(pattern);
+      } catch (e) {
+        console.log('Haptic vibration failed:', e);
+      }
+    }
+  },
+  tap() {
+    this.vibrate(15);
+  },
+  success() {
+    this.vibrate([20, 50, 40]);
+  },
+  error() {
+    this.vibrate([60, 50, 60]);
+  }
+};
+
+const AudioEffects = {
+  ctx: null,
+  init() {
+    if (!this.ctx) {
+      this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+  },
+  playClick() {
+    try {
+      this.init();
+      if (this.ctx.state === 'suspended') this.ctx.resume();
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      
+      osc.frequency.setValueAtTime(600, this.ctx.currentTime);
+      gain.gain.setValueAtTime(0.08, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.05);
+      
+      osc.start();
+      osc.stop(this.ctx.currentTime + 0.05);
+    } catch (e) {
+      console.log('Audio click error:', e);
+    }
+  },
+  playSuccess() {
+    try {
+      this.init();
+      if (this.ctx.state === 'suspended') this.ctx.resume();
+      const now = this.ctx.currentTime;
+      const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6 (Ascending arpeggio)
+      notes.forEach((freq, idx) => {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        
+        osc.frequency.setValueAtTime(freq, now + idx * 0.07);
+        gain.gain.setValueAtTime(0.06, now + idx * 0.07);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.07 + 0.2);
+        
+        osc.start(now + idx * 0.07);
+        osc.stop(now + idx * 0.07 + 0.2);
+      });
+    } catch (e) {
+      console.log('Audio success error:', e);
+    }
+  },
+  playError() {
+    try {
+      this.init();
+      if (this.ctx.state === 'suspended') this.ctx.resume();
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      
+      osc.frequency.setValueAtTime(150, this.ctx.currentTime);
+      gain.gain.setValueAtTime(0.12, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.25);
+      
+      osc.start();
+      osc.stop(this.ctx.currentTime + 0.25);
+    } catch (e) {
+      console.log('Audio error error:', e);
+    }
+  }
+};
+
 // Initialize Supabase Client
 function initSupabase() {
   if (typeof CONFIG === 'undefined') {
@@ -67,6 +160,8 @@ function setupGenderToggles() {
 
   if (maleBtn && femaleBtn) {
     maleBtn.addEventListener('click', () => {
+      AudioEffects.playClick();
+      HapticEffects.tap();
       selectedGender = 'Male';
       genderInput.value = 'Male';
       maleBtn.classList.add('selected-male');
@@ -75,6 +170,8 @@ function setupGenderToggles() {
     });
 
     femaleBtn.addEventListener('click', () => {
+      AudioEffects.playClick();
+      HapticEffects.tap();
       selectedGender = 'Female';
       genderInput.value = 'Female';
       femaleBtn.classList.add('selected-female');
@@ -114,6 +211,8 @@ function setupNavigation() {
     btnContinue.addEventListener('click', async () => {
       const isValid = await validateStep1();
       if (isValid) {
+        AudioEffects.playClick();
+        HapticEffects.tap();
         goToStep(2);
       }
     });
@@ -121,6 +220,8 @@ function setupNavigation() {
 
   if (btnEdit) {
     btnEdit.addEventListener('click', () => {
+      AudioEffects.playClick();
+      HapticEffects.tap();
       goToStep(1);
     });
   }
@@ -133,6 +234,8 @@ function setupNavigation() {
 
   if (btnJoinWhatsapp) {
     btnJoinWhatsapp.addEventListener('click', async () => {
+      AudioEffects.playClick();
+      HapticEffects.tap();
       const inviteLink = localStorage.getItem('whatsapp_invite_link') || CONFIG.WHATSAPP_INVITE_LINK;
       window.open(inviteLink, '_blank');
       
@@ -153,6 +256,8 @@ function setupNavigation() {
   const btnVisitFacebook = document.getElementById('btn-visit-facebook');
   if (btnVisitFacebook) {
     btnVisitFacebook.addEventListener('click', () => {
+      AudioEffects.playClick();
+      HapticEffects.tap();
       const fbLink = localStorage.getItem('facebook_link') || CONFIG.FACEBOOK_LINK;
       window.open(fbLink, '_blank');
     });
@@ -323,6 +428,8 @@ async function registerMember() {
       showFormError('Registration failed: ' + error.message);
     } else {
       currentRegisteredPhone = phone;
+      AudioEffects.playSuccess();
+      HapticEffects.success();
       goToStep(3);
     }
   } catch (err) {
@@ -334,6 +441,8 @@ async function registerMember() {
 
 // Utility UI Functions
 function showFormError(msg) {
+  AudioEffects.playError();
+  HapticEffects.error();
   const errorBox = document.getElementById('form-error-box');
   if (errorBox) {
     errorBox.textContent = msg;
