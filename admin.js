@@ -1120,6 +1120,17 @@ function downloadCSV() {
     return;
   }
 
+  // Escape special XML characters helper
+  const escapeXML = (val) => {
+    if (val === null || val === undefined) return '';
+    return String(val)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&apos;');
+  };
+
   // Format YYYY-MM-DD HH:MM in Local Time
   const formatLocalTimestamp = (isoStr) => {
     if (!isoStr) return '';
@@ -1137,39 +1148,167 @@ function downloadCSV() {
     }
   };
 
-  const headers = ['ID', 'Full Name', 'Gender', 'Hometown', 'Programme', 'Level', 'Phone', 'WhatsApp', 'WhatsApp Joined', 'Registered At'];
+  const headers = [
+    'ID', 
+    'Full Name', 
+    'Gender', 
+    'Hometown', 
+    'Programme', 
+    'Level', 
+    'Phone', 
+    'WhatsApp Number', 
+    'Has WhatsApp', 
+    'Registered At'
+  ];
+
   const rows = allMembers.map((m, index) => [
-    index + 1, // Sequential index instead of system UUID
-    m.full_name,
-    m.gender,
+    String(index + 1), // ID
+    m.full_name || '',
+    m.gender || '',
     m.hometown || '',
     m.programme || '',
-    m.level,
-    m.phone ? `="${m.phone}"` : '', // Force text format for Excel to prevent scientific notation
-    m.whatsapp ? `="${m.whatsapp}"` : '', // Force text format for Excel to prevent scientific notation
+    `Level ${m.level}`,
+    m.phone || '',
+    m.whatsapp || '',
     m.whatsapp_joined ? 'Yes' : 'No', // Human-readable Yes/No
     m.created_at ? formatLocalTimestamp(m.created_at) : '' // YYYY-MM-DD HH:MM Local Time
   ]);
 
-  // Convert array to CSV syntax (properly escape fields)
-  let csvContent = "data:text/csv;charset=utf-8,";
-  csvContent += headers.map(h => `"${escapeCSVField(h)}"`).join(',') + '\r\n';
-  
-  rows.forEach(r => {
-    csvContent += r.map(field => `"${escapeCSVField(field)}"`).join(',') + '\r\n';
+  // Calculate dynamic column widths (character length * 6 + 25 padding, min 50)
+  const colWidths = headers.map((header, colIndex) => {
+    let maxLength = header.length;
+    rows.forEach(row => {
+      const cellVal = String(row[colIndex] || '');
+      if (cellVal.length > maxLength) {
+        maxLength = cellVal.length;
+      }
+    });
+    return Math.max(50, maxLength * 6 + 25);
   });
 
-  const encodedUri = encodeURI(csvContent);
+  // Alignments config: center or left
+  const alignments = [
+    'Center', // ID
+    'Left',   // Full Name
+    'Center', // Gender
+    'Left',   // Hometown
+    'Left',   // Programme
+    'Center', // Level
+    'Center', // Phone
+    'Center', // WhatsApp Number
+    'Center', // Has WhatsApp
+    'Center'  // Registered At
+  ];
+
+  // XML Spreadsheet 2003 Content
+  let xml = `<?xml version="1.0"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:o="urn:schemas-microsoft-com:office:office"
+ xmlns:x="urn:schemas-microsoft-com:office:excel"
+ xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:html="http://www.w3.org/TR/REC-html40">
+  <Styles>
+    <Style ss:ID="Default" ss:Name="Normal">
+      <Alignment ss:Vertical="Center"/>
+      <Borders/>
+      <Font ss:FontName="Calibri" x:CharSet="1" x:Family="Swiss" ss:Size="11" ss:Color="#000000"/>
+      <Interior/>
+      <NumberFormat/>
+      <Protection/>
+    </Style>
+    <Style ss:ID="Header">
+      <Font ss:FontName="Calibri" ss:Size="11" ss:Bold="1" ss:Color="#000000"/>
+      <Interior ss:Color="#EAEAEA" ss:Pattern="Solid"/>
+      <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+      <Borders>
+        <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#B0B0B0"/>
+        <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#B0B0B0"/>
+        <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#B0B0B0"/>
+        <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#B0B0B0"/>
+      </Borders>
+    </Style>
+    <Style ss:ID="AlignLeft">
+      <Alignment ss:Horizontal="Left" ss:Vertical="Center"/>
+      <Borders>
+        <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#DCDCDC"/>
+        <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#DCDCDC"/>
+        <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#DCDCDC"/>
+        <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#DCDCDC"/>
+      </Borders>
+    </Style>
+    <Style ss:ID="AlignCenter">
+      <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+      <Borders>
+        <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#DCDCDC"/>
+        <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#DCDCDC"/>
+        <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#DCDCDC"/>
+        <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#DCDCDC"/>
+      </Borders>
+    </Style>
+    <Style ss:ID="PhoneText">
+      <NumberFormat ss:Format="@"/>
+      <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+      <Borders>
+        <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#DCDCDC"/>
+        <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#DCDCDC"/>
+        <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#DCDCDC"/>
+        <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#DCDCDC"/>
+      </Borders>
+    </Style>
+  </Styles>
+  <Worksheet ss:Name="Members Directory">
+    <Table>
+`;
+
+  // Write Column Widths
+  colWidths.forEach(w => {
+    xml += `      <Column ss:Width="${w}" />\n`;
+  });
+
+  // Write Header Row
+  xml += `      <Row ss:Height="22">\n`;
+  headers.forEach(h => {
+    xml += `        <Cell ss:StyleID="Header"><Data ss:Type="String">${escapeXML(h)}</Data></Cell>\n`;
+  });
+  xml += `      </Row>\n`;
+
+  // Write Data Rows
+  rows.forEach(r => {
+    xml += `      <Row ss:Height="18">\n`;
+    r.forEach((field, colIndex) => {
+      let styleID = alignments[colIndex] === 'Left' ? 'AlignLeft' : 'AlignCenter';
+      if (colIndex === 6 || colIndex === 7) {
+        styleID = 'PhoneText'; // explicit Excel text format to preserve numbers/leading zero
+      }
+      
+      const cleanVal = escapeXML(field);
+      xml += `        <Cell ss:StyleID="${styleID}"><Data ss:Type="String">${cleanVal}</Data></Cell>\n`;
+    });
+    xml += `      </Row>\n`;
+  });
+
+  xml += `    </Table>
+    <WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">
+      <Selected/>
+      <DisplayGridlines/>
+    </WorksheetOptions>
+  </Worksheet>
+</Workbook>`;
+
+  const blob = new Blob([xml], { type: 'application/vnd.ms-excel;charset=utf-8' });
+  const today = new Date().toISOString().split('T')[0];
   const link = document.createElement('a');
   
-  // Format Date for filename
-  const today = new Date().toISOString().split('T')[0];
-  link.setAttribute('href', encodedUri);
-  link.setAttribute('download', `NAGS-UENR-Members-${today}.csv`);
-  document.body.appendChild(link);
-  
-  link.click();
-  document.body.removeChild(link);
+  if (window.navigator.msSaveOrOpenBlob) {
+    window.navigator.msSaveOrOpenBlob(blob, `NAGS-UENR-Members-${today}.xls`);
+  } else {
+    link.href = URL.createObjectURL(blob);
+    link.setAttribute('download', `NAGS-UENR-Members-${today}.xls`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
 }
 
 function copySummaryText() {
