@@ -1435,21 +1435,40 @@ footer {
 }
 
 .analytics-ranking-list {
+  list-style: none;
+  padding: 0;
   margin: 0;
-  padding-left: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ranking-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px;
+  background-color: rgba(0, 0, 0, 0.02);
+  border-radius: 4px;
   font-family: var(--ui-font);
   font-size: 11px;
   color: var(--ink);
-  line-height: 1.8;
+  border: 1px solid rgba(0, 0, 0, 0.04);
 }
 
-.analytics-ranking-list li {
-  margin-bottom: 4px;
+.ranking-name {
+  font-weight: 600;
 }
 
-.analytics-ranking-list span {
-  color: var(--ink);
+.ranking-badge {
+  font-size: 9px;
   font-weight: bold;
+  background-color: var(--blue-dark);
+  color: var(--gold);
+  padding: 2px 8px;
+  border-radius: 10px;
+  border: 1px solid var(--gold);
+  flex-shrink: 0;
 }
 
 /* Modern hardware-accelerated SVG Spinner Loader */

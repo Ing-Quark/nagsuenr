@@ -489,11 +489,15 @@ function updateAnalyticsDashboard() {
   if (hometownList) {
     hometownList.innerHTML = '';
     if (sortedHometowns.length === 0) {
-      hometownList.innerHTML = '<li>No hometown data available</li>';
+      hometownList.innerHTML = '<li class="ranking-item">No hometown data available</li>';
     } else {
       sortedHometowns.forEach(item => {
         const li = document.createElement('li');
-        li.innerHTML = `${item.name} &middot; <span>${item.count}</span>`;
+        li.className = 'ranking-item';
+        li.innerHTML = `
+          <span class="ranking-name">${item.name}</span>
+          <span class="ranking-badge">${item.count} ${item.count === 1 ? 'student' : 'students'}</span>
+        `;
         hometownList.appendChild(li);
       });
     }
@@ -521,11 +525,15 @@ function updateAnalyticsDashboard() {
   if (programmeList) {
     programmeList.innerHTML = '';
     if (sortedProgrammes.length === 0) {
-      programmeList.innerHTML = '<li>No programme data available</li>';
+      programmeList.innerHTML = '<li class="ranking-item">No programme data available</li>';
     } else {
       sortedProgrammes.forEach(item => {
         const li = document.createElement('li');
-        li.innerHTML = `${item.name} &middot; <span>${item.count}</span>`;
+        li.className = 'ranking-item';
+        li.innerHTML = `
+          <span class="ranking-name">${item.name}</span>
+          <span class="ranking-badge">${item.count} ${item.count === 1 ? 'student' : 'students'}</span>
+        `;
         programmeList.appendChild(li);
       });
     }
