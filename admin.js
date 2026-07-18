@@ -493,8 +493,8 @@ function updateAnalyticsDashboard() {
       sortedHometowns.forEach(item => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td><strong>${item.name}</strong></td>
-          <td style="text-align: right; font-weight: bold; color: var(--blue-dark);">${item.count}</td>
+          <td>${item.name}</td>
+          <td style="text-align: right; font-weight: 500;">${item.count}</td>
         `;
         hometownList.appendChild(tr);
       });
@@ -527,8 +527,8 @@ function updateAnalyticsDashboard() {
       sortedProgrammes.forEach(item => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td><strong>${item.name}</strong></td>
-          <td style="text-align: right; font-weight: bold; color: var(--blue-dark);">${item.count}</td>
+          <td>${item.name}</td>
+          <td style="text-align: right; font-weight: 500;">${item.count}</td>
         `;
         programmeList.appendChild(tr);
       });

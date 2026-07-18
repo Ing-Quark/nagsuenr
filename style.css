@@ -1446,16 +1446,16 @@ footer {
   width: 100%;
   border-collapse: collapse;
   text-align: left;
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .analytics-table th {
-  background-color: var(--blue-dark);
-  color: var(--gold);
+  background-color: #f8fafc;
+  color: var(--ink-light);
   padding: 8px 10px;
-  font-weight: bold;
-  border-bottom: 2px solid var(--gold);
-  font-size: 9px;
+  font-weight: 600;
+  border-bottom: 1px solid var(--rule);
+  font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   position: sticky;
@@ -1465,7 +1465,7 @@ footer {
 
 .analytics-table td {
   padding: 8px 10px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  border-bottom: 1px solid var(--rule);
   color: var(--ink);
   vertical-align: middle;
 }
