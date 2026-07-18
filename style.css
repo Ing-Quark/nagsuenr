@@ -1617,6 +1617,21 @@ footer {
 .legend-dot.lvl-300 { background-color: #2e7d32; }
 .legend-dot.lvl-400 { background-color: #8e24aa; }
 
+/* Responsive grid layouts */
+.card-span-2 {
+  grid-column: span 2;
+}
+
+@media (max-width: 768px) {
+  .card-span-2 {
+    grid-column: span 1 !important;
+  }
+  
+  .analytics-visuals-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
 
 
 
