@@ -744,27 +744,23 @@ footer {
 /* Members Filtering UI */
 .filter-bar {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
   margin-bottom: 16px;
   background-color: var(--cream);
   border: 1px solid var(--rule);
   padding: 12px;
+  border-radius: 4px;
 }
 
-.search-input-wrapper {
-  position: relative;
-  width: 100%;
+.search-input-field {
+  flex: 1 1 280px;
+  min-width: 0;
 }
 
-.filter-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  align-items: center;
-}
-
-.filter-row .form-select {
+.filter-select-field {
+  flex: 0 0 auto;
   width: auto;
   min-width: 120px;
   padding: 6px 10px;
@@ -772,22 +768,32 @@ footer {
 }
 
 .clear-filter-btn {
+  flex: 0 0 auto;
   font-family: var(--ui-font);
-  font-size: 11px;
+  font-size: 12px;
   color: var(--blue);
   text-decoration: underline;
   cursor: pointer;
   border: none;
   background: none;
+  padding: 4px 8px;
 }
 
-@media (min-width: 600px) {
+@media (max-width: 600px) {
   .filter-bar {
-    flex-direction: row;
-    align-items: center;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
   }
-  .search-input-wrapper {
-    flex-grow: 1;
+  .search-input-field,
+  .filter-select-field {
+    width: 100% !important;
+    flex: 1 1 auto;
+  }
+  .clear-filter-btn {
+    text-align: center;
+    align-self: center;
+    width: auto;
   }
 }
 
