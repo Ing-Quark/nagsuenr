@@ -482,23 +482,21 @@ function updateAnalyticsDashboard() {
   });
 
   const sortedHometowns = Object.values(hometownCounts)
-    .sort((a, b) => b.count - a.count)
-    .slice(0, 5);
+    .sort((a, b) => b.count - a.count);
 
   const hometownList = document.getElementById('list-top-hometowns');
   if (hometownList) {
     hometownList.innerHTML = '';
     if (sortedHometowns.length === 0) {
-      hometownList.innerHTML = '<li class="ranking-item">No hometown data available</li>';
+      hometownList.innerHTML = '<tr><td colspan="2" style="text-align: center; color: var(--ink-light);">No data available</td></tr>';
     } else {
       sortedHometowns.forEach(item => {
-        const li = document.createElement('li');
-        li.className = 'ranking-item';
-        li.innerHTML = `
-          <span class="ranking-name">${item.name}</span>
-          <span class="ranking-badge">${item.count} ${item.count === 1 ? 'student' : 'students'}</span>
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><strong>${item.name}</strong></td>
+          <td style="text-align: right; font-weight: bold; color: var(--blue-dark);">${item.count}</td>
         `;
-        hometownList.appendChild(li);
+        hometownList.appendChild(tr);
       });
     }
   }
@@ -518,23 +516,21 @@ function updateAnalyticsDashboard() {
   });
 
   const sortedProgrammes = Object.values(programmeCounts)
-    .sort((a, b) => b.count - a.count)
-    .slice(0, 5);
+    .sort((a, b) => b.count - a.count);
 
   const programmeList = document.getElementById('list-top-programmes');
   if (programmeList) {
     programmeList.innerHTML = '';
     if (sortedProgrammes.length === 0) {
-      programmeList.innerHTML = '<li class="ranking-item">No programme data available</li>';
+      programmeList.innerHTML = '<tr><td colspan="2" style="text-align: center; color: var(--ink-light);">No data available</td></tr>';
     } else {
       sortedProgrammes.forEach(item => {
-        const li = document.createElement('li');
-        li.className = 'ranking-item';
-        li.innerHTML = `
-          <span class="ranking-name">${item.name}</span>
-          <span class="ranking-badge">${item.count} ${item.count === 1 ? 'student' : 'students'}</span>
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><strong>${item.name}</strong></td>
+          <td style="text-align: right; font-weight: bold; color: var(--blue-dark);">${item.count}</td>
         `;
-        programmeList.appendChild(li);
+        programmeList.appendChild(tr);
       });
     }
   }

@@ -1434,41 +1434,48 @@ footer {
   margin-bottom: 8px;
 }
 
-.analytics-ranking-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.ranking-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 6px 10px;
-  background-color: rgba(0, 0, 0, 0.02);
+.table-scroll-container {
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid var(--rule);
   border-radius: 4px;
-  font-family: var(--ui-font);
+  background-color: #ffffff;
+}
+
+.analytics-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
   font-size: 11px;
-  color: var(--ink);
-  border: 1px solid rgba(0, 0, 0, 0.04);
 }
 
-.ranking-name {
-  font-weight: 600;
-}
-
-.ranking-badge {
-  font-size: 9px;
-  font-weight: bold;
+.analytics-table th {
   background-color: var(--blue-dark);
   color: var(--gold);
-  padding: 2px 8px;
-  border-radius: 10px;
-  border: 1px solid var(--gold);
-  flex-shrink: 0;
+  padding: 8px 10px;
+  font-weight: bold;
+  border-bottom: 2px solid var(--gold);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.analytics-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  color: var(--ink);
+  vertical-align: middle;
+}
+
+.analytics-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.analytics-table tbody tr:nth-child(even) {
+  background-color: rgba(0, 0, 0, 0.01);
 }
 
 /* Modern hardware-accelerated SVG Spinner Loader */
