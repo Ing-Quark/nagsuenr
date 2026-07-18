@@ -229,20 +229,58 @@ function setupGenderToggles() {
   }
 }
 
-// Prefill/Sync WhatsApp number with Phone number
+// Prefill/Sync WhatsApp number with Phone number and enforce +233 prefix
 function setupPhoneSync() {
   const phoneInput = document.getElementById('phone');
   const whatsappInput = document.getElementById('whatsapp');
   let userEditedWhatsapp = false;
 
+  const enforcePrefix = (inputEl, onInputCallback) => {
+    inputEl.addEventListener('input', (e) => {
+      let val = e.target.value;
+
+      // Force start with +233
+      if (val.length < 4) {
+        val = '+233';
+      } else if (!val.startsWith('+233')) {
+        val = '+233' + val.replace(/\D/g, '').replace(/^233/, '');
+      }
+
+      // Strip non-digits after '+'
+      let digits = val.substring(1).replace(/\D/g, '');
+
+      // Auto-strip leading 0 if typed after country code (e.g. +233024... -> +23324...)
+      if (digits.startsWith('2330')) {
+        digits = '233' + digits.substring(4);
+      }
+
+      let cleaned = '+' + digits;
+
+      // Limit to 13 characters (+233 + 9 digits)
+      if (cleaned.length > 13) {
+        cleaned = cleaned.substring(0, 13);
+      }
+
+      e.target.value = cleaned;
+      
+      if (onInputCallback) {
+        onInputCallback(cleaned);
+      }
+    });
+  };
+
   if (phoneInput && whatsappInput) {
-    phoneInput.addEventListener('input', (e) => {
+    // Set initial values
+    if (phoneInput.value === '') phoneInput.value = '+233';
+    if (whatsappInput.value === '') whatsappInput.value = '+233';
+
+    enforcePrefix(phoneInput, (cleanedValue) => {
       if (!userEditedWhatsapp) {
-        whatsappInput.value = e.target.value;
+        whatsappInput.value = cleanedValue;
       }
     });
 
-    whatsappInput.addEventListener('input', () => {
+    enforcePrefix(whatsappInput, () => {
       userEditedWhatsapp = true;
     });
   }
@@ -375,15 +413,15 @@ async function validateStep1() {
     return false;
   }
 
-  if (!phone) {
+  if (!phone || phone === '+233') {
     showFormError('Phone Number is required.');
     return false;
   }
 
-  // Ghana number check: Starts with 0, 10 digits
-  const ghanaPhoneRegex = /^0[0-9]{9}$/;
+  // Ghana number check: Starts with +233 followed by exactly 9 digits
+  const ghanaPhoneRegex = /^\+233[0-9]{9}$/;
   if (!ghanaPhoneRegex.test(phone)) {
-    showFormError('Please enter a valid 10-digit Ghana phone number starting with 0 (e.g. 0244123456).');
+    showFormError('Please enter a valid phone number after the +233 prefix (e.g. +233244123456).');
     return false;
   }
 
@@ -431,7 +469,9 @@ function populateConfirmationDetails() {
   document.getElementById('lbl-programme').textContent = document.getElementById('programme').value.trim() || 'Not specified';
   document.getElementById('lbl-level').textContent = 'Level ' + document.getElementById('level').value;
   document.getElementById('lbl-phone').textContent = document.getElementById('phone').value.trim();
-  document.getElementById('lbl-whatsapp').textContent = document.getElementById('whatsapp').value.trim() || 'Not specified';
+  
+  const waVal = document.getElementById('whatsapp').value.trim();
+  document.getElementById('lbl-whatsapp').textContent = (waVal === '+233' || !waVal) ? 'Not specified' : waVal;
 }
 
 // Register Member in Supabase
@@ -444,7 +484,10 @@ async function registerMember() {
   const programme = document.getElementById('programme').value.trim();
   const level = document.getElementById('level').value;
   const phone = document.getElementById('phone').value.trim();
-  const whatsapp = document.getElementById('whatsapp').value.trim();
+  let whatsapp = document.getElementById('whatsapp').value.trim();
+  if (whatsapp === '+233') {
+    whatsapp = '';
+  }
 
   if (!supabaseClient) {
     showFormError('Database client is not available. Please try again.');

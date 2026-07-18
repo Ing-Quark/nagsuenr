@@ -165,13 +165,13 @@
 
         <div class="form-group">
           <label class="form-label" for="phone">Phone Number <span class="required">*</span></label>
-          <input type="tel" id="phone" class="form-input" placeholder="e.g. 0244123456" inputmode="numeric" required autocomplete="tel">
-          <span class="form-note">Must be a valid 10-digit Ghana phone number starting with 0. Used for SMS broadcasts.</span>
+          <input type="tel" id="phone" class="form-input" value="+233" placeholder="e.g. 244123456" inputmode="numeric" required autocomplete="tel" maxlength="13">
+          <span class="form-note">Prefilled with +233. Please type the remaining 9 digits of your number (e.g. 244123456).</span>
         </div>
 
         <div class="form-group">
           <label class="form-label" for="whatsapp">WhatsApp Number</label>
-          <input type="tel" id="whatsapp" class="form-input" placeholder="e.g. 0244123456" inputmode="numeric">
+          <input type="tel" id="whatsapp" class="form-input" value="+233" placeholder="e.g. 244123456" inputmode="numeric" maxlength="13">
           <span class="form-note">Automatically copied from your phone number. Change this only if your WhatsApp uses a different number.</span>
         </div>
 
@@ -273,7 +273,7 @@
   </footer>
 
   <!-- Scripts -->
-  <script src="config.js?v=6"></script>
-  <script src="registration.js?v=6"></script>
+  <script src="config.js?v=7"></script>
+  <script src="registration.js?v=7"></script>
 </body>
 </html>
