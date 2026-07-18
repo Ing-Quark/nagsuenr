@@ -1044,3 +1044,24 @@ footer {
   content: '♀';
   font-weight: normal;
 }
+
+.admin-link {
+  display: inline-block;
+  margin-top: 10px;
+  font-family: var(--ui-font);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--gold);
+  text-decoration: none;
+  border: 1px solid var(--gold);
+  padding: 4px 10px;
+  border-radius: 3px;
+  transition: all 0.2s;
+}
+
+.admin-link:hover {
+  background-color: var(--gold);
+  color: #ffffff;
+}
+
