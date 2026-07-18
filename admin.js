@@ -839,7 +839,7 @@ function initWhatsAppTab() {
 }
 
 function generateQRCode() {
-  const currentLink = localStorage.getItem('whatsapp_invite_link') || CONFIG.WHATSAPP_INVITE_LINK;
+  const siteUrl = window.location.origin;
   const container = document.getElementById('qrcode');
   if (!container) return;
 
@@ -851,7 +851,7 @@ function generateQRCode() {
   }
 
   qrCodeInstance = new QRCode(container, {
-    text: currentLink,
+    text: siteUrl,
     width: 180,
     height: 180,
     colorDark : "#111111",
@@ -870,7 +870,7 @@ function downloadQRCode() {
   }
 
   const link = document.createElement('a');
-  link.download = 'NAGS-UENR-WhatsApp-QR.png';
+  link.download = 'NAGS-UENR-Registration-QR.png';
 
   if (qrCanvas) {
     link.href = qrCanvas.toDataURL('image/png');
