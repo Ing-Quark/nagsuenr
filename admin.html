@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard | NAGS-UENR</title>
+  <meta name="description" content="Administration panel and dashboard for NAGS-UENR member records, SMS broadcasts, and WhatsApp management.">
+  
+  <!-- CSS Link -->
+  <link rel="stylesheet" href="style.css">
+  
+  <!-- Libraries CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+
+  <!-- LOGIN SECTION -->
+  <section id="login-section" class="login-wrapper">
+    <div class="login-card">
+      <div class="login-header">
+        <h1 class="login-title">NAGS-UENR Admin</h1>
+        <div class="login-subtitle">Public Relations Office</div>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label" for="admin-password">Password</label>
+        <input type="password" id="admin-password" class="form-input" placeholder="Enter admin password">
+        <div id="login-error" class="message-box error" style="margin-top: 8px; display: none;"></div>
+      </div>
+      
+      <button type="button" id="btn-login" class="btn btn-primary" style="width: 100%;">Login</button>
+    </div>
+  </section>
+
+  <!-- FULL DASHBOARD SECTION (Hidden by default) -->
+  <section id="dashboard-section" class="hidden" style="display: flex; flex-direction: column; min-height: 100vh;">
+    
+    <!-- Top Bar / Institutional Header -->
+    <header class="top-bar">
+      <div class="top-bar-content">
+        <div class="logo-box">
+          UENR LOGO
+          <span>[insert]</span>
+        </div>
+        <div class="header-text">
+          <div class="header-title">National Association of Gonjaland Students</div>
+          <div class="header-subtitle">NAGS-UENR — University of Energy and Natural Resources Chapter</div>
+          <div class="header-motto">Sunyani, Bono Region, Ghana · Knowledge · Integrity · Impact</div>
+        </div>
+        <button id="btn-logout" class="btn btn-secondary" style="width: auto; padding: 6px 12px; font-size: 11px; margin-left: auto;">Logout</button>
+      </div>
+    </header>
+
+    <!-- Top Live Stats Bar (3 equal columns) -->
+    <section class="stats-bar" aria-label="Quick Registration Statistics">
+      <div class="stats-col total">
+        <div class="stats-number" id="stat-total-val">0</div>
+        <div class="stats-label">Total Members</div>
+      </div>
+      <div class="stats-col male">
+        <div class="stats-number" id="stat-male-val">0</div>
+        <div class="stats-label">Male Members</div>
+      </div>
+      <div class="stats-col female">
+        <div class="stats-number" id="stat-female-val">0</div>
+        <div class="stats-label">Female Members</div>
+      </div>
+    </section>
+
+    <!-- Tab Navigation -->
+    <nav class="tabs-nav" aria-label="Dashboard Tabs Navigation">
+      <button class="tab-btn active" data-tab="members">Members</button>
+      <button class="tab-btn" data-tab="sms">SMS Broadcast</button>
+      <button class="tab-btn" data-tab="whatsapp">Socials</button>
+      <button class="tab-btn" data-tab="export">Export</button>
+    </nav>
+
+    <!-- Dashboard Container -->
+    <main class="container">
+      
+      <!-- Global Error Notice -->
+      <div id="admin-error-box" class="message-box" style="display: none;"></div>
+
+      <!-- TAB A: MEMBERS -->
+      <div id="tab-members" class="tab-content active">
+        <div class="section-header">
+          <span>Registered Members Database</span>
+          <span>Live Directory</span>
+        </div>
+
+        <!-- Mini Stats Grid -->
+        <div class="stats-cards-grid">
+          <div class="mini-stats-card total">
+            <div class="mini-stats-number" id="mini-stat-total">0</div>
+            <div class="mini-stats-label">Total Members</div>
+          </div>
+          <div class="mini-stats-card male">
+            <div class="mini-stats-number" id="mini-stat-male">0</div>
+            <div class="mini-stats-label">Male</div>
+          </div>
+          <div class="mini-stats-card female">
+            <div class="mini-stats-number" id="mini-stat-female">0</div>
+            <div class="mini-stats-label">Female</div>
+          </div>
+          <div class="mini-stats-card whatsapp">
+            <div class="mini-stats-number" id="mini-stat-whatsapp">0</div>
+            <div class="mini-stats-label">WA Joined</div>
+          </div>
+        </div>
+
+        <!-- Live Filters -->
+        <div class="filter-bar">
+          <div class="search-input-wrapper">
+            <input type="text" id="search-input" class="form-input" placeholder="Search by name, phone, program, hometown..." aria-label="Search members">
+          </div>
+          <div class="filter-row">
+            <select id="filter-gender" class="form-select" aria-label="Filter by gender">
+              <option value="All">All Genders</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+            </select>
+            <select id="filter-level" class="form-select" aria-label="Filter by level">
+              <option value="All">All Levels</option>
+              <option value="100">Level 100</option>
+              <option value="200">Level 200</option>
+              <option value="300">Level 300</option>
+              <option value="400">Level 400</option>
+            </select>
+            <button id="btn-clear-filters" class="clear-filter-btn">Clear filters</button>
+          </div>
+        </div>
+
+        <!-- Table Loading Indicator -->
+        <div id="table-loader" class="text-center hidden" style="padding: 20px; font-style: italic; color: #888;">
+          Fetching records from Supabase...
+        </div>
+
+        <!-- Table responsive box -->
+        <div class="table-responsive">
+          <table class="members-table">
+            <thead>
+              <tr>
+                <th style="width: 40px;">No.</th>
+                <th>Name</th>
+                <th>Gender</th>
+                <th>Programme</th>
+                <th>Level</th>
+                <th>Phone</th>
+                <th>WA Joined</th>
+                <th>Hometown</th>
+                <th>Registered</th>
+                <th style="width: 60px;" class="text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="members-table-body">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TAB B: SMS BROADCAST -->
+      <div id="tab-sms" class="tab-content">
+        <div class="section-header">
+          <span>SMS Broadcast Panel</span>
+          <span>Arkesel API Gateway</span>
+        </div>
+
+        <p style="margin-bottom: 16px; font-size: 14px; color: var(--ink-mid);">
+          Send a bulk SMS to members via Arkesel. Messages are sent directly to their phone numbers &mdash; no WhatsApp or internet connection is required on the recipient's phone.
+        </p>
+
+        <div class="card">
+          <form id="sms-form" class="sms-broadcast-form">
+            <div class="form-group">
+              <label class="form-label" for="sms-sender-id">Sender ID</label>
+              <input type="text" id="sms-sender-id" class="form-input" value="NAGSUENR" max="11" required>
+              <span class="form-note">Must be an approved alpha-numeric Sender ID registered on your Arkesel account (max 11 chars).</span>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="sms-message">Message Content</label>
+              <textarea id="sms-message" class="form-textarea" rows="4" placeholder="Type your announcement here..." required></textarea>
+              <div class="sms-char-counter">
+                <span id="sms-chars">0 / 160 characters</span>
+                <span id="sms-units">This will use 0 SMS unit(s) per recipient</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Select Recipients Group</label>
+              <div class="recipient-option-list">
+                <label class="recipient-option">
+                  <input type="radio" name="sms-target" value="all" checked>
+                  <span>All registered members <span id="lbl-cnt-all" style="color: #666;">(0 numbers)</span></span>
+                </label>
+                <label class="recipient-option">
+                  <input type="radio" name="sms-target" value="male">
+                  <span>Male members only <span id="lbl-cnt-male" style="color: #666;">(0 numbers)</span></span>
+                </label>
+                <label class="recipient-option">
+                  <input type="radio" name="sms-target" value="female">
+                  <span>Female members only <span id="lbl-cnt-female" style="color: #666;">(0 numbers)</span></span>
+                </label>
+                <label class="recipient-option">
+                  <input type="radio" name="sms-target" value="lvl100">
+                  <span>Level 100 members only <span id="lbl-cnt-l100" style="color: #666;">(0 numbers)</span></span>
+                </label>
+                <label class="recipient-option">
+                  <input type="radio" name="sms-target" value="lvl200">
+                  <span>Level 200 members only <span id="lbl-cnt-l200" style="color: #666;">(0 numbers)</span></span>
+                </label>
+                <label class="recipient-option">
+                  <input type="radio" name="sms-target" value="lvl300">
+                  <span>Level 300 members only <span id="lbl-cnt-l300" style="color: #666;">(0 numbers)</span></span>
+                </label>
+                <label class="recipient-option">
+                  <input type="radio" name="sms-target" value="lvl400">
+                  <span>Level 400 members only <span id="lbl-cnt-l400" style="color: #666;">(0 numbers)</span></span>
+                </label>
+              </div>
+            </div>
+
+            <div class="preview-strip" id="sms-preview-count">
+              This message will be sent to 0 members.
+            </div>
+
+            <button type="submit" id="btn-send-sms" class="btn btn-primary">Send SMS to 0 Members</button>
+          </form>
+          
+          <div id="sms-result-box" class="message-box" style="margin-top: 16px; display: none;"></div>
+        </div>
+      </div>
+
+      <!-- TAB C: SOCIALS -->
+      <div id="tab-whatsapp" class="tab-content">
+        <div class="section-header">
+          <span>Social Media Channels Manager</span>
+          <span>Community Engagement</span>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Social Settings</div>
+          
+          <!-- WhatsApp Link Display -->
+          <div class="form-group">
+            <label class="form-label">Current Active WhatsApp Link</label>
+            <div class="invite-link-row">
+              <input type="text" id="wa-current-link-val" class="form-input" readonly value="Loading...">
+              <button type="button" id="btn-copy-wa-link" class="btn btn-secondary" style="width: auto; font-size: 12px; padding: 0 16px;">Copy</button>
+            </div>
+          </div>
+
+          <!-- Facebook Link Display -->
+          <div class="form-group" style="margin-top: 12px;">
+            <label class="form-label">Current Facebook Page Link</label>
+            <div class="invite-link-row">
+              <input type="text" id="fb-current-link-val" class="form-input" readonly value="Loading...">
+              <button type="button" id="btn-copy-fb-link" class="btn btn-secondary" style="width: auto; font-size: 12px; padding: 0 16px;">Copy</button>
+            </div>
+          </div>
+
+          <!-- Update link inputs -->
+          <div class="form-group" style="margin-top: 24px; border-top: 1px dashed var(--rule); padding-top: 16px;">
+            <label class="form-label" for="wa-invite-link">Paste New WhatsApp Invite Link</label>
+            <input type="url" id="wa-invite-link" class="form-input" placeholder="e.g. https://chat.whatsapp.com/...">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="fb-invite-link">Paste New Facebook Page Link</label>
+            <input type="url" id="fb-invite-link" class="form-input" placeholder="e.g. https://facebook.com/nags.uenr">
+            <span class="form-note">Updating these fields saves the values to browser memory and propagates immediately to the registration page.</span>
+          </div>
+          
+          <button type="button" id="btn-update-socials" class="btn btn-primary" style="margin-top: 6px;">Update Social Links</button>
+        </div>
+
+        <div class="card qr-code-section">
+          <div class="card-title" style="width: 100%; text-align: left;">WhatsApp Group QR Code</div>
+          <p style="font-size: 13px; margin-bottom: 16px; color: var(--ink-light);">
+            This QR Code is dynamically generated from your active WhatsApp link. Print this out to place at meetings or display it on a screen for students to scan.
+          </p>
+          
+          <!-- QR container -->
+          <div class="qr-container">
+            <div id="qrcode"></div>
+          </div>
+          
+          <div class="qr-actions-row">
+            <button type="button" id="btn-download-qr" class="btn btn-green" style="font-size: 12px; padding: 8px 16px; width: auto;">Download QR Code</button>
+            <button type="button" id="btn-print-qr" class="btn btn-primary" style="font-size: 12px; padding: 8px 16px; width: auto;">Print QR Code</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB D: EXPORT -->
+      <div id="tab-export" class="tab-content">
+        <div class="section-header">
+          <span>Export &amp; Statistics Reporting</span>
+          <span>Data Utilities</span>
+        </div>
+
+        <div class="export-cards-grid">
+          <!-- CSV Card -->
+          <div class="export-card">
+            <div>
+              <div class="export-icon" aria-hidden="true">📊</div>
+              <h3 class="export-card-title">Export to CSV</h3>
+              <p class="export-card-desc">
+                Download the entire registered student database as a standard CSV spreadsheet file. Compatible with Microsoft Excel, Google Sheets, or Numbers.
+              </p>
+            </div>
+            <button type="button" id="btn-export-csv" class="btn btn-green">Download CSV File</button>
+          </div>
+
+          <!-- Text Summary Card -->
+          <div class="export-card">
+            <div>
+              <div class="export-icon" aria-hidden="true">📝</div>
+              <h3 class="export-card-title">Summary Report</h3>
+              <p class="export-card-desc">
+                Compile a raw text summary report containing total numbers, gender breakdown, academic level statistics, and WhatsApp enrollment data.
+              </p>
+            </div>
+            <button type="button" id="btn-export-summary" class="btn btn-primary">Copy Text Summary</button>
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- Page Footer -->
+    <footer style="margin-top: auto;">
+      NAGS-UENR &middot; Pioneers of Gonjaland at UENR &middot; Sunyani, Ghana
+    </footer>
+  </section>
+
+  <!-- Scripts -->
+  <script src="config.js?v=2"></script>
+  <script src="sms.js?v=2"></script>
+  <script src="admin.js?v=2"></script>
+</body>
+</html>
