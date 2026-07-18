@@ -645,7 +645,15 @@ function setupSMSBroadcast() {
               AudioEffects.playSuccess();
               HapticEffects.success();
               if (resultBox) {
-                resultBox.innerHTML = `<strong>&check; Broadcast sent successfully!</strong><br>Successfully transmitted to ${recipients.length} phone numbers via Arkesel gateway.`;
+                const rawData = res.data || {};
+                const dataInfo = rawData.data ? JSON.stringify(rawData.data) : JSON.stringify(rawData);
+                resultBox.innerHTML = `
+                  <strong>&check; Broadcast sent successfully!</strong><br>
+                  Successfully transmitted to ${recipients.length} phone numbers via Arkesel gateway.<br>
+                  <span style="font-size: 10px; font-family: monospace; display: block; margin-top: 8px; opacity: 0.85; word-break: break-all;">
+                    Gateway Response: ${dataInfo}
+                  </span>
+                `;
                 resultBox.className = 'message-box success';
                 resultBox.style.display = 'block';
                 smsTextarea.value = '';
