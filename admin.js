@@ -388,13 +388,13 @@ function updateAnalyticsDashboard() {
   const malePct = total ? Math.round((maleCount / total) * 100) : 0;
   const femalePct = total ? Math.round((femaleCount / total) * 100) : 0;
   
-  const malePctEl = document.getElementById('analytics-male-pct');
-  const femalePctEl = document.getElementById('analytics-female-pct');
+  const genderRatioEl = document.getElementById('analytics-gender-ratio');
   const maleBar = document.getElementById('analytics-male-bar');
   const femaleBar = document.getElementById('analytics-female-bar');
   
-  if (malePctEl) malePctEl.textContent = `${malePct}% Male (${maleCount})`;
-  if (femalePctEl) femalePctEl.textContent = `${femalePct}% Female (${femaleCount})`;
+  if (genderRatioEl) {
+    genderRatioEl.textContent = `${maleCount}M / ${femaleCount}F`;
+  }
   if (maleBar) maleBar.style.width = `${malePct}%`;
   if (femaleBar) femaleBar.style.width = `${femalePct}%`;
 
