@@ -231,6 +231,17 @@ function setupLogin() {
       checkAuth();
     });
   }
+  // Toggle password visibility (eye helper)
+  const togglePasswordBtn = document.getElementById('btn-toggle-password');
+  if (togglePasswordBtn && passwordInput) {
+    togglePasswordBtn.addEventListener('click', () => {
+      AudioEffects.playClick();
+      HapticEffects.tap();
+      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      passwordInput.setAttribute('type', type);
+      togglePasswordBtn.textContent = type === 'password' ? 'Show' : 'Hide';
+    });
+  }
 }
 
 // Dashboard Load Data

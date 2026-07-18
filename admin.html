@@ -28,7 +28,10 @@
       
       <div class="form-group">
         <label class="form-label" for="admin-password">Password</label>
-        <input type="password" id="admin-password" class="form-input" placeholder="Enter admin password">
+        <div class="password-input-wrapper">
+          <input type="password" id="admin-password" class="form-input" placeholder="Enter admin password">
+          <button type="button" id="btn-toggle-password" class="toggle-password-btn" aria-label="Toggle password visibility">Show</button>
+        </div>
         <div id="login-error" class="message-box error" style="margin-top: 8px; display: none;"></div>
       </div>
       
