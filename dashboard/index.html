@@ -4,84 +4,718 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Chapter Dashboard | NAGS Ghana</title>
+  <meta name="description" content="NAGS Ghana Chapter Executive Dashboard for member directory management, SMS, social channels, executives alignment, and financial ledger tracking.">
+  
   <link rel="stylesheet" href="../style.css">
+  
+  <!-- Supabase + QRCode Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  
   <link rel="icon" type="image/png" href="../nags.png">
+  
   <style>
-    body { display:flex; flex-direction:column; min-height:100vh; background:linear-gradient(160deg,#1a3f72,#0d2444); }
-    .stub-center { flex:1; display:flex; align-items:center; justify-content:center; padding:40px 20px; }
-    .stub-card { background:#fff; border-radius:12px; padding:40px 32px; max-width:500px; width:100%; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
-    .stub-icon { font-size:42px; margin-bottom:16px; }
-    .stub-title { font-size:20px; font-weight:700; color:#1a3f72; margin-bottom:8px; font-family:var(--ui-font,'Segoe UI',sans-serif); }
-    .stub-sub { font-size:13px; color:#888; line-height:1.7; margin-bottom:24px; font-family:var(--ui-font,'Segoe UI',sans-serif); }
-    .role-badge { display:inline-block; background:#1e5c2e; color:#fff; font-size:9px; font-family:var(--ui-font,'Segoe UI',sans-serif); font-weight:700; text-transform:uppercase; letter-spacing:0.1em; padding:3px 10px; border-radius:20px; margin-bottom:16px; }
-    .stub-phase { font-size:11px; color:#aaa; font-family:var(--ui-font,'Segoe UI',sans-serif); margin-top:16px; }
-    .tabs-preview { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin:16px 0; }
-    .tab-chip { background:#f0f4fb; color:#1a3f72; font-size:11px; font-family:var(--ui-font,'Segoe UI',sans-serif); padding:4px 12px; border-radius:20px; border:1px solid #d0dcf0; font-weight:600; }
+    /* ── Finance Tab specific styles ── */
+    .finance-metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .finance-card {
+      background: #ffffff;
+      border: 1px solid var(--rule);
+      border-radius: 8px;
+      padding: 20px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+    }
+    .finance-card.income { border-top: 3px solid var(--green); }
+    .finance-card.expense { border-top: 3px solid #ff4d4f; }
+    .finance-card.balance { border-top: 3px solid var(--gold); }
+    
+    .finance-label {
+      font-size: 11px;
+      color: var(--ink-light);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 700;
+    }
+    .finance-value {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--ink-dark);
+      font-family: var(--ui-font, 'Segoe UI', sans-serif);
+    }
+    
+    .btn-green {
+      background: var(--green);
+      color: #fff;
+    }
+    .btn-green:hover { background: #164622; }
+
+    /* ── Modal overlay for adding finance record ── */
+    .dashboard-modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(3px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+    .dashboard-modal-overlay.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .dashboard-modal-card {
+      background: #fff;
+      border-radius: 10px;
+      border: 1px solid var(--rule);
+      width: 100%;
+      max-width: 460px;
+      padding: 24px 28px;
+      box-shadow: 0 20px 48px rgba(0,0,0,0.15);
+      transform: scale(0.9);
+      transition: transform 0.25s ease;
+    }
+    .dashboard-modal-overlay.show .dashboard-modal-card {
+      transform: scale(1);
+    }
+    
+    /* ── Exec Tab Credentials display box ── */
+    .credentials-reveal-box {
+      background: #f0f4fb;
+      border: 1px dashed var(--blue);
+      border-radius: 6px;
+      padding: 16px;
+      margin-bottom: 20px;
+      display: none;
+    }
+    .countdown-timer-text {
+      font-size: 11px;
+      color: var(--ink-light);
+      margin-top: 8px;
+      font-style: italic;
+    }
+    .credentials-value-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 0;
+      font-size: 13px;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+    .credentials-value-row code {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--blue);
+    }
   </style>
 </head>
 <body>
-  <div class="stub-center">
-    <div>
-      <div class="stub-card">
-        <div class="stub-icon">📊</div>
-        <div class="role-badge" id="role-badge">Executive</div>
-        <div class="stub-title">Chapter Executive Dashboard</div>
-        <div class="stub-sub">
-          Welcome, <strong id="exec-name-display">—</strong>.<br>
-          The full chapter dashboard is being built in <strong>Phase 4</strong>.<br>
-          Your tabs will include:
+
+  <!-- Top Bar / Institutional Header -->
+  <header class="top-bar">
+    <div class="top-bar-content">
+      <div class="logo-box" style="border: none; padding: 0;">
+        <img src="../nags.png" alt="NAGS Logo" id="header-logo">
+      </div>
+      <div class="header-text">
+        <h1 class="header-title" id="header-title-text">National Association of Gonjaland Students</h1>
+        <div class="header-subtitle" id="header-subtitle-text">Chapter Executive Portal</div>
+        <div class="header-motto" id="header-motto-text">Motto: Kishilbi Konwule M'ata Kuyu</div>
+      </div>
+      
+      <div style="margin-left: auto; display: flex; align-items: center; gap: 14px;">
+        <div style="text-align: right; line-height: 1.35;" class="exec-greeting-box">
+          <div style="font-size: 12px; font-weight: 700; color: #fff;" id="exec-name-display">Exec Name</div>
+          <span class="badge-status active" id="exec-role-display" style="font-size: 8px; padding: 1px 6px;">ROLE</span>
         </div>
-        <div class="tabs-preview" id="tabs-preview">
-          <div class="tab-chip">Members</div>
-          <div class="tab-chip">SMS</div>
-          <div class="tab-chip">Analytics</div>
-        </div>
-        <a href="/login.html" id="btn-logout" class="btn btn-secondary" style="display:inline-block;text-decoration:none;padding:10px 24px;font-size:13px;">
-          Logout
-        </a>
-        <div class="stub-phase">Phase 1 of 5 complete — Phase 4 implements this dashboard</div>
+        <button id="btn-logout" class="btn btn-secondary" style="width: auto; padding: 6px 12px; font-size: 11px; margin: 0;">Logout</button>
       </div>
     </div>
+  </header>
+
+  <!-- Top Live Stats Bar (3 equal columns) -->
+  <section class="stats-bar" aria-label="Chapter Membership Stats">
+    <div class="stats-col total">
+      <div class="stats-number" id="stat-total-val">0</div>
+      <div class="stats-label">Total Members</div>
+    </div>
+    <div class="stats-col male">
+      <div class="stats-number" id="stat-male-val">0</div>
+      <div class="stats-label">Male Members</div>
+    </div>
+    <div class="stats-col female">
+      <div class="stats-number" id="stat-female-val">0</div>
+      <div class="stats-label">Female Members</div>
+    </div>
+  </section>
+
+  <!-- Dynamic Tab Navigation Bar -->
+  <nav class="tabs-nav" id="dashboard-tab-bar" aria-label="Dashboard Navigation Tabs">
+    <!-- Active items loaded based on authorization matrix in dashboard.js -->
+  </nav>
+
+  <!-- Container -->
+  <main class="container">
+    
+    <!-- Global Error Notice -->
+    <div id="admin-error-box" class="message-box error" style="display: none;"></div>
+
+    <!-- ═══ TAB 1: MEMBERS ═══ -->
+    <div id="tab-members" class="tab-content">
+      <div class="section-header">
+        <span>Registered Members Database</span>
+        <span>Live Directory</span>
+      </div>
+
+      <!-- Mini Stats Grid -->
+      <div class="stats-cards-grid">
+        <div class="mini-stats-card total">
+          <div class="mini-stats-number" id="mini-stat-total">0</div>
+          <div class="mini-stats-label">Total Members</div>
+        </div>
+        <div class="mini-stats-card male">
+          <div class="mini-stats-number" id="mini-stat-male">0</div>
+          <div class="mini-stats-label">Male</div>
+        </div>
+        <div class="mini-stats-card female">
+          <div class="mini-stats-number" id="mini-stat-female">0</div>
+          <div class="mini-stats-label">Female</div>
+        </div>
+        <div class="mini-stats-card whatsapp">
+          <div class="mini-stats-number" id="mini-stat-whatsapp">0</div>
+          <div class="mini-stats-label">WA Joined</div>
+        </div>
+      </div>
+
+      <!-- Live Filters -->
+      <div class="filter-bar">
+        <input type="text" id="search-input" class="form-input search-input-field" placeholder="Search by name, phone, program, hometown..." aria-label="Search members">
+        <select id="filter-gender" class="form-select filter-select-field" aria-label="Filter by gender">
+          <option value="All">All Genders</option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+        </select>
+        <select id="filter-level" class="form-select filter-select-field" aria-label="Filter by level">
+          <option value="All">All Levels</option>
+          <option value="100">Level 100</option>
+          <option value="200">Level 200</option>
+          <option value="300">Level 300</option>
+          <option value="400">Level 400</option>
+        </select>
+        <button id="btn-clear-filters" class="clear-filter-btn">Clear filters</button>
+      </div>
+
+      <!-- Table Loader -->
+      <div id="table-loader" class="text-center hidden" style="padding: 30px 10px; color: var(--ink-light); font-size: 13px;">
+        <svg class="btn-spinner" viewBox="0 0 50 50" style="width: 20px; height: 20px; color: var(--gold); margin-right: 8px; display: inline-block;">
+          <circle class="path" cx="25" cy="25" r="20" fill="none" stroke="currentColor" stroke-width="5"></circle>
+        </svg>
+        Retrieving member directory...
+      </div>
+
+      <!-- Members Table -->
+      <div class="table-responsive">
+        <table class="members-table">
+          <thead>
+            <tr>
+              <th style="width: 40px;">No.</th>
+              <th>Name</th>
+              <th>Gender</th>
+              <th>Programme</th>
+              <th>Level</th>
+              <th>Phone</th>
+              <th>WA Joined</th>
+              <th>Hometown</th>
+              <th>Registered</th>
+              <th style="width: 60px;" class="text-center exec-only-action">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="members-table-body">
+            <!-- Populated dynamically -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+
+    <!-- ═══ TAB 2: SMS BROADCAST ═══ -->
+    <div id="tab-sms" class="tab-content">
+      <div class="section-header">
+        <span>SMS Broadcast Panel</span>
+        <span>SMS Service</span>
+      </div>
+
+      <p style="margin-bottom: 16px; font-size: 14px; color: var(--ink-mid);">
+        Send text announcements directly to members' phones. All calls route securely via Vercel Serverless Functions.
+      </p>
+
+      <div class="card">
+        <form id="sms-form" class="sms-broadcast-form">
+          <div class="form-group">
+            <label class="form-label" for="sms-sender-id">Sender Name (Sender ID)</label>
+            <input type="text" id="sms-sender-id" class="form-input" value="NAGS GH" max="11" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="sms-message">Message Content</label>
+            <textarea id="sms-message" class="form-textarea" rows="4" placeholder="Type your announcement here..." required></textarea>
+            <div class="sms-char-counter">
+              <span id="sms-chars">0 / 160 characters</span>
+              <span id="sms-units">Uses 0 text credit(s) per recipient</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Select Recipients Group</label>
+            <div class="recipient-option-list">
+              <label class="recipient-option">
+                <input type="radio" name="sms-target" value="all" checked>
+                <span>All registered members <span id="lbl-cnt-all" style="color: #666;">(0 numbers)</span></span>
+              </label>
+              <label class="recipient-option">
+                <input type="radio" name="sms-target" value="male">
+                <span>Male members only <span id="lbl-cnt-male" style="color: #666;">(0 numbers)</span></span>
+              </label>
+              <label class="recipient-option">
+                <input type="radio" name="sms-target" value="female">
+                <span>Female members only <span id="lbl-cnt-female" style="color: #666;">(0 numbers)</span></span>
+              </label>
+              <label class="recipient-option">
+                <input type="radio" name="sms-target" value="lvl100">
+                <span>Level 100 members only <span id="lbl-cnt-l100" style="color: #666;">(0 numbers)</span></span>
+              </label>
+              <label class="recipient-option">
+                <input type="radio" name="sms-target" value="lvl200">
+                <span>Level 200 members only <span id="lbl-cnt-l200" style="color: #666;">(0 numbers)</span></span>
+              </label>
+              <label class="recipient-option">
+                <input type="radio" name="sms-target" value="lvl300">
+                <span>Level 300 members only <span id="lbl-cnt-l300" style="color: #666;">(0 numbers)</span></span>
+              </label>
+              <label class="recipient-option">
+                <input type="radio" name="sms-target" value="lvl400">
+                <span>Level 400 members only <span id="lbl-cnt-l400" style="color: #666;">(0 numbers)</span></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="preview-strip" id="sms-preview-count">
+            This message will be sent to 0 members.
+          </div>
+
+          <button type="submit" id="btn-send-sms" class="btn btn-primary">Send SMS</button>
+        </form>
+        
+        <div id="sms-result-box" class="message-box" style="margin-top: 16px; display: none;"></div>
+      </div>
+    </div>
+
+
+    <!-- ═══ TAB 3: SOCIAL LINKS ═══ -->
+    <div id="tab-socials" class="tab-content">
+      <div class="section-header">
+        <span>Social Media Channels Manager</span>
+        <span>Community Engagement</span>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Social Settings</div>
+        
+        <div class="form-group">
+          <label class="form-label">Current Active WhatsApp Link</label>
+          <div class="invite-link-row">
+            <input type="text" id="wa-current-link-val" class="form-input" readonly value="Loading...">
+            <button type="button" id="btn-copy-wa-link" class="btn btn-secondary" style="width: auto; font-size: 12px; padding: 0 16px;">Copy</button>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-top: 12px;">
+          <label class="form-label">Current Facebook Page Link</label>
+          <div class="invite-link-row">
+            <input type="text" id="fb-current-link-val" class="form-input" readonly value="Loading...">
+            <button type="button" id="btn-copy-fb-link" class="btn btn-secondary" style="width: auto; font-size: 12px; padding: 0 16px;">Copy</button>
+          </div>
+        </div>
+
+        <!-- Write links updates (Settings / Update permissions checked in dashboard.js) -->
+        <div class="settings-writable-group" style="display:none; margin-top: 24px; border-top: 1px dashed var(--rule); padding-top: 16px;">
+          <div class="form-group">
+            <label class="form-label" for="wa-invite-link">Paste New WhatsApp Invite Link</label>
+            <input type="url" id="wa-invite-link" class="form-input" placeholder="https://chat.whatsapp.com/...">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="fb-invite-link">Paste New Facebook Page Link</label>
+            <input type="url" id="fb-invite-link" class="form-input" placeholder="https://facebook.com/...">
+          </div>
+          
+          <button type="button" id="btn-update-socials" class="btn btn-primary" style="margin-top: 6px;">Update Social Links</button>
+        </div>
+      </div>
+
+      <div class="card qr-code-section">
+        <div class="card-title" style="width: 100%; text-align: left;">Registration Portal QR Code</div>
+        <p style="font-size: 13px; margin-bottom: 16px; color: var(--ink-light);">
+          This QR Code links directly to your public registration portal. Print this out to place on notice boards, print on flyers, or display at meetings so new members can scan and register instantly.
+        </p>
+        
+        <div class="qr-container">
+          <div id="qrcode"></div>
+        </div>
+        
+        <div class="qr-actions-row">
+          <button type="button" id="btn-download-qr" class="btn btn-green" style="font-size: 12px; padding: 8px 16px; width: auto;">Download QR Code</button>
+          <button type="button" id="btn-print-qr" class="btn btn-primary" style="font-size: 12px; padding: 8px 16px; width: auto;">Print QR Code</button>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ═══ TAB 4: ANALYTICS & EXPORT ═══ -->
+    <div id="tab-analytics" class="tab-content">
+      <div class="section-header">
+        <span>Association Analytics & Reports</span>
+        <span>Member Statistics</span>
+      </div>
+
+      <!-- Metric Summary Cards -->
+      <div class="analytics-metrics-grid">
+        <div class="metric-card">
+          <div class="metric-label">Total Registered Members</div>
+          <div id="analytics-total" class="metric-value">0</div>
+          <div class="metric-footer-text">Registered student records</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">WhatsApp Onboarding Rate</div>
+          <div id="analytics-wa-rate" class="metric-value">0%</div>
+          <div class="progress-bar-container">
+            <div id="analytics-wa-progress" class="progress-bar" style="width: 0%;"></div>
+          </div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Gender Distribution</div>
+          <div id="analytics-gender-ratio" class="metric-value">0M / 0F</div>
+          <div class="gender-progress-bar">
+            <div id="analytics-male-bar" class="gender-bar male" style="width: 0%;"></div>
+            <div id="analytics-female-bar" class="gender-bar female" style="width: 0%;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="analytics-visuals-grid">
+        <!-- Academic Levels Bar Chart -->
+        <div class="card analytics-card">
+          <div class="card-title">Academic Level Breakdown</div>
+          <div class="level-stats-list">
+            <div class="level-stat-row">
+              <span class="level-label">Level 100</span>
+              <div class="bar-wrapper">
+                <div id="bar-lvl-100" class="stat-bar" style="width: 0%;"></div>
+              </div>
+              <span id="val-lvl-100" class="stat-count">0</span>
+            </div>
+            <div class="level-stat-row">
+              <span class="level-label">Level 200</span>
+              <div class="bar-wrapper">
+                <div id="bar-lvl-200" class="stat-bar" style="width: 0%;"></div>
+              </div>
+              <span id="val-lvl-200" class="stat-count">0</span>
+            </div>
+            <div class="level-stat-row">
+              <span class="level-label">Level 300</span>
+              <div class="bar-wrapper">
+                <div id="bar-lvl-300" class="stat-bar" style="width: 0%;"></div>
+              </div>
+              <span id="val-lvl-300" class="stat-count">0</span>
+            </div>
+            <div class="level-stat-row">
+              <span class="level-label">Level 400</span>
+              <div class="bar-wrapper">
+                <div id="bar-lvl-400" class="stat-bar" style="width: 0%;"></div>
+              </div>
+              <span id="val-lvl-400" class="stat-count">0</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Donut Composition -->
+        <div class="card analytics-card donut-card-wrapper">
+          <div class="card-title">Academic Level Composition</div>
+          <div class="donut-chart-container">
+            <svg width="150" height="150" viewBox="0 0 100 100" class="donut-svg">
+              <circle cx="50" cy="50" r="35" fill="transparent" stroke="rgba(0, 0, 0, 0.05)" stroke-width="12"></circle>
+              <circle id="donut-lvl-100" cx="50" cy="50" r="35" fill="transparent" stroke="var(--gold)" stroke-width="12" stroke-dasharray="219.91" stroke-dashoffset="219.91" transform="rotate(-90 50 50)"></circle>
+              <circle id="donut-lvl-200" cx="50" cy="50" r="35" fill="transparent" stroke="#1a73e8" stroke-width="12" stroke-dasharray="219.91" stroke-dashoffset="219.91" transform="rotate(-90 50 50)"></circle>
+              <circle id="donut-lvl-300" cx="50" cy="50" r="35" fill="transparent" stroke="#2e7d32" stroke-width="12" stroke-dasharray="219.91" stroke-dashoffset="219.91" transform="rotate(-90 50 50)"></circle>
+              <circle id="donut-lvl-400" cx="50" cy="50" r="35" fill="transparent" stroke="#8e24aa" stroke-width="12" stroke-dasharray="219.91" stroke-dashoffset="219.91" transform="rotate(-90 50 50)"></circle>
+              <text x="50" y="52" text-anchor="middle" class="donut-center-text" id="donut-total-text">0</text>
+              <text x="50" y="64" text-anchor="middle" class="donut-center-subtext">Students</text>
+            </svg>
+            
+            <div class="donut-legend">
+              <div class="legend-item"><span class="legend-dot lvl-100"></span> L100: <strong id="lbl-donut-100">0%</strong></div>
+              <div class="legend-item"><span class="legend-dot lvl-200"></span> L200: <strong id="lbl-donut-200">0%</strong></div>
+              <div class="legend-item"><span class="legend-dot lvl-300"></span> L300: <strong id="lbl-donut-300">0%</strong></div>
+              <div class="legend-item"><span class="legend-dot lvl-400"></span> L400: <strong id="lbl-donut-400">0%</strong></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Demographics Table -->
+        <div class="card analytics-card card-span-2">
+          <div class="card-title">Demographics &amp; Study Fields</div>
+          <div class="table-scroll-container">
+            <table class="analytics-table">
+              <thead>
+                <tr>
+                  <th>Student</th>
+                  <th>Level</th>
+                  <th>Hometown</th>
+                  <th>Programme</th>
+                </tr>
+              </thead>
+              <tbody id="list-demographics-main">
+                <tr>
+                  <td colspan="4" style="text-align: center; color: var(--ink-light);">No student records available</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Export Panel -->
+      <div class="export-cards-grid" style="margin-top: 24px;">
+        <div class="export-card" id="export-card-excel-element">
+          <div>
+            <div class="export-icon" aria-hidden="true">📊</div>
+            <h3 class="export-card-title">Export Directory</h3>
+            <p class="export-card-desc">
+              Download the complete registered student database as a styled Excel spreadsheet file (.xls). Includes formatting matching existing standards.
+            </p>
+          </div>
+          <button type="button" id="btn-export-csv" class="btn btn-green">Download Excel File</button>
+        </div>
+
+        <div class="export-card">
+          <div>
+            <div class="export-icon" aria-hidden="true">📝</div>
+            <h3 class="export-card-title">Summary Report</h3>
+            <p class="export-card-desc">
+              Compile a raw text summary report containing total numbers, gender breakdown, level statistics, and WhatsApp enrollment data.
+            </p>
+          </div>
+          <button type="button" id="btn-export-summary" class="btn btn-primary">Copy Text Summary</button>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ═══ TAB 5: EXECUTIVES (Chapter Admin/President only) ═══ -->
+    <div id="tab-executives" class="tab-content">
+      <div class="section-header">
+        <span>Chapter Executive Team</span>
+        <span>Leadership Registry</span>
+      </div>
+
+      <!-- Credentials display countdown card (auto-clears after 30 seconds) -->
+      <div class="credentials-reveal-box" id="reveal-credentials-wrapper">
+        <h3 class="card-title" style="margin-top:0; color:var(--blue); font-size:14px; border-bottom: 1px solid rgba(26,115,232,0.15); padding-bottom:8px;">
+          🔑 NEW EXECUTIVE CREDENTIALS CREATED
+        </h3>
+        <p style="font-size:12px; margin-bottom:12px; color:#555;">
+          Copy these credentials now to share with the executive. For security, this card will clear itself in <strong id="credentials-countdown">30</strong> seconds.
+        </p>
+        
+        <div class="credentials-value-row">
+          <span>Email Address:</span>
+          <code id="reveal-email-val">—</code>
+        </div>
+        <div class="credentials-value-row" style="margin-bottom:14px;">
+          <span>Temporary Password:</span>
+          <code id="reveal-password-val">—</code>
+        </div>
+        
+        <button type="button" id="btn-copy-credentials" class="btn btn-primary" style="margin:0; width:100%; font-size:12px; padding:8px;">Copy Credentials</button>
+      </div>
+
+      <!-- Add Executive Form Card -->
+      <div class="card">
+        <div class="card-title">Create Executive Access</div>
+        <form id="exec-form" onsubmit="handleExecSubmit(event)">
+          <div class="form-group">
+            <label class="form-label" for="exec-fullname">Full Name <span class="required">*</span></label>
+            <input type="text" id="exec-fullname" class="form-input" placeholder="e.g. Mahama Haruna" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="exec-email">Email Address <span class="required">*</span></label>
+            <input type="email" id="exec-email" class="form-input" placeholder="e.g. haruna@domain.com" required>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 20px;">
+            <label class="form-label" for="exec-role">Executive Position <span class="required">*</span></label>
+            <select id="exec-role" class="form-select" required>
+              <option value="" disabled selected>Select Position</option>
+              <option value="president">President</option>
+              <option value="vice_president">Vice President</option>
+              <option value="pro">PRO (Public Relations Officer)</option>
+              <option value="financial_sec">Financial Secretary</option>
+              <option value="secretary">Secretary</option>
+              <option value="welfare">Welfare Officer</option>
+              <option value="organizing_sec">Organizing Secretary</option>
+            </select>
+            <!-- super_admin NEVER shown in chapter dropdown -->
+          </div>
+
+          <button type="submit" id="btn-exec-submit" class="btn btn-primary">Create Executive</button>
+        </form>
+      </div>
+
+      <!-- Executive Team List Table -->
+      <div class="card" style="margin-top:24px;">
+        <div class="card-title">Active Leadership Team</div>
+        <div class="table-responsive">
+          <table class="members-table" style="font-size:12.5px;">
+            <thead>
+              <tr>
+                <th>Full Name</th>
+                <th>Email Address</th>
+                <th>Position</th>
+                <th>Status</th>
+                <th style="width: 100px;" class="text-center">Action</th>
+              </tr>
+            </thead>
+            <tbody id="execs-table-body">
+              <!-- Populated dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ═══ TAB 6: FINANCE ═══ -->
+    <div id="tab-finance" class="tab-content">
+      <div class="section-header">
+        <span>Chapter Financial Ledger</span>
+        <span>Account Registry</span>
+      </div>
+
+      <!-- Balance Sheet cards -->
+      <div class="finance-metrics-grid">
+        <div class="finance-card income">
+          <span class="finance-label">Total Revenue (Income)</span>
+          <span class="finance-value" id="finance-income-val">GHS 0.00</span>
+        </div>
+        <div class="finance-card expense">
+          <span class="finance-label">Total Disbursed (Expenses)</span>
+          <span class="finance-value" id="finance-expense-val">GHS 0.00</span>
+        </div>
+        <div class="finance-card balance">
+          <span class="finance-label">Available Balance</span>
+          <span class="finance-value" id="finance-balance-val" style="color:var(--green);">GHS 0.00</span>
+        </div>
+      </div>
+
+      <!-- Controls row -->
+      <div class="filter-bar" style="justify-content: space-between;">
+        <div style="display:flex; gap:10px; align-items:center;">
+          <span style="font-size:12px; font-weight:700; color:var(--ink-mid);">Transactions Ledger</span>
+        </div>
+        
+        <div style="display:flex; gap:10px;">
+          <button type="button" id="btn-export-finance-csv" class="btn btn-secondary" style="width:auto; font-size:12px; padding: 6px 14px; margin:0;">Export Ledger</button>
+          <button type="button" id="btn-trigger-add-record" class="btn btn-primary" style="width:auto; font-size:12px; padding: 6px 14px; margin:0;">+ Add Record</button>
+        </div>
+      </div>
+
+      <!-- Financial Ledger table -->
+      <div class="table-responsive" style="margin-top:16px;">
+        <table class="members-table" style="font-size:12.5px;">
+          <thead>
+            <tr>
+              <th style="width:100px;">Date</th>
+              <th>Description</th>
+              <th>Type</th>
+              <th>Amount</th>
+              <th>Recorded By</th>
+              <th style="width:80px;" class="text-center">Receipt</th>
+              <th style="width:50px;" class="text-center delete-finance-col">Delete</th>
+            </tr>
+          </thead>
+          <tbody id="finance-table-body">
+            <!-- Populated dynamically -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ═══ MODAL: FINANCE TRANSACTION FORM ═══ -->
+  <div class="dashboard-modal-overlay" id="finance-modal">
+    <div class="dashboard-modal-card">
+      <div class="modal-header" style="margin-bottom: 16px;">
+        <h2 class="modal-title" style="color:var(--ink-dark);">Record Transaction Entry</h2>
+        <button type="button" class="btn-close-modal" style="color:var(--ink-light);" onclick="closeFinanceModal()">&times;</button>
+      </div>
+
+      <form id="finance-form" onsubmit="handleFinanceSubmit(event)">
+        <div class="form-group">
+          <label class="form-label" for="fin-type">Transaction Type <span class="required">*</span></label>
+          <select id="fin-type" class="form-select" required>
+            <option value="" disabled selected>Select transaction type</option>
+            <option value="income">Income (Revenue / Dues)</option>
+            <option value="expense">Expense (Disbursement)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="fin-amount">Amount (GHS) <span class="required">*</span></label>
+          <!-- Custom currency validation pattern -->
+          <input type="number" step="0.01" min="0.01" id="fin-amount" class="form-input" placeholder="e.g. 150.00" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="fin-date">Date <span class="required">*</span></label>
+          <input type="date" id="fin-date" class="form-input" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="fin-desc">Description / Narrative <span class="required">*</span></label>
+          <input type="text" id="fin-desc" class="form-input" placeholder="e.g. Midsem refreshments, Dues collections" required>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 24px;">
+          <label class="form-label" for="fin-receipt">Receipt Image / Doc URL</label>
+          <input type="url" id="fin-receipt" class="form-input" placeholder="e.g. https://domain.com/receipt.jpg">
+        </div>
+
+        <div style="display:flex; justify-content: flex-end; gap: 10px;">
+          <button type="button" class="btn btn-secondary" style="margin:0; padding:8px 16px;" onclick="closeFinanceModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary" style="margin:0; padding:8px 16px;" id="btn-finance-submit">Save Transaction</button>
+        </div>
+      </form>
+    </div>
   </div>
+
+  <footer>
+    &copy; 2026 NAGS Ghana &middot; Pioneers of Gonjaland &middot; Developed by Q-Nova GH
+  </footer>
+
+  <!-- Scripts -->
   <script src="../config.js?v=36"></script>
-  <script>
-    // ── Auth Guard ──
-    const loggedIn = sessionStorage.getItem('nags_logged_in');
-    const role     = sessionStorage.getItem('nags_role');
-    const name     = sessionStorage.getItem('nags_exec_name');
-
-    if (!loggedIn) {
-      window.location.href = '/login.html';
-    }
-    if (role === 'super_admin') {
-      window.location.href = '/super-admin/';
-    }
-
-    // ── Populate stub with session data ──
-    if (name) document.getElementById('exec-name-display').textContent = name;
-    if (role) document.getElementById('role-badge').textContent = role.replace(/_/g,' ').toUpperCase();
-
-    // Show role-appropriate tabs in preview
-    const tabsByRole = {
-      chapter_admin:  ['Members','SMS','Analytics','Executives','Finance','Settings'],
-      president:      ['Members','SMS','Analytics','Executives','Finance','Settings'],
-      vice_president: ['Members','SMS','Analytics','Finance (read-only)'],
-      pro:            ['Members','SMS','Analytics'],
-      organizing_sec: ['Members','SMS'],
-      financial_sec:  ['Finance','Analytics (read-only)'],
-      secretary:      ['Members (read-only)','Analytics (read-only)'],
-      welfare:        ['Members (read-only)']
-    };
-    const tabs = tabsByRole[role] || ['Members'];
-    const preview = document.getElementById('tabs-preview');
-    preview.innerHTML = tabs.map(t => `<div class="tab-chip">${t}</div>`).join('');
-
-    // Logout clears session
-    document.getElementById('btn-logout').addEventListener('click', (e) => {
-      e.preventDefault();
-      sessionStorage.clear();
-      window.location.href = '/login.html';
-    });
-  </script>
+  <script src="dashboard.js?v=36"></script>
 </body>
 </html>

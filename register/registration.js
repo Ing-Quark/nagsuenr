@@ -1,7 +1,8 @@
-// registration.js - Public Registration Flow Logic
+// registration.js - Public Registration Flow Logic (Multi-Tenant Version)
 
 let supabaseClient;
 let currentRegisteredPhone = '';
+let currentUniversity = null; // Store university record { id, name, short_name, slug, whatsapp_link, facebook_link }
 
 // Custom Toast Notification system replacing browser alert dialogs
 const Toast = {
@@ -144,8 +145,8 @@ const AudioEffects = {
   }
 };
 
-// Initialize Database Client
-function initSupabase() {
+// Initialize Database Client and Load Chapter Context
+async function initSupabase() {
   if (typeof CONFIG === 'undefined') {
     showErrorBanner('System Configuration Error: Configuration files are missing.');
     return;
@@ -159,11 +160,65 @@ function initSupabase() {
   try {
     if (window.supabase) {
       supabaseClient = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
+      await loadChapterContext();
     } else {
       showErrorBanner('System Offline: Please verify your internet connection.');
     }
   } catch (e) {
     showErrorBanner('Database Connection Error: Service temporarily unavailable.');
+  }
+}
+
+// Load Chapter dynamic branding based on slug ?chapter=
+async function loadChapterContext() {
+  const params = new URLSearchParams(window.location.search);
+  const slug = params.get('chapter') || 'uenr';
+
+  // Static Fallback for UENR (consistent with Phase 2 seed data)
+  const fallbackUENR = {
+    id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+    name: 'University of Energy and Natural Resources',
+    short_name: 'UENR',
+    slug: 'uenr',
+    location: 'Sunyani, Bono Region, Ghana',
+    whatsapp_link: 'https://chat.whatsapp.com/invite',
+    facebook_link: 'https://facebook.com/nagsuenr'
+  };
+
+  try {
+    const { data, error } = await supabaseClient
+      .from('universities')
+      .select('*')
+      .eq('slug', slug)
+      .eq('is_active', true)
+      .single();
+
+    if (error || !data) {
+      // Use fallback if table doesn't exist yet or query fails
+      currentUniversity = fallbackUENR;
+    } else {
+      currentUniversity = data;
+    }
+  } catch (e) {
+    currentUniversity = fallbackUENR;
+  }
+
+  // Update DOM elements dynamically
+  const titleEl = document.getElementById('chapter-title');
+  const subtitleEl = document.getElementById('chapter-subtitle');
+  const mottoEl = document.getElementById('chapter-motto');
+  const logoEl = document.getElementById('chapter-logo');
+
+  if (titleEl) titleEl.textContent = 'National Association of Gonjaland Students';
+  if (subtitleEl) subtitleEl.textContent = `NAGS-${currentUniversity.short_name} — ${currentUniversity.name} Chapter`;
+  
+  if (mottoEl) {
+    const loc = currentUniversity.location || 'Ghana';
+    mottoEl.innerHTML = `${loc} &middot; Motto: Kishilbi Konwule M'ata Kuyu`;
+  }
+
+  if (logoEl && currentUniversity.logo_url) {
+    logoEl.src = currentUniversity.logo_url;
   }
 }
 
@@ -221,7 +276,8 @@ function setupAdminPortalEasterEgg() {
       if (window.navigator && window.navigator.vibrate) {
         window.navigator.vibrate([80, 50, 80]); // Triple haptic vibration
       }
-      window.location.href = '/admin';
+      const slug = currentUniversity ? currentUniversity.slug : 'uenr';
+      window.location.href = `/login.html?chapter=${encodeURIComponent(slug)}`;
     }
   });
 
@@ -232,7 +288,8 @@ function setupAdminPortalEasterEgg() {
       if (window.navigator && window.navigator.vibrate) {
         window.navigator.vibrate(120); // Single long vibration confirmation
       }
-      window.location.href = '/admin';
+      const slug = currentUniversity ? currentUniversity.slug : 'uenr';
+      window.location.href = `/login.html?chapter=${encodeURIComponent(slug)}`;
     }, 1500);
   };
   const endPress = () => {
@@ -379,16 +436,17 @@ function setupNavigation() {
     btnJoinWhatsapp.addEventListener('click', async () => {
       AudioEffects.playClick();
       HapticEffects.tap();
-      const inviteLink = localStorage.getItem('whatsapp_invite_link') || CONFIG.WHATSAPP_INVITE_LINK;
+      const inviteLink = (currentUniversity && currentUniversity.whatsapp_link) || CONFIG.WHATSAPP_INVITE_LINK;
       window.open(inviteLink, '_blank');
       
       // Attempt to silently update database that they joined
-      if (supabaseClient && currentRegisteredPhone) {
+      if (supabaseClient && currentRegisteredPhone && currentUniversity) {
         try {
           await supabaseClient
             .from('nags_members')
             .update({ whatsapp_joined: true })
-            .eq('phone', currentRegisteredPhone);
+            .eq('phone', currentRegisteredPhone)
+            .eq('university_id', currentUniversity.id);
         } catch (e) {
           console.warn('Silent WA status update failed: ', e);
         }
@@ -401,7 +459,7 @@ function setupNavigation() {
     btnVisitFacebook.addEventListener('click', () => {
       AudioEffects.playClick();
       HapticEffects.tap();
-      const fbLink = localStorage.getItem('facebook_link') || CONFIG.FACEBOOK_LINK;
+      const fbLink = (currentUniversity && currentUniversity.facebook_link) || CONFIG.FACEBOOK_LINK;
       window.open(fbLink, '_blank');
     });
   }
@@ -488,12 +546,19 @@ async function validateStep1() {
     return false;
   }
 
+  if (!currentUniversity) {
+    showFormError('Institutional configuration is loading. Please wait.');
+    return false;
+  }
+
   showLoader(true);
   try {
+    // Check duplicates ONLY within this specific university chapter
     const { data, error } = await supabaseClient
       .from('nags_members')
       .select('id')
       .eq('phone', phone)
+      .eq('university_id', currentUniversity.id)
       .maybeSingle();
 
     showLoader(false);
@@ -505,7 +570,7 @@ async function validateStep1() {
     }
 
     if (data) {
-      showFormError('This number is already registered. Welcome back!');
+      showFormError('This number is already registered in this chapter. Welcome back!');
       return false;
     }
 
@@ -546,7 +611,7 @@ async function registerMember() {
     whatsapp = '';
   }
 
-  if (!supabaseClient) {
+  if (!supabaseClient || !currentUniversity) {
     showFormError('Database client is not available. Please try again.');
     return;
   }
@@ -564,7 +629,8 @@ async function registerMember() {
           level: level,
           phone: phone,
           whatsapp: whatsapp,
-          whatsapp_joined: false
+          whatsapp_joined: false,
+          university_id: currentUniversity.id // multi-tenant association
         }
       ])
       .select();
@@ -598,6 +664,7 @@ function showFormError(msg) {
   }
 }
 
+// Clear error
 function clearError() {
   const errorBox = document.getElementById('form-error-box');
   if (errorBox) {
@@ -606,6 +673,7 @@ function clearError() {
   }
 }
 
+// Show/Hide Spinner loading (no arrows on Continue / Confirm text)
 function showLoader(show, text = 'Checking...') {
   const btn = document.getElementById('btn-continue');
   const btnConfirm = document.getElementById('btn-confirm');
@@ -629,11 +697,11 @@ function showLoader(show, text = 'Checking...') {
   } else {
     if (btn && btn.disabled) {
       btn.disabled = false;
-      btn.innerHTML = btn.dataset.originalText || 'Continue &rarr;';
+      btn.innerHTML = btn.dataset.originalText || 'Continue';
     }
     if (btnConfirm && btnConfirm.disabled) {
       btnConfirm.disabled = false;
-      btnConfirm.innerHTML = btnConfirm.dataset.originalText || 'Confirm &amp; Register &rarr;';
+      btnConfirm.innerHTML = btnConfirm.dataset.originalText || 'Confirm &amp; Register';
     }
   }
 }
