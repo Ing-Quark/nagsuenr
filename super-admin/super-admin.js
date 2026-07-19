@@ -240,26 +240,31 @@ async function loadPlatformAggregates() {
     });
     totalFinanceBalance = balance;
 
+    const setElemText = (id, text) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = text;
+    };
+
     // Animate stats ribbon
     animateCounter('stat-chapters', uCount || 0);
     animateCounter('stat-execs', executivesList.length);
     animateCounter('stat-members', totalMembersCount);
-    document.getElementById('stat-revenue').textContent = `GHS ${totalFinanceBalance.toFixed(2)}`;
+    setElemText('stat-revenue', `GHS ${totalFinanceBalance.toFixed(2)}`);
 
     // Sub-pills
     const activeCount = chapters.filter(c => c.is_active).length;
-    document.getElementById('stat-active-chapters-pill').textContent = `${activeCount} Active`;
+    setElemText('stat-active-chapters-pill', `${activeCount} Active`);
 
     // Analytics tab
-    document.getElementById('stats-active-chapters').textContent = `${activeCount} / ${chapters.length}`;
-    document.getElementById('stats-exec-count').textContent = executivesList.length;
-    document.getElementById('stats-sms-count').textContent = totalSMSCount;
-    document.getElementById('stats-member-count').textContent = totalMembersCount;
-    document.getElementById('stats-total-balances').textContent = `GHS ${totalFinanceBalance.toFixed(2)}`;
+    setElemText('stats-active-chapters', `${activeCount} / ${chapters.length}`);
+    setElemText('stats-exec-count', executivesList.length);
+    setElemText('stats-sms-count', totalSMSCount);
+    setElemText('stats-member-count', totalMembersCount);
+    setElemText('stats-total-balances', `GHS ${totalFinanceBalance.toFixed(2)}`);
 
     // Tab badges
-    document.getElementById('badge-chapters-count').textContent = chapters.length;
-    document.getElementById('badge-execs-count').textContent = executivesList.length;
+    setElemText('badge-chapters-count', chapters.length);
+    setElemText('badge-execs-count', executivesList.length);
 
   } catch(e) {
     console.error('Stats aggregation error:', e);
