@@ -2,7 +2,14 @@
 
 let supabaseClient;
 let currentRegisteredPhone = '';
-let currentUniversity = null; // Store university record { id, name, short_name, slug, whatsapp_link, facebook_link }
+let currentUniversity = null;
+
+// Safe Lucide Vector Icon Re-rendering Engine (Patch #1: Race condition fix)
+function refreshVectorIcons() {
+  if (typeof lucide !== 'undefined' && typeof lucide.createIcons === 'function') {
+    try { lucide.createIcons(); } catch(e){}
+  }
+}
 
 // Custom Toast Notification system replacing browser alert dialogs
 const Toast = {

@@ -1,28 +1,47 @@
 /* style.css - NAGS-UENR Global Styles */
 
-/* Design System Tokens */
-:root {
-  /* Colors */
-  --blue: #1a3f72;
-  --blue-dark: #15325c;
-  --green: #1e5c2e;
-  --gold: #c9960a;
-  --gold-light: #f0d878;
-  --ink: #111111;
-  --ink-mid: #3a3a3a;
-  --ink-light: #6b6b6b;
-  --rule: #cccccc;
-  --paper: #fdfcf9;
-  --cream: #f5f0e8;
-  --bg: #f0f0ee;
-  
-  /* Fonts */
-  --primary-font: 'Times New Roman', Georgia, serif;
-  --ui-font: Arial, Helvetica, sans-serif;
-  
-  /* Shadow */
-  --card-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
+  /* Premium Multi-Tenant Glassmorphic Tokens */
+  --bg-app-rgb: 6, 11, 20;
+  --surface-01-rgb: 11, 20, 36;
+  --surface-02-rgb: 17, 31, 56;
+  --surface-03-rgb: 26, 44, 76;
+  --gold-primary-rgb: 226, 180, 59;
+  --emerald-active-rgb: 16, 185, 129;
+  --crimson-alert-rgb: 244, 63, 94;
+
+  --bg-app: rgba(var(--bg-app-rgb), 1);
+  --surface-01: rgba(var(--surface-01-rgb), 0.95);
+  --surface-02: rgba(var(--surface-02-rgb), 0.75);
+  --surface-03: rgba(var(--surface-03-rgb), 0.85);
+  --surface-hover: rgba(var(--surface-02-rgb), 0.95);
+
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-medium: rgba(255, 255, 255, 0.16);
+  --border-accent: rgba(var(--gold-primary-rgb), 0.35);
+
+  --gold-primary: rgba(var(--gold-primary-rgb), 1);
+  --gold-hover: #f3cd68;
+  --gold-muted: rgba(var(--gold-primary-rgb), 0.15);
+  --emerald-active: rgba(var(--emerald-active-rgb), 1);
+  --emerald-muted: rgba(var(--emerald-active-rgb), 0.15);
+  --crimson-alert: rgba(var(--crimson-alert-rgb), 1);
+  --crimson-muted: rgba(var(--crimson-alert-rgb), 0.15);
 }
+
+/* Lucide Vector Icon Utility Rules */
+.lucide-icon, svg.lucide {
+  width: 16px;
+  height: 16px;
+  stroke-width: 2.2px;
+  vertical-align: middle;
+  display: inline-block;
+  flex-shrink: 0;
+}
+.lucide-lg { width: 22px; height: 22px; }
+.lucide-sm { width: 14px; height: 14px; }
+.lucide-gold { stroke: var(--gold-primary); }
+.lucide-emerald { stroke: var(--emerald-active); }
+.lucide-crimson { stroke: var(--crimson-alert); }
 
 /* Reset and Core Layout */
 * {

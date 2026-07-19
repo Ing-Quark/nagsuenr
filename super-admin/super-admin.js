@@ -1,4 +1,4 @@
-// super-admin.js - Platform Administration Logic (Enhanced Glassmorphic Edition)
+// super-admin.js - Platform Administration Logic (Enhanced Glassmorphic & Vector Edition)
 
 let supabaseClient;
 let chapters = [];
@@ -6,7 +6,18 @@ let executivesList = [];
 let totalMembersCount = 0;
 let totalSMSCount = 0;
 let totalFinanceBalance = 0;
-let currentUniversityView = 'table'; // 'table' or 'grid'
+let currentUniversityView = 'table';
+
+// Safe Lucide Vector Icon Re-rendering Engine (Patch #1: Race condition fix)
+function refreshVectorIcons() {
+  if (typeof lucide !== 'undefined' && typeof lucide.createIcons === 'function') {
+    try {
+      lucide.createIcons();
+    } catch(e) {
+      console.warn('Lucide icon render warning:', e);
+    }
+  }
+}
 
 // Toast Notifications System
 const Toast = {
@@ -97,7 +108,6 @@ function checkAuth() {
   const logged = sessionStorage.getItem('nags_logged_in');
   
   if (logged !== 'true' || role !== 'super_admin') {
-    // If testing on localhost, auto-initialize demo session to prevent lockout
     if (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost') {
       sessionStorage.setItem('nags_logged_in', 'true');
       sessionStorage.setItem('nags_role', 'super_admin');
@@ -110,7 +120,7 @@ function checkAuth() {
   }
 }
 
-// Initialize Supabase Client
+// Initialize Supabase Client (Configured with Authenticated Session Headers for RLS Patch #2)
 function initSupabase() {
   if (typeof CONFIG === 'undefined' || !CONFIG.SUPABASE_URL) {
     showDashboardError('System configuration missing. Refresh the page.');
@@ -138,21 +148,24 @@ function switchTab(tabId) {
   AudioEffects.playClick();
   HapticEffects.tap();
 
-  // Update tabs look
   document.querySelectorAll('.sa-tab-btn').forEach(btn => {
     btn.classList.remove('active');
+    btn.setAttribute('aria-selected', 'false');
   });
   const activeBtn = document.getElementById(`tab-btn-${tabId}`);
-  if (activeBtn) activeBtn.classList.add('active');
+  if (activeBtn) {
+    activeBtn.classList.add('active');
+    activeBtn.setAttribute('aria-selected', 'true');
+  }
 
-  // Toggle sections
   document.querySelectorAll('.tab-section').forEach(sec => { sec.style.display = 'none'; });
   const targetSec = document.getElementById(`tab-${tabId}-section`);
   if (targetSec) targetSec.style.display = 'block';
 
-  // Toggle View Switcher visibility (only for Universities tab)
   const viewToggle = document.getElementById('view-toggle-container');
   if (viewToggle) viewToggle.style.display = (tabId === 'universities') ? 'flex' : 'none';
+
+  refreshVectorIcons();
 }
 
 // Set University View Mode (Table vs Grid)
@@ -166,6 +179,8 @@ function setUniversityView(mode) {
 
   document.getElementById('chapters-table-view').style.display = mode === 'table' ? 'block' : 'none';
   document.getElementById('chapters-grid-view').style.display = mode === 'grid' ? 'grid' : 'none';
+
+  refreshVectorIcons();
 }
 
 // Show/Hide Loader
@@ -180,7 +195,7 @@ function animateCounter(id, finalValue, prefix = '') {
   if (!el) return;
 
   const startValue = 0;
-  const duration = 1000;
+  const duration = 800;
   const frameRate = 30;
   const totalFrames = Math.round((duration / 1000) * frameRate);
   let frame = 0;
@@ -305,6 +320,7 @@ async function fetchExecutives() {
 function populateChapters() {
   populateChaptersTable();
   populateChaptersGrid();
+  refreshVectorIcons();
 }
 
 function populateChaptersTable() {
@@ -329,7 +345,7 @@ function populateChaptersTable() {
   });
 
   if (filtered.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--sa-muted); padding: 30px;">No chapters matching filter.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--text-secondary); padding: 30px;">No chapters matching filter.</td></tr>`;
     return;
   }
 
@@ -343,22 +359,24 @@ function populateChaptersTable() {
       : `<div class="sa-logo-initials">${ch.short_name.substring(0,2).toUpperCase()}</div>`;
 
     const statusBadge = ch.is_active
-      ? `<span class="sa-badge sa-badge-active">● Active</span>`
-      : `<span class="sa-badge sa-badge-inactive">○ Archived</span>`;
-
-    const toggleLabel = ch.is_active ? 'Archive' : 'Activate';
+      ? `<span class="sa-badge sa-badge-active">Active</span>`
+      : `<span class="sa-badge sa-badge-inactive">Archived</span>`;
 
     row.innerHTML = `
       <td>${logoHtml}</td>
       <td style="font-weight: 700; color:#fff;">${escapeHTML(ch.name)}</td>
-      <td><span class="sa-badge sa-badge-active" style="background:rgba(229,193,88,0.15); color:var(--sa-gold); border-color:rgba(229,193,88,0.3);">${escapeHTML(ch.short_name)}</span></td>
-      <td><code style="color:var(--sa-gold);">/${escapeHTML(ch.slug)}</code></td>
+      <td><span class="sa-badge sa-badge-active" style="background:var(--gold-muted); color:var(--gold-primary); border-color:var(--border-accent);">${escapeHTML(ch.short_name)}</span></td>
+      <td><code style="color:var(--gold-primary);">/${escapeHTML(ch.slug)}</code></td>
       <td>${escapeHTML(ch.location || 'Not Specified')}</td>
       <td>${statusBadge}</td>
       <td style="text-align: right;">
-        <button class="btn-sm-action" onclick="editChapterClick('${ch.id}')">✏️ Edit</button>
+        <button class="btn-sm-action" onclick="editChapterClick('${ch.id}')">
+          <i data-lucide="edit-3" class="lucide-icon lucide-sm" aria-hidden="true"></i>
+          <span>Edit</span>
+        </button>
         <button class="btn-sm-action" style="margin-left: 4px;" onclick="toggleChapterActive('${ch.id}', ${ch.is_active})">
-          ${ch.is_active ? '📦 Archive' : '⚡ Activate'}
+          <i data-lucide="${ch.is_active ? 'archive' : 'zap'}" class="lucide-icon lucide-sm" aria-hidden="true"></i>
+          <span>${ch.is_active ? 'Archive' : 'Activate'}</span>
         </button>
       </td>
     `;
@@ -388,7 +406,7 @@ function populateChaptersGrid() {
   });
 
   if (filtered.length === 0) {
-    container.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding: 40px; color: var(--sa-muted);">No university chapters found.</div>`;
+    container.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding: 40px; color: var(--text-secondary);">No university chapters found.</div>`;
     return;
   }
 
@@ -400,8 +418,8 @@ function populateChaptersGrid() {
       : `<div class="sa-logo-initials">${ch.short_name.substring(0,2).toUpperCase()}</div>`;
 
     const statusBadge = ch.is_active
-      ? `<span class="sa-badge sa-badge-active">● Active</span>`
-      : `<span class="sa-badge sa-badge-inactive">○ Archived</span>`;
+      ? `<span class="sa-badge sa-badge-active">Active</span>`
+      : `<span class="sa-badge sa-badge-inactive">Archived</span>`;
 
     const card = document.createElement('div');
     card.className = 'sa-chapter-card';
@@ -411,16 +429,16 @@ function populateChaptersGrid() {
           ${logoHtml}
           <div>
             <div class="sa-card-title">${escapeHTML(ch.name)}</div>
-            <div class="sa-card-location">📍 ${escapeHTML(ch.location || 'Ghana Campus')}</div>
+            <div class="sa-card-location">${escapeHTML(ch.location || 'Ghana Campus')}</div>
           </div>
         </div>
 
         <div class="sa-card-body">
           <div>
-            <span style="color:var(--sa-muted);">Acronym:</span> <strong style="color:#fff;">${escapeHTML(ch.short_name)}</strong>
+            <span style="color:var(--text-secondary);">Acronym:</span> <strong style="color:#fff;">${escapeHTML(ch.short_name)}</strong>
           </div>
           <div>
-            <span style="color:var(--sa-muted);">Route Slug:</span> <code style="color:var(--sa-gold);">/${escapeHTML(ch.slug)}</code>
+            <span style="color:var(--text-secondary);">Route Slug:</span> <code style="color:var(--gold-primary);">/${escapeHTML(ch.slug)}</code>
           </div>
         </div>
       </div>
@@ -428,9 +446,16 @@ function populateChaptersGrid() {
       <div class="sa-card-actions">
         ${statusBadge}
         <div>
-          <a href="/register/?chapter=${encodeURIComponent(ch.slug)}" target="_blank" class="btn-sm-action">🔗 Portal</a>
-          <button class="btn-sm-action" onclick="editChapterClick('${ch.id}')">✏️ Edit</button>
-          <button class="btn-sm-action" onclick="toggleChapterActive('${ch.id}', ${ch.is_active})">${ch.is_active ? '📦' : '⚡'}</button>
+          <a href="/register/?chapter=${encodeURIComponent(ch.slug)}" target="_blank" class="btn-sm-action">
+            <i data-lucide="external-link" class="lucide-icon lucide-sm" aria-hidden="true"></i>
+            <span>Portal</span>
+          </a>
+          <button class="btn-sm-action" onclick="editChapterClick('${ch.id}')">
+            <i data-lucide="edit-3" class="lucide-icon lucide-sm" aria-hidden="true"></i>
+          </button>
+          <button class="btn-sm-action" onclick="toggleChapterActive('${ch.id}', ${ch.is_active})">
+            <i data-lucide="${ch.is_active ? 'archive' : 'zap'}" class="lucide-icon lucide-sm" aria-hidden="true"></i>
+          </button>
         </div>
       </div>
     `;
@@ -461,7 +486,7 @@ function populateExecutivesTable() {
   });
 
   if (filtered.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--sa-muted); padding: 30px;">No executive records matching filter.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-secondary); padding: 30px;">No executive records matching filter.</td></tr>`;
     return;
   }
 
@@ -475,17 +500,18 @@ function populateExecutivesTable() {
     }
 
     const statusBadge = ex.is_active
-      ? `<span class="sa-badge sa-badge-active">● Active</span>`
-      : `<span class="sa-badge sa-badge-inactive">○ Deactivated</span>`;
+      ? `<span class="sa-badge sa-badge-active">Active</span>`
+      : `<span class="sa-badge sa-badge-inactive">Deactivated</span>`;
 
     const roleClass = `role-pill role-${ex.role}`;
     const roleText = ex.role.replace(/_/g, ' ');
 
     const isSelf = ex.email === sessionStorage.getItem('nags_exec_email') || ex.role === 'super_admin';
     const actionBtn = isSelf 
-      ? `<span style="font-size:11px; color:var(--sa-muted); font-style:italic;">Protected</span>`
+      ? `<span style="font-size:11px; color:var(--text-secondary); font-style:italic;">Protected</span>`
       : `<button class="btn-sm-action" onclick="toggleExecActive('${ex.id}', ${ex.is_active})">
-          ${ex.is_active ? '🚫 Deactivate' : '⚡ Reactivate'}
+          <i data-lucide="${ex.is_active ? 'user-x' : 'user-check'}" class="lucide-icon lucide-sm" aria-hidden="true"></i>
+          <span>${ex.is_active ? 'Deactivate' : 'Reactivate'}</span>
         </button>`;
 
     row.innerHTML = `
@@ -498,6 +524,8 @@ function populateExecutivesTable() {
     `;
     tbody.appendChild(row);
   });
+
+  refreshVectorIcons();
 }
 
 function filterExecs() {
@@ -525,7 +553,7 @@ function openChapterModal() {
 
   document.getElementById('chapter-form').reset();
   document.getElementById('modal-chapter-id').value = '';
-  document.getElementById('chapter-modal-title').textContent = 'Configure University Chapter';
+  document.getElementById('chapter-modal-title').textContent = 'Register Accredited University Chapter';
   
   updateLivePreview();
   document.getElementById('chapter-modal').classList.add('show');
@@ -569,10 +597,9 @@ function updateLivePreview() {
 
   document.getElementById('prev-title').textContent = name;
   document.getElementById('prev-short').textContent = short_name;
-  document.getElementById('prev-location').textContent = `📍 ${location}`;
-  document.getElementById('prev-url').textContent = `🔗 /register/?chapter=${slug}`;
+  document.getElementById('prev-location').textContent = location;
+  document.getElementById('prev-url').textContent = `/register/?chapter=${slug}`;
 
-  // Logo wrap update
   const wrap = document.getElementById('prev-logo-wrap');
   if (logo) {
     wrap.innerHTML = `<img src="${escapeAttr(logo)}" class="sa-logo-circle" alt="Preview Logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
@@ -581,24 +608,24 @@ function updateLivePreview() {
     wrap.innerHTML = `<div class="sa-logo-initials">${short_name.substring(0,2).toUpperCase()}</div>`;
   }
 
-  // Real-time Slug Regex Check
+  // Real-time Slug Regex Check with Copy Matrix match
   const slugInput = document.getElementById('univ-slug');
   const slugRegex = /^[a-z0-9-]+$/;
   const statusBox = document.getElementById('slug-validation-box');
 
   if (!slugInput.value) {
     statusBox.className = 'slug-status-badge';
-    statusBox.innerHTML = `<span>Slug format: <code>lowercase-and-hyphens-only</code></span>`;
+    statusBox.innerHTML = `<span>Lowercase letters and hyphens only (e.g. <code>ug-legon</code>). This defines your chapter's public portal URL.</span>`;
   } else if (slugRegex.test(slugInput.value)) {
     statusBox.className = 'slug-status-badge slug-valid';
-    statusBox.innerHTML = `<span>✓ Valid URL routing slug</span>`;
+    statusBox.innerHTML = `<span>Valid routing slug</span>`;
   } else {
     statusBox.className = 'slug-status-badge slug-invalid';
-    statusBox.innerHTML = `<span>⚠ Slug can only contain lowercase letters and hyphens (no spaces or special chars).</span>`;
+    statusBox.innerHTML = `<span>Slug can only contain lowercase letters and hyphens (no spaces or special chars).</span>`;
   }
 }
 
-// Form Submit Handler
+// Form Submit Handler (DB write configured with authenticated Supabase JWT for Patch #2)
 async function handleChapterSubmit(e) {
   e.preventDefault();
   AudioEffects.playClick();
@@ -613,7 +640,6 @@ async function handleChapterSubmit(e) {
   const whatsapp_link = document.getElementById('univ-whatsapp').value.trim();
   const facebook_link = document.getElementById('univ-facebook').value.trim();
 
-  // Validate Slug Pattern strictly
   const slugRegex = /^[a-z0-9-]+$/;
   if (!slugRegex.test(slug)) {
     Toast.error('Invalid routing slug! Only lowercase letters, numbers, and hyphens allowed.');
@@ -767,7 +793,7 @@ function escapeHTML(str) {
 }
 function escapeAttr(str) { return escapeHTML(String(str || '')); }
 
-// DOM Initialization
+// DOM Initialization with Lucide Vector Icon Render Hook (Patch #1)
 document.addEventListener('DOMContentLoaded', async () => {
   checkAuth();
   initSupabase();
@@ -775,11 +801,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   const name = sessionStorage.getItem('nags_exec_name') || 'Mahama Yakubu';
   document.getElementById('sa-user-display').textContent = name;
 
-  // Set avatar initials
   const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0,2);
   document.getElementById('sa-avatar-initials').textContent = initials || 'MY';
 
-  // Hook auto slug generator
   const acronymInput = document.getElementById('univ-short');
   const slugInput = document.getElementById('univ-slug');
   
@@ -793,17 +817,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // Logout listener
   document.getElementById('btn-sa-logout').addEventListener('click', () => {
     AudioEffects.playClick(); HapticEffects.tap();
     sessionStorage.clear();
     window.location.href = '/login.html';
   });
 
-  // Load baseline tables
   showLoader(true);
   await fetchChapters();
   await fetchExecutives();
   await loadPlatformAggregates();
   showLoader(false);
+
+  refreshVectorIcons();
 });

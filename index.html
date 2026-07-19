@@ -3,52 +3,69 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NAGS Ghana — Chapter Network</title>
+  <title>National Association of Gonjaland Students — Ghana Platform</title>
   <meta name="description" content="National Association of Gonjaland Students — Ghana Chapter Network. Select your university to register or access your chapter portal.">
   
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
   <link rel="stylesheet" href="style.css">
   <link rel="icon" type="image/png" href="nags.png">
   
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
 
   <style>
-    /* ── Platform Landing Specific Styles ── */
+    body {
+      background-color: var(--bg-app);
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(var(--gold-primary-rgb), 0.06) 0%, transparent 40%),
+        radial-gradient(circle at 85% 85%, rgba(var(--emerald-active-rgb), 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 50% 50%, var(--bg-app) 0%, #040810 100%);
+      background-attachment: fixed;
+      min-height: 100vh;
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+    }
+
     .platform-main {
-      background: linear-gradient(160deg, #1a3f72 0%, #0d2444 60%, #081830 100%);
-      min-height: calc(100vh - 120px);
-      padding: 32px 20px 48px;
+      min-height: calc(100vh - 160px);
+      padding: 40px 20px 60px;
     }
     .platform-section-label {
       text-align: center;
-      color: rgba(255,255,255,0.55);
-      font-family: var(--ui-font, 'Segoe UI', sans-serif);
-      font-size: 10px;
+      color: var(--text-secondary);
+      font-size: 11px;
       text-transform: uppercase;
-      letter-spacing: 0.2em;
-      margin-bottom: 24px;
+      letter-spacing: 0.15em;
+      font-weight: 700;
+      margin-bottom: 28px;
     }
     .chapters-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 20px;
-      max-width: 1100px;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 22px;
+      max-width: 1140px;
       margin: 0 auto;
     }
     .chapter-card {
-      background: #ffffff;
-      border-radius: 10px;
-      border: 1px solid #e6eaf0;
-      border-top: 3px solid #1a3f72;
-      padding: 24px 22px;
+      background: var(--surface-02);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 24px;
       display: flex;
       flex-direction: column;
-      gap: 14px;
-      transition: box-shadow 0.25s ease, transform 0.2s ease;
-      cursor: default;
+      justify-content: space-between;
+      gap: 16px;
+      transition: all 0.25s ease;
     }
     .chapter-card:hover {
-      box-shadow: 0 12px 32px rgba(0,0,0,0.18);
-      transform: translateY(-2px);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.4);
+      transform: translateY(-3px);
+      border-color: rgba(255, 255, 255, 0.18);
     }
     .chapter-card-header {
       display: flex;
@@ -56,15 +73,16 @@
       gap: 14px;
     }
     .chapter-logo-wrap {
-      width: 54px;
-      height: 54px;
+      width: 50px;
+      height: 50px;
       flex-shrink: 0;
       border-radius: 50%;
       overflow: hidden;
-      background: #f0f4fb;
+      background: rgba(255,255,255,0.08);
       display: flex;
       align-items: center;
       justify-content: center;
+      border: 1px solid var(--border-subtle);
     }
     .chapter-logo-wrap img {
       width: 100%;
@@ -72,117 +90,106 @@
       object-fit: contain;
     }
     .chapter-logo-initials {
-      font-size: 18px;
+      font-size: 16px;
       font-weight: 800;
-      color: #1a3f72;
-      font-family: var(--ui-font, 'Segoe UI', sans-serif);
-      letter-spacing: -0.5px;
+      color: var(--gold-primary);
     }
     .chapter-name {
-      font-size: 14px;
+      font-size: 15px;
       font-weight: 700;
-      color: #1a1a2e;
+      color: #fff;
       line-height: 1.35;
-      font-family: var(--body-font, Georgia, serif);
     }
     .chapter-badge {
       display: inline-block;
-      background: #1a3f72;
-      color: white;
+      background: var(--gold-muted);
+      color: var(--gold-primary);
+      border: 1px solid var(--border-accent);
       font-size: 9px;
-      font-family: var(--ui-font, 'Segoe UI', sans-serif);
-      font-weight: 700;
+      font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.1em;
-      padding: 2px 9px;
-      border-radius: 20px;
-      margin-top: 3px;
+      letter-spacing: 0.08em;
+      padding: 2px 8px;
+      border-radius: var(--radius-pill);
+      margin-top: 4px;
     }
     .chapter-location {
-      font-size: 11px;
-      color: #777;
-      font-family: var(--ui-font, 'Segoe UI', sans-serif);
+      font-size: 12px;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
     .chapter-actions {
       display: flex;
-      gap: 8px;
-      flex-direction: column;
+      gap: 10px;
+      margin-top: 6px;
     }
     .chapter-actions a {
-      display: block;
+      flex: 1;
       text-align: center;
       text-decoration: none;
-      padding: 9px 14px;
-      border-radius: 6px;
+      padding: 9px 12px;
+      border-radius: var(--radius-md);
       font-size: 12px;
-      font-weight: 600;
-      font-family: var(--ui-font, 'Segoe UI', sans-serif);
-      transition: opacity 0.2s ease;
-      cursor: pointer;
+      font-weight: 700;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
     }
-    .chapter-actions a:hover { opacity: 0.85; }
     .chapter-btn-register {
-      background: #1a3f72;
-      color: white;
+      background: linear-gradient(135deg, var(--gold-primary), #c49918);
+      color: #070e1b;
+    }
+    .chapter-btn-register:hover {
+      background: linear-gradient(135deg, #ebd076, #d4a720);
     }
     .chapter-btn-login {
-      background: transparent;
-      color: #1a3f72;
-      border: 1.5px solid #1a3f72;
+      background: rgba(255,255,255,0.06);
+      color: #fff;
+      border: 1px solid var(--border-subtle);
+    }
+    .chapter-btn-login:hover {
+      background: rgba(255,255,255,0.12);
     }
 
-    /* Loading skeleton */
     .skeleton-card {
-      background: rgba(255,255,255,0.07);
-      border-radius: 10px;
-      border: 1px solid rgba(255,255,255,0.1);
-      padding: 24px 22px;
-      height: 220px;
+      background: var(--surface-02);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-subtle);
+      height: 200px;
       animation: skeleton-pulse 1.5s ease-in-out infinite;
     }
     @keyframes skeleton-pulse {
       0%, 100% { opacity: 0.5; }
       50% { opacity: 1; }
     }
-    .platform-empty {
-      text-align: center;
-      padding: 60px 20px;
-      color: rgba(255,255,255,0.6);
-      font-family: var(--ui-font, 'Segoe UI', sans-serif);
-      max-width: 420px;
-      margin: 0 auto;
-    }
-    .platform-empty-icon { font-size: 42px; margin-bottom: 16px; }
-    .platform-empty-title { font-size: 16px; font-weight: 600; color: rgba(255,255,255,0.85); margin-bottom: 8px; }
-    .platform-empty-sub { font-size: 12px; line-height: 1.7; }
-
-    @media (max-width: 520px) {
-      .chapters-grid { grid-template-columns: 1fr; }
-    }
   </style>
 </head>
 <body>
 
   <!-- Platform Header -->
-  <header class="top-bar">
+  <header class="top-bar" role="banner">
     <div class="top-bar-content" style="justify-content: center;">
-      <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center;">
-        <div class="logo-box" style="border: none; padding: 0; margin-bottom: 4px;">
-          <img src="nags.png" alt="NAGS Ghana Logo" style="width: 50px; height: 50px; object-fit: contain;">
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center;">
+        <div class="logo-box" style="border: none; padding: 0; margin-bottom: 2px;">
+          <img src="nags.png" alt="NAGS Ghana Logo" style="width: 54px; height: 54px; object-fit: contain;">
         </div>
-        <h1 class="header-title">National Association of Gonjaland Students</h1>
-        <div class="header-subtitle">Ghana Chapter Network</div>
-        <div class="header-motto">Select your university to register or access your chapter portal</div>
+        <h1 class="header-title" style="font-size: 18px;">National Association of Gonjaland Students — Ghana Platform</h1>
+        <div class="header-subtitle" style="font-size: 13px; color: var(--gold-primary);">Centralized Chapter Network &amp; Member Registry</div>
+        <div class="header-motto">Select your university chapter to register or access your executive portal</div>
       </div>
     </div>
   </header>
 
   <!-- Main Platform Body -->
-  <main class="platform-main">
-    <p class="platform-section-label">Active Chapters</p>
+  <main class="platform-main" id="main-content">
+    <p class="platform-section-label">Accredited Public University Chapters</p>
 
     <!-- Loading skeletons shown initially -->
-    <div id="chapters-container" class="chapters-grid">
+    <div id="chapters-container" class="chapters-grid" aria-live="polite">
       <div class="skeleton-card"></div>
       <div class="skeleton-card"></div>
       <div class="skeleton-card"></div>
@@ -190,13 +197,19 @@
   </main>
 
   <!-- Platform Footer -->
-  <footer>
+  <footer role="contentinfo">
     <div>&copy; 2026 National Association of Gonjaland Students, Ghana. All rights reserved. Developed by Q-Nova GH</div>
   </footer>
 
   <script src="config.js?v=36"></script>
   <script>
     let supabaseClient;
+
+    function refreshVectorIcons() {
+      if (typeof lucide !== 'undefined' && typeof lucide.createIcons === 'function') {
+        try { lucide.createIcons(); } catch(e){}
+      }
+    }
 
     async function loadChapters() {
       const container = document.getElementById('chapters-container');
@@ -215,7 +228,6 @@
           .order('name', { ascending: true });
 
         if (error) {
-          // Table may not exist yet (Phase 2 not yet run) — show UENR fallback
           if (error.code === '42P01' || error.message.includes('does not exist')) {
             renderFallback(container);
             return;
@@ -225,11 +237,12 @@
 
         if (!data || data.length === 0) {
           container.outerHTML = `
-            <div class="platform-empty">
-              <div class="platform-empty-icon">🏛️</div>
-              <div class="platform-empty-title">No chapters registered yet</div>
-              <div class="platform-empty-sub">Chapters will appear here once added by the platform administrator.</div>
+            <div style="text-align:center; padding:60px 20px; color:var(--text-secondary);">
+              <i data-lucide="building-2" class="lucide-icon lucide-lg" style="margin-bottom:12px; opacity:0.5;"></i>
+              <div style="font-size:16px; font-weight:700; color:#fff; margin-bottom:6px;">No chapters registered yet</div>
+              <div style="font-size:12px;">Accredited university chapters will appear here once registered by national administration.</div>
             </div>`;
+          refreshVectorIcons();
           return;
         }
 
@@ -252,39 +265,60 @@
         const card = document.createElement('div');
         card.className = 'chapter-card';
         card.innerHTML = `
-          <div class="chapter-card-header">
-            <div class="chapter-logo-wrap">${logoContent}</div>
-            <div>
-              <div class="chapter-name">${escapeHTML(ch.name)}</div>
-              <div class="chapter-badge">${escapeHTML(ch.short_name)}</div>
+          <div>
+            <div class="chapter-card-header">
+              <div class="chapter-logo-wrap">${logoContent}</div>
+              <div>
+                <div class="chapter-name">${escapeHTML(ch.name)}</div>
+                <div class="chapter-badge">${escapeHTML(ch.short_name)}</div>
+              </div>
             </div>
+            ${ch.location ? `<div class="chapter-location" style="margin-top:12px;"><i data-lucide="map-pin" class="lucide-icon lucide-sm" aria-hidden="true"></i> <span>${escapeHTML(ch.location)}</span></div>` : ''}
           </div>
-          ${ch.location ? `<div class="chapter-location">&#128205; ${escapeHTML(ch.location)}</div>` : ''}
+
           <div class="chapter-actions">
-            <a href="/register/?chapter=${encodeURIComponent(ch.slug)}" class="chapter-btn-register">Register as Member &rarr;</a>
-            <a href="/login.html?chapter=${encodeURIComponent(ch.slug)}" class="chapter-btn-login">Executive Login</a>
+            <a href="/register/?chapter=${encodeURIComponent(ch.slug)}" class="chapter-btn-register">
+              <span>Register</span>
+              <i data-lucide="arrow-right" class="lucide-icon lucide-sm" aria-hidden="true"></i>
+            </a>
+            <a href="/login.html?chapter=${encodeURIComponent(ch.slug)}" class="chapter-btn-login">
+              <i data-lucide="lock" class="lucide-icon lucide-sm" aria-hidden="true"></i>
+              <span>Exec Login</span>
+            </a>
           </div>`;
         container.appendChild(card);
       });
+      refreshVectorIcons();
     }
 
     function renderFallback(container) {
-      // Show UENR as a static fallback when the universities table does not exist yet
       container.innerHTML = `
         <div class="chapter-card">
-          <div class="chapter-card-header">
-            <div class="chapter-logo-wrap"><img src="nags.png" alt="NAGS-UENR Logo"></div>
-            <div>
-              <div class="chapter-name">University of Energy and Natural Resources</div>
-              <div class="chapter-badge">UENR</div>
+          <div>
+            <div class="chapter-card-header">
+              <div class="chapter-logo-wrap"><img src="nags.png" alt="NAGS-UENR Logo"></div>
+              <div>
+                <div class="chapter-name">University of Energy and Natural Resources</div>
+                <div class="chapter-badge">UENR</div>
+              </div>
+            </div>
+            <div class="chapter-location" style="margin-top:12px;">
+              <i data-lucide="map-pin" class="lucide-icon lucide-sm" aria-hidden="true"></i>
+              <span>Sunyani, Bono Region, Ghana</span>
             </div>
           </div>
-          <div class="chapter-location">&#128205; Sunyani, Bono Region, Ghana</div>
           <div class="chapter-actions">
-            <a href="/register/?chapter=uenr" class="chapter-btn-register">Register as Member &rarr;</a>
-            <a href="/login.html?chapter=uenr" class="chapter-btn-login">Executive Login</a>
+            <a href="/register/?chapter=uenr" class="chapter-btn-register">
+              <span>Register</span>
+              <i data-lucide="arrow-right" class="lucide-icon lucide-sm" aria-hidden="true"></i>
+            </a>
+            <a href="/login.html?chapter=uenr" class="chapter-btn-login">
+              <i data-lucide="lock" class="lucide-icon lucide-sm" aria-hidden="true"></i>
+              <span>Exec Login</span>
+            </a>
           </div>
         </div>`;
+      refreshVectorIcons();
     }
 
     function escapeHTML(str) {
@@ -293,7 +327,10 @@
     }
     function escapeAttr(str) { return escapeHTML(String(str || '')); }
 
-    document.addEventListener('DOMContentLoaded', loadChapters);
+    document.addEventListener('DOMContentLoaded', () => {
+      loadChapters();
+      refreshVectorIcons();
+    });
   </script>
 
 </body>

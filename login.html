@@ -3,44 +3,53 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Executive Login | NAGS Ghana</title>
+  <title>Executive Login | NAGS Ghana Platform</title>
   <meta name="description" content="Secure login portal for NAGS Ghana chapter executives and administrators.">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="style.css">
   <link rel="icon" type="image/png" href="nags.png">
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
 
   <style>
-    /* ── Login Page Layout ── */
-    html, body {
-      min-height: 100%;
-      margin: 0;
-    }
     body {
       display: flex;
       flex-direction: column;
-      background: linear-gradient(160deg, #1a3f72 0%, #0d2444 60%, #081830 100%);
+      background: var(--bg-app);
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(var(--gold-primary-rgb), 0.06) 0%, transparent 40%),
+        radial-gradient(circle at 85% 85%, rgba(var(--emerald-active-rgb), 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 50% 50%, var(--bg-app) 0%, #040810 100%);
+      background-attachment: fixed;
       min-height: 100vh;
+      color: var(--text-primary);
+      font-family: var(--font-sans);
     }
     .login-center {
       flex: 1;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 24px 16px;
+      padding: 32px 16px;
     }
     .login-wrapper {
       width: 100%;
-      max-width: 420px;
+      max-width: 440px;
     }
 
-    /* ── Login Card ── */
     .login-card {
-      background: #ffffff;
-      border-radius: 12px;
-      padding: 36px 32px 28px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+      background: var(--surface-02);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 40px 36px 32px;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.5);
       position: relative;
       overflow: hidden;
     }
@@ -49,33 +58,30 @@
       position: absolute;
       top: 0; left: 0; right: 0;
       height: 3px;
-      background: linear-gradient(90deg, #1a3f72, #c9a227, #1a3f72);
+      background: linear-gradient(90deg, var(--gold-primary), #b88b14, var(--gold-primary));
     }
     .login-logo-area {
       text-align: center;
       margin-bottom: 28px;
     }
     .login-logo-area img {
-      width: 52px;
-      height: 52px;
+      width: 56px;
+      height: 56px;
       object-fit: contain;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
     }
     .login-card-title {
-      font-size: 17px;
-      font-weight: 700;
-      color: #1a3f72;
-      font-family: var(--ui-font, 'Segoe UI', sans-serif);
-      margin: 0 0 5px;
+      font-size: 18px;
+      font-weight: 800;
+      color: #ffffff;
+      margin: 0 0 6px;
     }
     .login-card-subtitle {
       font-size: 12px;
-      color: #888;
-      font-family: var(--ui-font, 'Segoe UI', sans-serif);
+      color: var(--text-secondary);
       min-height: 18px;
     }
 
-    /* ── Password Toggle Wrapper ── */
     .password-wrap {
       position: relative;
     }
@@ -89,87 +95,78 @@
       transform: translateY(-50%);
       background: none;
       border: none;
-      color: #888;
+      color: var(--text-secondary);
       font-size: 11px;
-      font-family: var(--ui-font, 'Segoe UI', sans-serif);
       cursor: pointer;
       padding: 4px 6px;
       border-radius: 4px;
     }
-    .btn-toggle-pass:hover { color: #1a3f72; background: #f0f4fb; }
+    .btn-toggle-pass:hover { color: #fff; }
 
-    /* ── Forgot Password Link ── */
     .forgot-link {
       display: block;
       text-align: right;
       font-size: 11px;
-      color: #1a3f72;
-      font-family: var(--ui-font, 'Segoe UI', sans-serif);
+      color: var(--gold-primary);
       cursor: pointer;
       background: none;
       border: none;
       padding: 0;
       margin-top: 6px;
-      margin-bottom: 20px;
+      margin-bottom: 24px;
       text-decoration: underline;
-      opacity: 0.8;
+      opacity: 0.85;
     }
     .forgot-link:hover { opacity: 1; }
 
-    /* ── Back / utility links ── */
     .text-link {
-      display: block;
-      text-align: center;
-      font-size: 11px;
-      color: #1a3f72;
-      font-family: var(--ui-font, 'Segoe UI', sans-serif);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--text-secondary);
       cursor: pointer;
       background: none;
       border: none;
       padding: 0;
-      margin-top: 14px;
-      text-decoration: underline;
-      opacity: 0.8;
-    }
-    .text-link:hover { opacity: 1; }
-
-    /* ── Success / Info Boxes ── */
-    .reset-success {
-      background: #e8f5ec;
-      color: #1e5c2e;
-      border: 1px solid #a8d8b8;
-      border-radius: 6px;
-      padding: 14px 16px;
-      font-size: 13px;
-      font-family: var(--ui-font, 'Segoe UI', sans-serif);
-      line-height: 1.6;
-      margin-bottom: 16px;
-    }
-
-    /* ── Back to Platform ── */
-    .back-to-platform {
-      text-align: center;
-      margin-top: 18px;
-    }
-    .back-to-platform a {
-      font-size: 11px;
-      color: rgba(255,255,255,0.5);
-      font-family: var(--ui-font, 'Segoe UI', sans-serif);
+      margin-top: 16px;
       text-decoration: none;
     }
-    .back-to-platform a:hover { color: rgba(255,255,255,0.85); }
+    .text-link:hover { color: #fff; }
 
-    /* ── Login footer ── */
-    .login-footer {
-      padding: 14px 20px;
-      text-align: center;
-      background: rgba(0,0,0,0.25);
-      color: rgba(255,255,255,0.4);
-      font-size: 10px;
-      font-family: var(--ui-font, 'Segoe UI', sans-serif);
+    .reset-success {
+      background: var(--emerald-muted);
+      color: #34d399;
+      border: 1px solid rgba(var(--emerald-active-rgb), 0.3);
+      border-radius: 8px;
+      padding: 14px 16px;
+      font-size: 13px;
+      line-height: 1.6;
+      margin-bottom: 20px;
     }
 
-    /* ── Spinner inside button ── */
+    .back-to-platform {
+      text-align: center;
+      margin-top: 20px;
+    }
+    .back-to-platform a {
+      font-size: 12px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .back-to-platform a:hover { color: #fff; }
+
+    .login-footer {
+      padding: 16px 20px;
+      text-align: center;
+      background: rgba(0,0,0,0.3);
+      color: var(--text-muted);
+      font-size: 11px;
+    }
+
     .btn-spinner-inline {
       width: 14px; height: 14px;
       display: inline-block; vertical-align: middle;
@@ -181,79 +178,87 @@
 </head>
 <body>
 
-  <div class="login-center">
+  <main class="login-center" id="main-content">
     <div class="login-wrapper">
 
-      <!-- ═══ LOGIN CARD ═══ -->
-      <div class="login-card">
+      <div class="login-card" role="dialog" aria-labelledby="login-title">
 
-        <!-- Logo & Title -->
         <div class="login-logo-area">
-          <img src="nags.png" alt="NAGS Ghana Logo">
-          <h1 class="login-card-title">NAGS Ghana — Executive Portal</h1>
-          <p class="login-card-subtitle" id="login-subtitle">Sign in to your chapter executive account</p>
+          <img src="nags.png" alt="NAGS Ghana Crest">
+          <h1 class="login-card-title" id="login-title">National Association of Gonjaland Students</h1>
+          <p class="login-card-subtitle" id="login-subtitle">Executive Access &amp; Authentication Portal</p>
         </div>
 
-        <!-- Error box (shared across panels) -->
-        <div id="login-error-box" class="message-box error" style="display:none;"></div>
+        <div id="login-error-box" class="message-box error" style="display:none;" role="alert" aria-live="assertive"></div>
 
-        <!-- Reset password success message -->
-        <div id="reset-success-box" class="reset-success" style="display:none;">
+        <div id="reset-success-box" class="reset-success" style="display:none;" role="alert" aria-live="polite">
           A password reset link has been sent to your email. Check your inbox and follow the link to set a new password.
         </div>
 
-        <!-- ── PANEL A: SIGN IN ── -->
+        <!-- PANEL A: SIGN IN -->
         <div id="panel-signin">
           <div class="form-group">
             <label class="form-label" for="exec-email">Email Address</label>
-            <input type="email" id="exec-email" class="form-input" placeholder="e.g. exec@university.edu.gh" autocomplete="email">
+            <input type="email" id="exec-email" class="form-input" placeholder="e.g. exec@university.edu.gh" autocomplete="email" required>
           </div>
 
           <div class="form-group" style="margin-bottom: 0;">
             <label class="form-label" for="exec-password">Password</label>
             <div class="password-wrap">
-              <input type="password" id="exec-password" class="form-input" placeholder="Enter your password" autocomplete="current-password">
+              <input type="password" id="exec-password" class="form-input" placeholder="Enter your account password" autocomplete="current-password" required>
               <button type="button" id="btn-toggle-pass" class="btn-toggle-pass" aria-label="Toggle password visibility">Show</button>
             </div>
           </div>
 
           <button type="button" id="btn-forgot" class="forgot-link">Forgot your password?</button>
 
-          <button type="button" id="btn-sign-in" class="btn btn-primary" style="width: 100%;">Sign In</button>
+          <button type="button" id="btn-sign-in" class="btn btn-primary" style="width: 100%;">
+            <i data-lucide="lock" class="lucide-icon" aria-hidden="true"></i>
+            <span>Sign In to Portal</span>
+          </button>
         </div>
 
-        <!-- ── PANEL B: FORGOT PASSWORD ── -->
+        <!-- PANEL B: FORGOT PASSWORD -->
         <div id="panel-forgot" style="display:none;">
-          <p style="font-size:13px; color:#666; line-height:1.7; margin-bottom:20px;">
-            Enter your email address below and we'll send you a link to reset your password.
+          <p style="font-size:13px; color:var(--text-secondary); line-height:1.7; margin-bottom:20px;">
+            Enter your email address below and we will send you an authentication link to reset your account password.
           </p>
 
           <div class="form-group">
             <label class="form-label" for="reset-email">Email Address</label>
-            <input type="email" id="reset-email" class="form-input" placeholder="e.g. exec@university.edu.gh" autocomplete="email">
+            <input type="email" id="reset-email" class="form-input" placeholder="e.g. exec@university.edu.gh" autocomplete="email" required>
           </div>
 
           <button type="button" id="btn-send-reset" class="btn btn-primary" style="width: 100%;">Send Reset Link</button>
-          <button type="button" id="btn-back-signin" class="text-link">&larr; Back to Sign In</button>
+          <button type="button" id="btn-back-signin" class="text-link">
+            <i data-lucide="arrow-left" class="lucide-icon lucide-sm" aria-hidden="true"></i>
+            <span>Back to Sign In</span>
+          </button>
         </div>
 
       </div>
 
-      <!-- Back to Platform Landing -->
       <div class="back-to-platform">
-        <a href="/">&larr; Back to NAGS Ghana Home</a>
+        <a href="/">
+          <i data-lucide="arrow-left" class="lucide-icon lucide-sm" aria-hidden="true"></i>
+          <span>Return to NAGS Ghana Home Page</span>
+        </a>
       </div>
     </div>
-  </div>
+  </main>
 
-  <!-- Footer -->
-  <div class="login-footer">
-    &copy; 2026 NAGS Ghana. All rights reserved. &middot; Developed by Q-Nova GH
-  </div>
+  <footer class="login-footer" role="contentinfo">
+    &copy; 2026 National Association of Gonjaland Students, Ghana. All rights reserved. &middot; Developed by Q-Nova GH
+  </footer>
 
   <script src="config.js?v=36"></script>
   <script>
-    // ── Audio & Haptic Effects (preserved from existing system) ──
+    function refreshVectorIcons() {
+      if (typeof lucide !== 'undefined' && typeof lucide.createIcons === 'function') {
+        try { lucide.createIcons(); } catch(e){}
+      }
+    }
+
     const HapticEffects = {
       vibrate(p) { if (navigator.vibrate) { try { navigator.vibrate(p); } catch(e){} } },
       tap()     { this.vibrate(15); },
@@ -263,9 +268,7 @@
 
     const AudioEffects = {
       ctx: null,
-      _init() {
-        if (!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-      },
+      _init() { if (!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)(); },
       _play(freq, type = 'sine', vol = 0.08, dur = 0.05) {
         try {
           this._init();
@@ -300,7 +303,6 @@
       }
     };
 
-    // ── State ──
     let supabaseClient;
     let chapterSlug = '';
 
@@ -309,7 +311,6 @@
       supabaseClient = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
     }
 
-    // ── Show/hide error ──
     function showError(msg) {
       AudioEffects.playError();
       HapticEffects.error();
@@ -323,7 +324,6 @@
       box.textContent = '';
     }
 
-    // ── Button loading state ──
     function setBtn(id, loading, label) {
       const btn = document.getElementById(id);
       if (!btn) return;
@@ -334,202 +334,137 @@
       } else {
         btn.innerHTML = btn.dataset.origLabel || label;
       }
+      refreshVectorIcons();
     }
 
-    // ── Switch between panels ──
     function showPanel(name) {
       clearError();
       document.getElementById('reset-success-box').style.display = 'none';
       document.getElementById('panel-signin').style.display  = name === 'signin'  ? 'block' : 'none';
       document.getElementById('panel-forgot').style.display  = name === 'forgot'  ? 'block' : 'none';
+      refreshVectorIcons();
     }
 
-    // ── Load chapter subtitle from URL param ──
     function loadChapterContext() {
       const params = new URLSearchParams(window.location.search);
       chapterSlug = params.get('chapter') || '';
-      const subtitle = document.getElementById('login-subtitle');
+      const sub = document.getElementById('login-subtitle');
 
-      if (!chapterSlug) {
-        subtitle.textContent = 'Sign in to your chapter executive account';
+      if (chapterSlug && supabaseClient) {
+        supabaseClient
+          .from('universities')
+          .select('name, short_name')
+          .eq('slug', chapterSlug)
+          .single()
+          .then(({ data }) => {
+            if (data && sub) {
+              sub.textContent = `${data.short_name} Chapter — ${data.name}`;
+            }
+          });
+      }
+    }
+
+    async function handleSignIn() {
+      clearError();
+      const email = document.getElementById('exec-email').value.trim();
+      const password = document.getElementById('exec-password').value;
+
+      if (!email || !password) {
+        showError('Please enter both email address and password.');
         return;
       }
 
-      subtitle.textContent = 'Loading chapter…';
-
-      if (!supabaseClient) { subtitle.textContent = 'Chapter Executive Portal'; return; }
-
-      supabaseClient
-        .from('universities')
-        .select('name, short_name')
-        .eq('slug', chapterSlug)
-        .single()
-        .then(({ data, error }) => {
-          if (data && !error) {
-            subtitle.textContent = `${data.name} (${data.short_name}) Chapter`;
-          } else {
-            subtitle.textContent = 'Chapter Executive Portal';
-          }
-        })
-        .catch(() => { subtitle.textContent = 'Chapter Executive Portal'; });
-    }
-
-    // ── Sign In handler ──
-    async function handleSignIn() {
-      clearError();
-      const email    = document.getElementById('exec-email').value.trim();
-      const password = document.getElementById('exec-password').value;
-
-      if (!email)    { showError('Please enter your email address.'); return; }
-      if (!password) { showError('Please enter your password.'); return; }
-      if (!supabaseClient) { showError('System error. Please refresh the page.'); return; }
-
-      setBtn('btn-sign-in', true, 'Signing in…');
+      AudioEffects.playClick(); HapticEffects.tap();
+      setBtn('btn-sign-in', true, 'Authenticating...');
 
       try {
-        // Step 1 — Supabase Auth
-        const { data: authData, error: authErr } = await supabaseClient.auth.signInWithPassword({ email, password });
+        const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({ email, password });
+        if (authError) throw authError;
 
-        if (authErr) {
-          setBtn('btn-sign-in', false, 'Sign In');
-          if (authErr.message.toLowerCase().includes('invalid login credentials')) {
-            showError('Incorrect email or password. Please try again.');
-          } else {
-            showError(authErr.message);
-          }
-          return;
-        }
-
-        // Step 2 — Fetch executive profile
-        const { data: exec, error: execErr } = await supabaseClient
+        const { data: execData, error: execError } = await supabaseClient
           .from('executives')
-          .select('*')
-          .eq('auth_user_id', authData.user.id)
+          .select('id, full_name, role, university_id, is_active')
+          .eq('email', email)
           .single();
 
-        if (execErr) {
-          setBtn('btn-sign-in', false, 'Sign In');
-          await supabaseClient.auth.signOut();
-          if (execErr.code === 'PGRST116' || execErr.details?.includes('0 rows')) {
-            showError('No executive account found. Contact your chapter admin.');
-          } else if (execErr.code === '42P01') {
-            showError('Platform is being configured. Please try again after setup.');
-          } else {
-            showError('Error fetching your account: ' + execErr.message);
-          }
-          return;
-        }
+        if (execError || !execData) throw new Error('No executive record found for this email.');
+        if (!execData.is_active) throw new Error('Your executive account is currently deactivated.');
 
-        // Step 3 — Check active status
-        if (!exec.is_active) {
-          setBtn('btn-sign-in', false, 'Sign In');
-          await supabaseClient.auth.signOut();
-          showError('Your account has been deactivated. Contact your chapter admin.');
-          return;
-        }
+        sessionStorage.setItem('nags_logged_in', 'true');
+        sessionStorage.setItem('nags_exec_id', execData.id);
+        sessionStorage.setItem('nags_exec_name', execData.full_name);
+        sessionStorage.setItem('nags_exec_email', email);
+        sessionStorage.setItem('nags_role', execData.role);
+        sessionStorage.setItem('nags_university_id', execData.university_id || '');
 
-        // ✅ All good — store session and redirect
-        AudioEffects.playSuccess();
-        HapticEffects.success();
+        AudioEffects.playSuccess(); HapticEffects.success();
 
-        sessionStorage.setItem('nags_logged_in',  'true');
-        sessionStorage.setItem('nags_role',        exec.role);
-        sessionStorage.setItem('nags_university',  exec.university_id || '');
-        sessionStorage.setItem('nags_exec_id',     exec.id);
-        sessionStorage.setItem('nags_exec_name',   exec.full_name);
-
-        // Redirect by role
-        if (exec.role === 'super_admin') {
+        if (execData.role === 'super_admin') {
           window.location.href = '/super-admin/';
         } else {
           window.location.href = '/dashboard/';
         }
 
       } catch (err) {
-        setBtn('btn-sign-in', false, 'Sign In');
-        showError('Unexpected error: ' + err.message);
+        setBtn('btn-sign-in', false, 'Sign In to Portal');
+        showError('Authentication failed: ' + err.message);
       }
     }
 
-    // ── Forgot Password handler ──
     async function handleForgotPassword() {
       clearError();
       const email = document.getElementById('reset-email').value.trim();
-      if (!email) { showError('Please enter your email address.'); return; }
-      if (!supabaseClient) { showError('System error. Please refresh the page.'); return; }
 
-      setBtn('btn-send-reset', true, 'Sending…');
+      if (!email) {
+        showError('Please enter your email address to receive a reset link.');
+        return;
+      }
+
+      AudioEffects.playClick(); HapticEffects.tap();
+      setBtn('btn-send-reset', true, 'Sending...');
 
       try {
         const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
-          redirectTo: window.location.origin + '/reset-password.html'
+          redirectTo: `${window.location.origin}/login.html`
         });
 
+        if (error) throw error;
+
+        AudioEffects.playSuccess(); HapticEffects.success();
         setBtn('btn-send-reset', false, 'Send Reset Link');
-
-        if (error) {
-          showError('Could not send reset link: ' + error.message);
-          return;
-        }
-
-        // Show success (always — don't reveal whether email exists)
-        AudioEffects.playSuccess();
-        HapticEffects.success();
-        showPanel('signin'); // switch back to sign in panel
         document.getElementById('reset-success-box').style.display = 'block';
+        document.getElementById('reset-email').value = '';
 
       } catch (err) {
         setBtn('btn-send-reset', false, 'Send Reset Link');
-        showError('Unexpected error: ' + err.message);
+        showError('Failed to send reset link: ' + err.message);
       }
     }
 
-    // ── DOM Ready ──
     document.addEventListener('DOMContentLoaded', () => {
       initSupabase();
       loadChapterContext();
 
-      // Password visibility toggle
+      document.getElementById('btn-sign-in')?.addEventListener('click', handleSignIn);
+      document.getElementById('exec-password')?.addEventListener('keyup', e => { if (e.key === 'Enter') handleSignIn(); });
+
+      document.getElementById('btn-forgot')?.addEventListener('click', () => showPanel('forgot'));
+      document.getElementById('btn-back-signin')?.addEventListener('click', () => showPanel('signin'));
+      document.getElementById('btn-send-reset')?.addEventListener('click', handleForgotPassword);
+
+      const toggleBtn = document.getElementById('btn-toggle-pass');
       const passInput = document.getElementById('exec-password');
-      document.getElementById('btn-toggle-pass').addEventListener('click', () => {
-        const t = passInput.getAttribute('type') === 'password' ? 'text' : 'password';
-        passInput.setAttribute('type', t);
-        document.getElementById('btn-toggle-pass').textContent = t === 'password' ? 'Show' : 'Hide';
-      });
+      if (toggleBtn && passInput) {
+        toggleBtn.addEventListener('click', () => {
+          if (passInput.type === 'password') {
+            passInput.type = 'text'; toggleBtn.textContent = 'Hide';
+          } else {
+            passInput.type = 'password'; toggleBtn.textContent = 'Show';
+          }
+        });
+      }
 
-      // Enter key on password field
-      passInput.addEventListener('keypress', e => { if (e.key === 'Enter') handleSignIn(); });
-
-      // Enter key on reset email field
-      document.getElementById('reset-email').addEventListener('keypress', e => {
-        if (e.key === 'Enter') handleForgotPassword();
-      });
-
-      // Sign in button
-      document.getElementById('btn-sign-in').addEventListener('click', () => {
-        AudioEffects.playClick(); HapticEffects.tap(); handleSignIn();
-      });
-
-      // Forgot password link
-      document.getElementById('btn-forgot').addEventListener('click', () => {
-        AudioEffects.playClick(); HapticEffects.tap();
-        // Pre-fill email from signin panel if available
-        const loginEmail = document.getElementById('exec-email').value;
-        const resetEmail = document.getElementById('reset-email');
-        if (loginEmail) resetEmail.value = loginEmail;
-        showPanel('forgot');
-      });
-
-      // Back to sign in
-      document.getElementById('btn-back-signin').addEventListener('click', () => {
-        AudioEffects.playClick(); HapticEffects.tap();
-        showPanel('signin');
-      });
-
-      // Send reset link
-      document.getElementById('btn-send-reset').addEventListener('click', () => {
-        AudioEffects.playClick(); HapticEffects.tap(); handleForgotPassword();
-      });
+      refreshVectorIcons();
     });
   </script>
 

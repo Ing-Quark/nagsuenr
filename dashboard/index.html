@@ -3,65 +3,88 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chapter Dashboard | NAGS Ghana</title>
+  <title>Chapter Executive Portal | NAGS Ghana</title>
   <meta name="description" content="NAGS Ghana Chapter Executive Dashboard for member directory management, SMS, social channels, executives alignment, and financial ledger tracking.">
   
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
   <link rel="stylesheet" href="../style.css">
-  
-  <!-- Supabase + QRCode Libraries -->
+  <link rel="icon" type="image/png" href="../nags.png">
+
+  <!-- Supabase + Lucide Icons + QRCode Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   
-  <link rel="icon" type="image/png" href="../nags.png">
-  
   <style>
-    /* ── Finance Tab specific styles ── */
+    /* ── DASHBOARD STYLES & OVERRIDES ── */
+    body {
+      background-color: var(--bg-app);
+      background-image: 
+        radial-gradient(circle at 10% 10%, rgba(var(--gold-primary-rgb), 0.05) 0%, transparent 40%),
+        radial-gradient(circle at 90% 90%, rgba(var(--emerald-active-rgb), 0.06) 0%, transparent 40%),
+        radial-gradient(circle at 50% 50%, var(--bg-app) 0%, #040810 100%);
+      background-attachment: fixed;
+      min-height: 100vh;
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      -webkit-font-smoothing: antialiased;
+    }
+
     .finance-metrics-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 16px;
+      gap: 18px;
       margin-bottom: 24px;
     }
     .finance-card {
-      background: #ffffff;
-      border: 1px solid var(--rule);
-      border-radius: 8px;
+      background: var(--surface-02);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
       padding: 20px 24px;
       display: flex;
       flex-direction: column;
       gap: 6px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+      position: relative;
+      overflow: hidden;
     }
-    .finance-card.income { border-top: 3px solid var(--green); }
-    .finance-card.expense { border-top: 3px solid #ff4d4f; }
-    .finance-card.balance { border-top: 3px solid var(--gold); }
-    
+    .finance-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 3px;
+    }
+    .finance-card.income::before { background: var(--emerald-active); }
+    .finance-card.expense::before { background: var(--crimson-alert); }
+    .finance-card.balance::before { background: var(--gold-primary); }
+
     .finance-label {
       font-size: 11px;
-      color: var(--ink-light);
+      color: var(--text-secondary);
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.06em;
       font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
     .finance-value {
-      font-size: 24px;
+      font-size: 26px;
       font-weight: 800;
-      color: var(--ink-dark);
-      font-family: var(--ui-font, 'Segoe UI', sans-serif);
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
     }
-    
-    .btn-green {
-      background: var(--green);
-      color: #fff;
-    }
-    .btn-green:hover { background: #164622; }
 
-    /* ── Modal overlay for adding finance record ── */
+    /* Modal Overlay */
     .dashboard-modal-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.5);
-      backdrop-filter: blur(3px);
+      background: rgba(4, 8, 16, 0.75);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -69,109 +92,110 @@
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.25s ease;
+      padding: 20px;
     }
     .dashboard-modal-overlay.show {
       opacity: 1;
       pointer-events: auto;
     }
     .dashboard-modal-card {
-      background: #fff;
-      border-radius: 10px;
-      border: 1px solid var(--rule);
+      background: #0f1c30;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 16px;
       width: 100%;
-      max-width: 460px;
-      padding: 24px 28px;
-      box-shadow: 0 20px 48px rgba(0,0,0,0.15);
-      transform: scale(0.9);
-      transition: transform 0.25s ease;
+      max-width: 480px;
+      padding: 28px;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+      transform: scale(0.94);
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .dashboard-modal-overlay.show .dashboard-modal-card {
       transform: scale(1);
     }
-    
-    /* ── Exec Tab Credentials display box ── */
+
+    /* Credentials Card System */
     .credentials-reveal-box {
-      background: #f0f4fb;
-      border: 1px dashed var(--blue);
-      border-radius: 6px;
-      padding: 16px;
-      margin-bottom: 20px;
+      background: rgba(var(--gold-primary-rgb), 0.08);
+      border: 1px dashed var(--gold-primary);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 24px;
       display: none;
-    }
-    .countdown-timer-text {
-      font-size: 11px;
-      color: var(--ink-light);
-      margin-top: 8px;
-      font-style: italic;
     }
     .credentials-value-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 6px 0;
+      padding: 8px 0;
       font-size: 13px;
-      border-bottom: 1px solid rgba(0,0,0,0.05);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
     }
     .credentials-value-row code {
-      font-size: 12px;
+      font-size: 13px;
       font-weight: 700;
-      color: var(--blue);
+      color: var(--gold-primary);
+      background: rgba(0,0,0,0.3);
+      padding: 2px 8px;
+      border-radius: 4px;
     }
   </style>
 </head>
 <body>
 
   <!-- Top Bar / Institutional Header -->
-  <header class="top-bar">
+  <header class="top-bar" role="banner">
     <div class="top-bar-content">
       <div class="logo-box" style="border: none; padding: 0;">
-        <img src="../nags.png" alt="NAGS Logo" id="header-logo">
+        <img src="../nags.png" alt="NAGS Ghana Crest" id="header-logo">
       </div>
       <div class="header-text">
-        <h1 class="header-title" id="header-title-text">National Association of Gonjaland Students</h1>
+        <h1 class="header-title" id="header-title-text">National Association of Gonjaland Students — Ghana Platform</h1>
         <div class="header-subtitle" id="header-subtitle-text">Chapter Executive Portal</div>
         <div class="header-motto" id="header-motto-text">Motto: Kishilbi Konwule M'ata Kuyu</div>
       </div>
       
       <div style="margin-left: auto; display: flex; align-items: center; gap: 14px;">
         <div style="text-align: right; line-height: 1.35;" class="exec-greeting-box">
-          <div style="font-size: 12px; font-weight: 700; color: #fff;" id="exec-name-display">Exec Name</div>
-          <span class="badge-status active" id="exec-role-display" style="font-size: 8px; padding: 1px 6px;">ROLE</span>
+          <div style="font-size: 12px; font-weight: 700; color: #fff;" id="exec-name-display">Officer</div>
+          <span class="sa-badge sa-badge-active" id="exec-role-display" style="font-size: 8px; padding: 1px 6px;">ROLE</span>
         </div>
-        <button id="btn-logout" class="btn btn-secondary" style="width: auto; padding: 6px 12px; font-size: 11px; margin: 0;">Logout</button>
+        <button id="btn-logout" class="btn-sa-logout" aria-label="Sign out of executive portal">
+          <i data-lucide="log-out" class="lucide-icon lucide-sm" aria-hidden="true"></i>
+          <span>Sign Out</span>
+        </button>
       </div>
     </div>
   </header>
 
   <!-- Top Live Stats Bar (3 equal columns) -->
-  <section class="stats-bar" aria-label="Chapter Membership Stats">
+  <section class="stats-bar" aria-label="Chapter Membership Statistics">
     <div class="stats-col total">
-      <div class="stats-number" id="stat-total-val">0</div>
+      <div class="stats-number" id="stat-total-val" aria-live="polite">0</div>
       <div class="stats-label">Total Members</div>
     </div>
     <div class="stats-col male">
-      <div class="stats-number" id="stat-male-val">0</div>
+      <div class="stats-number" id="stat-male-val" aria-live="polite">0</div>
       <div class="stats-label">Male Members</div>
     </div>
     <div class="stats-col female">
-      <div class="stats-number" id="stat-female-val">0</div>
+      <div class="stats-number" id="stat-female-val" aria-live="polite">0</div>
       <div class="stats-label">Female Members</div>
     </div>
   </section>
 
   <!-- Dynamic Tab Navigation Bar -->
-  <nav class="tabs-nav" id="dashboard-tab-bar" aria-label="Dashboard Navigation Tabs">
-    <!-- Active items loaded based on authorization matrix in dashboard.js -->
+  <nav class="tabs-nav" id="dashboard-tab-bar" aria-label="Dashboard Navigation Tabs" role="navigation">
+    <!-- Active items loaded dynamically matching role matrix -->
   </nav>
 
   <!-- Container -->
-  <main class="container">
+  <main class="container" id="main-content">
     
     <!-- Global Error Notice -->
-    <div id="admin-error-box" class="message-box error" style="display: none;"></div>
+    <div id="admin-error-box" class="message-box error" style="display: none;" role="alert" aria-live="assertive"></div>
 
     <!-- ═══ TAB 1: MEMBERS ═══ -->
-    <div id="tab-members" class="tab-content">
+    <div id="tab-members" class="tab-content" role="tabpanel" aria-labelledby="tab-btn-members">
       <div class="section-header">
         <span>Registered Members Database</span>
         <span>Live Directory</span>
@@ -199,13 +223,13 @@
 
       <!-- Live Filters -->
       <div class="filter-bar">
-        <input type="text" id="search-input" class="form-input search-input-field" placeholder="Search by name, phone, program, hometown..." aria-label="Search members">
-        <select id="filter-gender" class="form-select filter-select-field" aria-label="Filter by gender">
+        <input type="text" id="search-input" class="form-input search-input-field" placeholder="Search by name, phone, program, hometown..." aria-label="Search members directory">
+        <select id="filter-gender" class="form-select filter-select-field" aria-label="Filter members by gender">
           <option value="All">All Genders</option>
           <option value="Male">Male</option>
           <option value="Female">Female</option>
         </select>
-        <select id="filter-level" class="form-select filter-select-field" aria-label="Filter by level">
+        <select id="filter-level" class="form-select filter-select-field" aria-label="Filter members by academic level">
           <option value="All">All Levels</option>
           <option value="100">Level 100</option>
           <option value="200">Level 200</option>
@@ -216,8 +240,8 @@
       </div>
 
       <!-- Table Loader -->
-      <div id="table-loader" class="text-center hidden" style="padding: 30px 10px; color: var(--ink-light); font-size: 13px;">
-        <svg class="btn-spinner" viewBox="0 0 50 50" style="width: 20px; height: 20px; color: var(--gold); margin-right: 8px; display: inline-block;">
+      <div id="table-loader" class="text-center hidden" style="padding: 30px 10px; color: var(--text-secondary); font-size: 13px;">
+        <svg class="btn-spinner" viewBox="0 0 50 50" style="width: 20px; height: 20px; color: var(--gold-primary); margin-right: 8px; display: inline-block;">
           <circle class="path" cx="25" cy="25" r="20" fill="none" stroke="currentColor" stroke-width="5"></circle>
         </svg>
         Retrieving member directory...
@@ -228,16 +252,16 @@
         <table class="members-table">
           <thead>
             <tr>
-              <th style="width: 40px;">No.</th>
-              <th>Name</th>
-              <th>Gender</th>
-              <th>Programme</th>
-              <th>Level</th>
-              <th>Phone</th>
-              <th>WA Joined</th>
-              <th>Hometown</th>
-              <th>Registered</th>
-              <th style="width: 60px;" class="text-center exec-only-action">Actions</th>
+              <th scope="col" style="width: 40px;">No.</th>
+              <th scope="col">Name</th>
+              <th scope="col">Gender</th>
+              <th scope="col">Programme</th>
+              <th scope="col">Level</th>
+              <th scope="col">Phone</th>
+              <th scope="col">WA Joined</th>
+              <th scope="col">Hometown</th>
+              <th scope="col">Registered</th>
+              <th scope="col" style="width: 60px;" class="text-center exec-only-action">Actions</th>
             </tr>
           </thead>
           <tbody id="members-table-body">
@@ -249,14 +273,14 @@
 
 
     <!-- ═══ TAB 2: SMS BROADCAST ═══ -->
-    <div id="tab-sms" class="tab-content">
+    <div id="tab-sms" class="tab-content" role="tabpanel" aria-labelledby="tab-btn-sms">
       <div class="section-header">
         <span>SMS Broadcast Panel</span>
         <span>SMS Service</span>
       </div>
 
-      <p style="margin-bottom: 16px; font-size: 14px; color: var(--ink-mid);">
-        Send text announcements directly to members' phones. All calls route securely via Vercel Serverless Functions.
+      <p style="margin-bottom: 16px; font-size: 13px; color: var(--text-secondary);">
+        Send text announcements directly to members' phones. All broadcasts route via secure Vercel Serverless Functions.
       </p>
 
       <div class="card">
@@ -280,31 +304,31 @@
             <div class="recipient-option-list">
               <label class="recipient-option">
                 <input type="radio" name="sms-target" value="all" checked>
-                <span>All registered members <span id="lbl-cnt-all" style="color: #666;">(0 numbers)</span></span>
+                <span>Broadcast to All Registered Chapter Members <span id="lbl-cnt-all" style="color: var(--text-muted);">(0 numbers)</span></span>
               </label>
               <label class="recipient-option">
                 <input type="radio" name="sms-target" value="male">
-                <span>Male members only <span id="lbl-cnt-male" style="color: #666;">(0 numbers)</span></span>
+                <span>Male members only <span id="lbl-cnt-male" style="color: var(--text-muted);">(0 numbers)</span></span>
               </label>
               <label class="recipient-option">
                 <input type="radio" name="sms-target" value="female">
-                <span>Female members only <span id="lbl-cnt-female" style="color: #666;">(0 numbers)</span></span>
+                <span>Female members only <span id="lbl-cnt-female" style="color: var(--text-muted);">(0 numbers)</span></span>
               </label>
               <label class="recipient-option">
                 <input type="radio" name="sms-target" value="lvl100">
-                <span>Level 100 members only <span id="lbl-cnt-l100" style="color: #666;">(0 numbers)</span></span>
+                <span>Level 100 members only <span id="lbl-cnt-l100" style="color: var(--text-muted);">(0 numbers)</span></span>
               </label>
               <label class="recipient-option">
                 <input type="radio" name="sms-target" value="lvl200">
-                <span>Level 200 members only <span id="lbl-cnt-l200" style="color: #666;">(0 numbers)</span></span>
+                <span>Level 200 members only <span id="lbl-cnt-l200" style="color: var(--text-muted);">(0 numbers)</span></span>
               </label>
               <label class="recipient-option">
                 <input type="radio" name="sms-target" value="lvl300">
-                <span>Level 300 members only <span id="lbl-cnt-l300" style="color: #666;">(0 numbers)</span></span>
+                <span>Level 300 members only <span id="lbl-cnt-l300" style="color: var(--text-muted);">(0 numbers)</span></span>
               </label>
               <label class="recipient-option">
                 <input type="radio" name="sms-target" value="lvl400">
-                <span>Level 400 members only <span id="lbl-cnt-l400" style="color: #666;">(0 numbers)</span></span>
+                <span>Level 400 members only <span id="lbl-cnt-l400" style="color: var(--text-muted);">(0 numbers)</span></span>
               </label>
             </div>
           </div>
@@ -313,7 +337,10 @@
             This message will be sent to 0 members.
           </div>
 
-          <button type="submit" id="btn-send-sms" class="btn btn-primary">Send SMS</button>
+          <button type="submit" id="btn-send-sms" class="btn btn-primary">
+            <i data-lucide="send" class="lucide-icon" aria-hidden="true"></i>
+            <span>Send SMS</span>
+          </button>
         </form>
         
         <div id="sms-result-box" class="message-box" style="margin-top: 16px; display: none;"></div>
@@ -322,7 +349,7 @@
 
 
     <!-- ═══ TAB 3: SOCIAL LINKS ═══ -->
-    <div id="tab-socials" class="tab-content">
+    <div id="tab-socials" class="tab-content" role="tabpanel" aria-labelledby="tab-btn-socials">
       <div class="section-header">
         <span>Social Media Channels Manager</span>
         <span>Community Engagement</span>
@@ -347,8 +374,7 @@
           </div>
         </div>
 
-        <!-- Write links updates (Settings / Update permissions checked in dashboard.js) -->
-        <div class="settings-writable-group" style="display:none; margin-top: 24px; border-top: 1px dashed var(--rule); padding-top: 16px;">
+        <div class="settings-writable-group" style="display:none; margin-top: 24px; border-top: 1px dashed var(--border-subtle); padding-top: 16px;">
           <div class="form-group">
             <label class="form-label" for="wa-invite-link">Paste New WhatsApp Invite Link</label>
             <input type="url" id="wa-invite-link" class="form-input" placeholder="https://chat.whatsapp.com/...">
@@ -365,7 +391,7 @@
 
       <div class="card qr-code-section">
         <div class="card-title" style="width: 100%; text-align: left;">Registration Portal QR Code</div>
-        <p style="font-size: 13px; margin-bottom: 16px; color: var(--ink-light);">
+        <p style="font-size: 13px; margin-bottom: 16px; color: var(--text-secondary);">
           This QR Code links directly to your public registration portal. Print this out to place on notice boards, print on flyers, or display at meetings so new members can scan and register instantly.
         </p>
         
@@ -374,15 +400,21 @@
         </div>
         
         <div class="qr-actions-row">
-          <button type="button" id="btn-download-qr" class="btn btn-green" style="font-size: 12px; padding: 8px 16px; width: auto;">Download QR Code</button>
-          <button type="button" id="btn-print-qr" class="btn btn-primary" style="font-size: 12px; padding: 8px 16px; width: auto;">Print QR Code</button>
+          <button type="button" id="btn-download-qr" class="btn btn-green" style="font-size: 12px; padding: 8px 16px; width: auto;">
+            <i data-lucide="download" class="lucide-icon lucide-sm" aria-hidden="true"></i>
+            <span>Download QR Code</span>
+          </button>
+          <button type="button" id="btn-print-qr" class="btn btn-primary" style="font-size: 12px; padding: 8px 16px; width: auto;">
+            <i data-lucide="printer" class="lucide-icon lucide-sm" aria-hidden="true"></i>
+            <span>Print QR Code</span>
+          </button>
         </div>
       </div>
     </div>
 
 
     <!-- ═══ TAB 4: ANALYTICS & EXPORT ═══ -->
-    <div id="tab-analytics" class="tab-content">
+    <div id="tab-analytics" class="tab-content" role="tabpanel" aria-labelledby="tab-btn-analytics">
       <div class="section-header">
         <span>Association Analytics & Reports</span>
         <span>Member Statistics</span>
@@ -454,7 +486,7 @@
           <div class="donut-chart-container">
             <svg width="150" height="150" viewBox="0 0 100 100" class="donut-svg">
               <circle cx="50" cy="50" r="35" fill="transparent" stroke="rgba(0, 0, 0, 0.05)" stroke-width="12"></circle>
-              <circle id="donut-lvl-100" cx="50" cy="50" r="35" fill="transparent" stroke="var(--gold)" stroke-width="12" stroke-dasharray="219.91" stroke-dashoffset="219.91" transform="rotate(-90 50 50)"></circle>
+              <circle id="donut-lvl-100" cx="50" cy="50" r="35" fill="transparent" stroke="var(--gold-primary)" stroke-width="12" stroke-dasharray="219.91" stroke-dashoffset="219.91" transform="rotate(-90 50 50)"></circle>
               <circle id="donut-lvl-200" cx="50" cy="50" r="35" fill="transparent" stroke="#1a73e8" stroke-width="12" stroke-dasharray="219.91" stroke-dashoffset="219.91" transform="rotate(-90 50 50)"></circle>
               <circle id="donut-lvl-300" cx="50" cy="50" r="35" fill="transparent" stroke="#2e7d32" stroke-width="12" stroke-dasharray="219.91" stroke-dashoffset="219.91" transform="rotate(-90 50 50)"></circle>
               <circle id="donut-lvl-400" cx="50" cy="50" r="35" fill="transparent" stroke="#8e24aa" stroke-width="12" stroke-dasharray="219.91" stroke-dashoffset="219.91" transform="rotate(-90 50 50)"></circle>
@@ -478,15 +510,15 @@
             <table class="analytics-table">
               <thead>
                 <tr>
-                  <th>Student</th>
-                  <th>Level</th>
-                  <th>Hometown</th>
-                  <th>Programme</th>
+                  <th scope="col">Student</th>
+                  <th scope="col">Level</th>
+                  <th scope="col">Hometown</th>
+                  <th scope="col">Programme</th>
                 </tr>
               </thead>
               <tbody id="list-demographics-main">
                 <tr>
-                  <td colspan="4" style="text-align: center; color: var(--ink-light);">No student records available</td>
+                  <td colspan="4" style="text-align: center; color: var(--text-secondary);">No student records available</td>
                 </tr>
               </tbody>
             </table>
@@ -498,10 +530,12 @@
       <div class="export-cards-grid" style="margin-top: 24px;">
         <div class="export-card" id="export-card-excel-element">
           <div>
-            <div class="export-icon" aria-hidden="true">📊</div>
+            <div class="export-icon" aria-hidden="true">
+              <i data-lucide="file-spreadsheet" class="lucide-icon lucide-lg" aria-hidden="true"></i>
+            </div>
             <h3 class="export-card-title">Export Directory</h3>
             <p class="export-card-desc">
-              Download the complete registered student database as a styled Excel spreadsheet file (.xls). Includes formatting matching existing standards.
+              Download the complete registered student database as a styled Excel spreadsheet file (.xls). Includes auto-fitted columns and custom formatting.
             </p>
           </div>
           <button type="button" id="btn-export-csv" class="btn btn-green">Download Excel File</button>
@@ -509,7 +543,9 @@
 
         <div class="export-card">
           <div>
-            <div class="export-icon" aria-hidden="true">📝</div>
+            <div class="export-icon" aria-hidden="true">
+              <i data-lucide="file-text" class="lucide-icon lucide-lg" aria-hidden="true"></i>
+            </div>
             <h3 class="export-card-title">Summary Report</h3>
             <p class="export-card-desc">
               Compile a raw text summary report containing total numbers, gender breakdown, level statistics, and WhatsApp enrollment data.
@@ -522,19 +558,20 @@
 
 
     <!-- ═══ TAB 5: EXECUTIVES (Chapter Admin/President only) ═══ -->
-    <div id="tab-executives" class="tab-content">
+    <div id="tab-executives" class="tab-content" role="tabpanel" aria-labelledby="tab-btn-executives">
       <div class="section-header">
         <span>Chapter Executive Team</span>
         <span>Leadership Registry</span>
       </div>
 
-      <!-- Credentials display countdown card (auto-clears after 30 seconds) -->
-      <div class="credentials-reveal-box" id="reveal-credentials-wrapper">
-        <h3 class="card-title" style="margin-top:0; color:var(--blue); font-size:14px; border-bottom: 1px solid rgba(26,115,232,0.15); padding-bottom:8px;">
-          🔑 NEW EXECUTIVE CREDENTIALS CREATED
+      <!-- Credentials display countdown card (Patch #4 Copy Alignment: "Temporary credentials generated...") -->
+      <div class="credentials-reveal-box" id="reveal-credentials-wrapper" role="alert" aria-live="polite">
+        <h3 class="card-title" style="margin-top:0; color:var(--gold-primary); font-size:14px; border-bottom: 1px solid var(--border-subtle); padding-bottom:8px; display:flex; align-items:center; gap:6px;">
+          <i data-lucide="key-round" class="lucide-icon" aria-hidden="true"></i>
+          <span>Temporary Login Credentials Generated</span>
         </h3>
-        <p style="font-size:12px; margin-bottom:12px; color:#555;">
-          Copy these credentials now to share with the executive. For security, this card will clear itself in <strong id="credentials-countdown">30</strong> seconds.
+        <p style="font-size:12px; margin-bottom:12px; color:var(--text-secondary);">
+          Temporary credentials generated. Copy and share securely with the officer. This panel self-destructs in <strong id="credentials-countdown" style="color:var(--gold-primary);">30</strong> seconds.
         </p>
         
         <div class="credentials-value-row">
@@ -575,7 +612,6 @@
               <option value="welfare">Welfare Officer</option>
               <option value="organizing_sec">Organizing Secretary</option>
             </select>
-            <!-- super_admin NEVER shown in chapter dropdown -->
           </div>
 
           <button type="submit" id="btn-exec-submit" class="btn btn-primary">Create Executive</button>
@@ -589,11 +625,11 @@
           <table class="members-table" style="font-size:12.5px;">
             <thead>
               <tr>
-                <th>Full Name</th>
-                <th>Email Address</th>
-                <th>Position</th>
-                <th>Status</th>
-                <th style="width: 100px;" class="text-center">Action</th>
+                <th scope="col">Full Name</th>
+                <th scope="col">Email Address</th>
+                <th scope="col">Position</th>
+                <th scope="col">Status</th>
+                <th scope="col" style="width: 100px;" class="text-center">Action</th>
               </tr>
             </thead>
             <tbody id="execs-table-body">
@@ -606,7 +642,7 @@
 
 
     <!-- ═══ TAB 6: FINANCE ═══ -->
-    <div id="tab-finance" class="tab-content">
+    <div id="tab-finance" class="tab-content" role="tabpanel" aria-labelledby="tab-btn-finance">
       <div class="section-header">
         <span>Chapter Financial Ledger</span>
         <span>Account Registry</span>
@@ -615,28 +651,43 @@
       <!-- Balance Sheet cards -->
       <div class="finance-metrics-grid">
         <div class="finance-card income">
-          <span class="finance-label">Total Revenue (Income)</span>
+          <span class="finance-label">
+            <i data-lucide="arrow-down-left" class="lucide-icon lucide-emerald" aria-hidden="true"></i>
+            <span>Total Revenue (Income)</span>
+          </span>
           <span class="finance-value" id="finance-income-val">GHS 0.00</span>
         </div>
         <div class="finance-card expense">
-          <span class="finance-label">Total Disbursed (Expenses)</span>
+          <span class="finance-label">
+            <i data-lucide="arrow-up-right" class="lucide-icon lucide-crimson" aria-hidden="true"></i>
+            <span>Total Disbursed (Expenses)</span>
+          </span>
           <span class="finance-value" id="finance-expense-val">GHS 0.00</span>
         </div>
         <div class="finance-card balance">
-          <span class="finance-label">Available Balance</span>
-          <span class="finance-value" id="finance-balance-val" style="color:var(--green);">GHS 0.00</span>
+          <span class="finance-label">
+            <i data-lucide="wallet" class="lucide-icon lucide-gold" aria-hidden="true"></i>
+            <span>Available Balance</span>
+          </span>
+          <span class="finance-value" id="finance-balance-val" style="color:var(--emerald-active);">GHS 0.00</span>
         </div>
       </div>
 
       <!-- Controls row -->
       <div class="filter-bar" style="justify-content: space-between;">
         <div style="display:flex; gap:10px; align-items:center;">
-          <span style="font-size:12px; font-weight:700; color:var(--ink-mid);">Transactions Ledger</span>
+          <span style="font-size:12px; font-weight:700; color:var(--text-secondary);">Transactions Ledger</span>
         </div>
         
         <div style="display:flex; gap:10px;">
-          <button type="button" id="btn-export-finance-csv" class="btn btn-secondary" style="width:auto; font-size:12px; padding: 6px 14px; margin:0;">Export Ledger</button>
-          <button type="button" id="btn-trigger-add-record" class="btn btn-primary" style="width:auto; font-size:12px; padding: 6px 14px; margin:0;">+ Add Record</button>
+          <button type="button" id="btn-export-finance-csv" class="btn btn-secondary" style="width:auto; font-size:12px; padding: 6px 14px; margin:0;">
+            <i data-lucide="file-spreadsheet" class="lucide-icon lucide-sm" aria-hidden="true"></i>
+            <span>Export Ledger</span>
+          </button>
+          <button type="button" id="btn-trigger-add-record" class="btn btn-primary" style="width:auto; font-size:12px; padding: 6px 14px; margin:0;">
+            <i data-lucide="plus" class="lucide-icon lucide-sm" aria-hidden="true"></i>
+            <span>Add Record</span>
+          </button>
         </div>
       </div>
 
@@ -645,13 +696,13 @@
         <table class="members-table" style="font-size:12.5px;">
           <thead>
             <tr>
-              <th style="width:100px;">Date</th>
-              <th>Description</th>
-              <th>Type</th>
-              <th>Amount</th>
-              <th>Recorded By</th>
-              <th style="width:80px;" class="text-center">Receipt</th>
-              <th style="width:50px;" class="text-center delete-finance-col">Delete</th>
+              <th scope="col" style="width:100px;">Date</th>
+              <th scope="col">Description</th>
+              <th scope="col">Type</th>
+              <th scope="col">Amount</th>
+              <th scope="col">Recorded By</th>
+              <th scope="col" style="width:80px;" class="text-center">Receipt</th>
+              <th scope="col" style="width:50px;" class="text-center delete-finance-col">Delete</th>
             </tr>
           </thead>
           <tbody id="finance-table-body">
@@ -663,12 +714,12 @@
 
   </main>
 
-  <!-- ═══ MODAL: FINANCE TRANSACTION FORM ═══ -->
-  <div class="dashboard-modal-overlay" id="finance-modal">
+  <!-- ═══ MODAL: FINANCE TRANSACTION FORM (Patch #4 Copy Alignment) ═══ -->
+  <div class="dashboard-modal-overlay" id="finance-modal" role="dialog" aria-modal="true" aria-labelledby="finance-modal-title">
     <div class="dashboard-modal-card">
       <div class="modal-header" style="margin-bottom: 16px;">
-        <h2 class="modal-title" style="color:var(--ink-dark);">Record Transaction Entry</h2>
-        <button type="button" class="btn-close-modal" style="color:var(--ink-light);" onclick="closeFinanceModal()">&times;</button>
+        <h2 class="modal-title" id="finance-modal-title" style="color:#fff;">Log Financial Ledger Transaction</h2>
+        <button type="button" class="btn-close-modal" style="color:var(--text-secondary);" onclick="closeFinanceModal()" aria-label="Close modal">&times;</button>
       </div>
 
       <form id="finance-form" onsubmit="handleFinanceSubmit(event)">
@@ -682,8 +733,7 @@
         </div>
 
         <div class="form-group">
-          <label class="form-label" for="fin-amount">Amount (GHS) <span class="required">*</span></label>
-          <!-- Custom currency validation pattern -->
+          <label class="form-label" for="fin-amount">Amount (GHS) — Recorded with 2 decimal places <span class="required">*</span></label>
           <input type="number" step="0.01" min="0.01" id="fin-amount" class="form-input" placeholder="e.g. 150.00" required>
         </div>
 
@@ -699,7 +749,7 @@
 
         <div class="form-group" style="margin-bottom: 24px;">
           <label class="form-label" for="fin-receipt">Receipt Image / Doc URL</label>
-          <input type="url" id="fin-receipt" class="form-input" placeholder="e.g. https://domain.com/receipt.jpg">
+          <input type="url" id="fin-receipt" class="form-input" placeholder="https://domain.com/receipt.jpg">
         </div>
 
         <div style="display:flex; justify-content: flex-end; gap: 10px;">
@@ -710,11 +760,10 @@
     </div>
   </div>
 
-  <footer>
-    &copy; 2026 NAGS Ghana &middot; Pioneers of Gonjaland &middot; Developed by Q-Nova GH
+  <footer role="contentinfo">
+    &copy; 2026 National Association of Gonjaland Students, Ghana. All rights reserved. Developed by Q-Nova GH
   </footer>
 
-  <!-- Scripts -->
   <script src="../config.js?v=36"></script>
   <script src="dashboard.js?v=36"></script>
 </body>
