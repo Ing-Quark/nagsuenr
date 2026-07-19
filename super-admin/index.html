@@ -3,158 +3,329 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Super Admin Portal | NAGS Ghana</title>
+  <title>Super Admin Console | NAGS Ghana Platform</title>
+  <meta name="description" content="Centralized Multi-Tenant Super Admin Control Panel for National Association of Gonjaland Students (NAGS) Ghana.">
+
+  <!-- Google Fonts & Supabase -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
   <link rel="stylesheet" href="../style.css">
   <link rel="icon" type="image/png" href="../nags.png">
   
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  
+
   <style>
-    /* ── Super Admin Dashboard Layout & Theme overrides ── */
+    /* ── SUPER ADMIN ADVANCED GLASSMORPHISM THEME ── */
+    :root {
+      --sa-bg: #070e1b;
+      --sa-surface: rgba(15, 25, 45, 0.75);
+      --sa-surface-hover: rgba(22, 36, 64, 0.85);
+      --sa-border: rgba(255, 255, 255, 0.08);
+      --sa-border-glow: rgba(229, 193, 88, 0.3);
+      --sa-gold: #e5c158;
+      --sa-gold-glow: rgba(229, 193, 88, 0.15);
+      --sa-text: #f1f5f9;
+      --sa-muted: #94a3b8;
+      --sa-radius: 12px;
+      --sa-font: 'Plus Jakarta Sans', var(--ui-font, 'Segoe UI', sans-serif);
+    }
+
     body {
-      background: #0d1e36;
-      background: radial-gradient(circle at top right, #162f52, #0a1729);
+      background-color: var(--sa-bg);
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(229, 193, 88, 0.06) 0%, transparent 40%),
+        radial-gradient(circle at 85% 85%, rgba(30, 92, 46, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 50% 50%, #070e1b 0%, #040810 100%);
+      background-attachment: fixed;
       min-height: 100vh;
-      color: #f0f4fb;
+      color: var(--sa-text);
       display: flex;
       flex-direction: column;
-      font-family: var(--ui-font, 'Segoe UI', sans-serif);
+      font-family: var(--sa-font);
+      -webkit-font-smoothing: antialiased;
     }
-    
+
     .admin-container {
-      max-width: 1200px;
+      max-width: 1280px;
       width: 100%;
       margin: 0 auto;
-      padding: 24px 20px 60px;
+      padding: 24px 24px 80px;
       flex: 1;
     }
-    
-    /* ── Header ── */
-    .dashboard-header {
+
+    /* ── Glass Top Navigation Bar ── */
+    .sa-top-bar {
+      background: rgba(7, 14, 27, 0.8);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--sa-border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .sa-top-content {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .sa-brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .sa-brand-logo {
+      width: 42px;
+      height: 42px;
+      object-fit: contain;
+      filter: drop-shadow(0 2px 8px rgba(0,0,0,0.3));
+    }
+    .sa-brand-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: -0.01em;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .sa-badge-crown {
+      background: linear-gradient(135deg, #e5c158, #b88b14);
+      color: #070e1b;
+      font-size: 9px;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    .sa-brand-sub {
+      font-size: 11px;
+      color: var(--sa-muted);
+      margin-top: 1px;
+    }
+
+    .sa-user-pill {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--sa-border);
+      padding: 6px 14px 6px 10px;
+      border-radius: 30px;
+    }
+    .sa-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--sa-gold);
+      color: #070e1b;
+      font-weight: 800;
+      font-size: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .sa-user-info {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.2;
+    }
+    .sa-user-name {
+      font-size: 12px;
+      font-weight: 700;
+      color: #fff;
+    }
+    .sa-user-role {
+      font-size: 9px;
+      color: var(--sa-gold);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 700;
+    }
+    .btn-sa-logout {
+      background: transparent;
+      border: 1px solid rgba(255, 107, 107, 0.3);
+      color: #ff8585;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 5px 12px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .btn-sa-logout:hover {
+      background: rgba(255, 107, 107, 0.15);
+      border-color: #ff6b6b;
+      color: #fff;
+    }
+
+    /* ── Animated Stats Ribbon ── */
+    .sa-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 18px;
+      margin: 28px 0 32px;
+    }
+    .sa-stat-card {
+      background: var(--sa-surface);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--sa-border);
+      border-radius: var(--sa-radius);
+      padding: 20px 22px;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .sa-stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 2px;
+      background: transparent;
+      transition: background 0.25s ease;
+    }
+    .sa-stat-card:hover {
+      transform: translateY(-3px);
+      background: var(--sa-surface-hover);
+      border-color: rgba(255, 255, 255, 0.15);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+    }
+    .sa-stat-card.active-card::before, .sa-stat-card:hover::before {
+      background: linear-gradient(90deg, var(--sa-gold), #b88b14);
+    }
+    .sa-stat-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 28px;
-      padding-bottom: 20px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      margin-bottom: 8px;
     }
-    .header-left {
+    .sa-stat-title {
+      font-size: 11px;
+      color: var(--sa-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 700;
+    }
+    .sa-stat-icon {
+      font-size: 18px;
+      opacity: 0.7;
+    }
+    .sa-stat-num {
+      font-size: 28px;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: -0.02em;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+    }
+    .sa-stat-sub {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.45);
       display: flex;
       align-items: center;
-      gap: 16px;
-    }
-    .header-logo {
-      width: 50px;
-      height: 50px;
-      object-fit: contain;
-    }
-    .header-title-box h1 {
-      font-size: 20px;
-      font-weight: 700;
-      color: #fff;
-      margin: 0 0 4px;
-    }
-    .header-title-box p {
-      font-size: 11px;
-      color: rgba(255, 255, 255, 0.5);
-      text-transform: uppercase;
-      letter-spacing: 0.15em;
-      margin: 0;
-    }
-    .btn-logout {
-      background: transparent;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      color: rgba(255, 255, 255, 0.75);
-      font-size: 11px;
-      font-weight: 600;
-      padding: 6px 14px;
-      border-radius: 4px;
-      transition: all 0.2s ease;
-      cursor: pointer;
-    }
-    .btn-logout:hover {
-      background: rgba(255, 255, 255, 0.05);
-      color: #ff6b6b;
-      border-color: #ff6b6b;
-    }
-
-    /* ── Stats Ribbon ── */
-    .stats-ribbon {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 16px;
-      margin-bottom: 28px;
-    }
-    .stat-card {
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 8px;
-      padding: 20px 22px;
-      display: flex;
-      flex-direction: column;
       gap: 6px;
-      transition: transform 0.2s ease;
     }
-    .stat-card:hover {
-      transform: translateY(-2px);
-      background: rgba(255, 255, 255, 0.06);
-    }
-    .stat-label {
+    .sa-pill-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
       font-size: 10px;
-      color: rgba(255, 255, 255, 0.45);
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      font-weight: 600;
-    }
-    .stat-value {
-      font-size: 26px;
       font-weight: 700;
-      color: #fff;
+      padding: 1px 6px;
+      border-radius: 10px;
     }
-    .stat-desc {
-      font-size: 11px;
-      color: rgba(255, 255, 255, 0.35);
-    }
+    .sa-pill-green { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+    .sa-pill-gold { background: rgba(229, 193, 88, 0.15); color: var(--sa-gold); }
 
-    /* ── Navigation Tab Bar ── */
-    .tab-bar {
+    /* ── Navigation Tabs ── */
+    .sa-tabs-row {
       display: flex;
-      border-bottom: 2px solid rgba(255, 255, 255, 0.06);
-      gap: 20px;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--sa-border);
       margin-bottom: 24px;
+      padding-bottom: 2px;
     }
-    .tab-button {
-      background: none;
+    .sa-tab-group {
+      display: flex;
+      gap: 8px;
+    }
+    .sa-tab-btn {
+      background: transparent;
       border: none;
-      color: rgba(255, 255, 255, 0.45);
-      padding: 12px 6px;
+      color: var(--sa-muted);
       font-size: 13px;
       font-weight: 600;
       font-family: inherit;
+      padding: 10px 16px;
+      border-radius: 8px;
       cursor: pointer;
-      position: relative;
-      transition: color 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
     }
-    .tab-button:hover {
-      color: rgba(255, 255, 255, 0.8);
+    .sa-tab-btn:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.04);
     }
-    .tab-button.active {
-      color: #c9a227; /* Gold accent */
+    .sa-tab-btn.active {
+      color: var(--sa-gold);
+      background: var(--sa-gold-glow);
+      border: 1px solid rgba(229, 193, 88, 0.25);
     }
-    .tab-button.active::after {
-      content: '';
-      position: absolute;
-      bottom: -2px; left: 0; right: 0;
-      height: 2px;
-      background: #c9a227;
+    .sa-tab-count {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 10px;
+    }
+    .sa-tab-btn.active .sa-tab-count {
+      background: var(--sa-gold);
+      color: #070e1b;
     }
 
-    /* ── Search & Filter Panel ── */
-    .filter-panel {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.06);
+    /* ── View Switcher Controls (Table vs Grid) ── */
+    .sa-view-switcher {
+      display: flex;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--sa-border);
+      padding: 3px;
       border-radius: 8px;
-      padding: 16px 20px;
+      gap: 2px;
+    }
+    .sa-view-btn {
+      background: transparent;
+      border: none;
+      color: var(--sa-muted);
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .sa-view-btn.active {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+    }
+
+    /* ── Filter Control Bar ── */
+    .sa-filter-bar {
+      background: var(--sa-surface);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--sa-border);
+      border-radius: var(--sa-radius);
+      padding: 14px 18px;
       margin-bottom: 20px;
       display: flex;
       flex-wrap: wrap;
@@ -162,116 +333,254 @@
       align-items: center;
       justify-content: space-between;
     }
-    .filter-group {
-      display: flex;
-      gap: 8px;
-      align-items: center;
+    .sa-search-wrap {
+      position: relative;
+      flex: 1;
+      min-width: 240px;
     }
-    .filter-input {
-      background: rgba(0, 0, 0, 0.2);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 4px;
+    .sa-search-input {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--sa-border);
+      border-radius: 8px;
+      color: #fff;
+      font-size: 13px;
+      padding: 8px 12px 8px 36px;
+      outline: none;
+      font-family: inherit;
+      transition: border-color 0.2s ease;
+    }
+    .sa-search-input:focus {
+      border-color: var(--sa-gold);
+    }
+    .sa-search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--sa-muted);
+      font-size: 14px;
+    }
+
+    .sa-select-input {
+      background: rgba(7, 14, 27, 0.9);
+      border: 1px solid var(--sa-border);
+      border-radius: 8px;
       color: #fff;
       font-size: 12px;
       padding: 8px 12px;
       outline: none;
-      transition: border-color 0.2s ease;
-    }
-    .filter-input:focus {
-      border-color: #c9a227;
-    }
-    .filter-select {
-      background: #0d1e36;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 4px;
-      color: #fff;
-      font-size: 12px;
-      padding: 8px 10px;
-      outline: none;
+      font-family: inherit;
+      cursor: pointer;
     }
 
-    /* ── Table Styling ── */
-    .table-container {
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid rgba(255, 255, 255, 0.06);
+    .btn-sa-primary {
+      background: linear-gradient(135deg, var(--sa-gold), #c49918);
+      color: #070e1b;
+      font-weight: 700;
+      font-size: 12px;
+      border: none;
+      padding: 9px 18px;
       border-radius: 8px;
-      overflow-x: auto;
-      margin-bottom: 20px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 12px rgba(229, 193, 88, 0.2);
+      transition: all 0.2s ease;
     }
-    .data-table {
+    .btn-sa-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(229, 193, 88, 0.3);
+      background: linear-gradient(135deg, #ebd076, #d4a720);
+    }
+
+    /* ── Table Visuals ── */
+    .sa-table-container {
+      background: var(--sa-surface);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--sa-border);
+      border-radius: var(--sa-radius);
+      overflow-x: auto;
+      margin-bottom: 24px;
+    }
+    .sa-table {
       width: 100%;
       border-collapse: collapse;
       text-align: left;
       font-size: 13px;
     }
-    .data-table th {
+    .sa-table th {
       background: rgba(255, 255, 255, 0.03);
-      color: rgba(255, 255, 255, 0.6);
-      font-weight: 600;
-      padding: 14px 16px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--sa-muted);
+      font-weight: 700;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--sa-border);
       font-size: 11px;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.06em;
     }
-    .data-table td {
-      padding: 12px 16px;
+    .sa-table td {
+      padding: 14px 18px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-      color: rgba(255, 255, 255, 0.85);
+      color: rgba(241, 245, 249, 0.9);
       vertical-align: middle;
     }
-    .data-table tr:hover td {
-      background: rgba(255, 255, 255, 0.02);
+    .sa-table tr:hover td {
+      background: rgba(255, 255, 255, 0.03);
     }
-    .logo-thumbnail {
-      width: 32px;
-      height: 32px;
+    .sa-logo-circle {
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
       object-fit: contain;
-      background: rgba(255,255,255,0.06);
+      background: rgba(255,255,255,0.08);
       padding: 2px;
+      border: 1px solid rgba(255,255,255,0.1);
     }
-    
-    /* Toggle active badges */
-    .badge-status {
-      display: inline-block;
-      font-size: 9px;
+    .sa-logo-initials {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(229, 193, 88, 0.2), rgba(229, 193, 88, 0.05));
+      border: 1px solid rgba(229, 193, 88, 0.3);
+      color: var(--sa-gold);
+      font-weight: 800;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Status Badges */
+    .sa-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 10px;
       font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 3px 10px;
+      border-radius: 20px;
+    }
+    .sa-badge-active {
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+    .sa-badge-inactive {
+      background: rgba(239, 68, 68, 0.15);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    /* Role Pill Colors */
+    .role-pill {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 0.05em;
       padding: 2px 8px;
-      border-radius: 12px;
+      border-radius: 6px;
     }
-    .badge-status.active {
-      background: rgba(30, 92, 46, 0.2);
-      color: #52c41a;
-      border: 1px solid rgba(82, 196, 26, 0.4);
-    }
-    .badge-status.inactive {
-      background: rgba(255, 77, 79, 0.15);
-      color: #ff4d4f;
-      border: 1px solid rgba(255, 77, 79, 0.4);
-    }
+    .role-super_admin  { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); }
+    .role-chapter_admin{ background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
+    .role-president    { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.4); }
+    .role-vice_president{ background: rgba(6, 182, 212, 0.2); color: #22d3ee; border: 1px solid rgba(6, 182, 212, 0.4); }
+    .role-pro          { background: rgba(168, 85, 247, 0.2); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.4); }
+    .role-financial_sec{ background: rgba(217, 119, 6, 0.2); color: #fbbf24; border: 1px solid rgba(217, 119, 6, 0.4); }
+    .role-secretary    { background: rgba(99, 102, 241, 0.2); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.4); }
+    .role-welfare      { background: rgba(244, 63, 94, 0.2); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.4); }
+    .role-organizing_sec{ background: rgba(20, 184, 166, 0.2); color: #2dd4bf; border: 1px solid rgba(20, 184, 166, 0.4); }
 
-    /* ── Forms and Modals ── */
-    .btn-create {
-      background: #c9a227;
-      color: #081830;
+    /* ── Chapter Grid Cards View ── */
+    .sa-grid-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+    .sa-chapter-card {
+      background: var(--sa-surface);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--sa-border);
+      border-radius: var(--sa-radius);
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      transition: all 0.25s ease;
+    }
+    .sa-chapter-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(255, 255, 255, 0.18);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.4);
+    }
+    .sa-card-top {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+    .sa-card-title {
+      font-size: 15px;
       font-weight: 700;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 4px;
-      font-size: 12px;
-      cursor: pointer;
-      transition: background-color 0.2s ease;
+      color: #fff;
+      line-height: 1.3;
+      margin-bottom: 4px;
     }
-    .btn-create:hover { background-color: #e0b62d; }
+    .sa-card-location {
+      font-size: 12px;
+      color: var(--sa-muted);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .sa-card-body {
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 12px 0;
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+    }
+    .sa-card-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .btn-sm-action {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--sa-border);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .btn-sm-action:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.25);
+    }
 
-    .modal-overlay {
+    /* ── Live Preview Modal System ── */
+    .sa-modal-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0, 0, 0, 0.6);
-      backdrop-filter: blur(4px);
+      background: rgba(4, 8, 16, 0.75);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -279,175 +588,291 @@
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.25s ease;
+      padding: 20px;
     }
-    .modal-overlay.show {
+    .sa-modal-overlay.show {
       opacity: 1;
       pointer-events: auto;
     }
-    .modal-card {
-      background: #11233d;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 12px;
+    .sa-modal-grid {
+      background: #0f1c30;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 16px;
       width: 100%;
-      max-width: 500px;
-      padding: 28px 24px;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-      transform: scale(0.9);
-      transition: transform 0.25s ease;
+      max-width: 900px;
+      max-height: 90vh;
+      overflow-y: auto;
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+      transform: scale(0.94);
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .modal-overlay.show .modal-card {
+    .sa-modal-overlay.show .sa-modal-grid {
       transform: scale(1);
     }
-    .modal-header {
+    @media (max-width: 768px) {
+      .sa-modal-grid { grid-template-columns: 1fr; }
+      .sa-preview-col { display: none; }
+    }
+    .sa-modal-main {
+      padding: 28px;
+    }
+    .sa-preview-col {
+      background: rgba(7, 14, 27, 0.6);
+      border-left: 1px solid var(--sa-border);
+      padding: 28px;
       display: flex;
-      justify-content: space-between;
-      align-items: center;
+      flex-direction: column;
+    }
+    .sa-modal-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: #fff;
+      margin: 0 0 6px;
+    }
+    .sa-modal-sub {
+      font-size: 12px;
+      color: var(--sa-muted);
       margin-bottom: 20px;
     }
-    .modal-title {
-      font-size: 16px;
-      font-weight: 700;
-      color: #fff;
-      margin: 0;
-    }
-    .btn-close-modal {
-      background: none;
-      border: none;
-      color: rgba(255, 255, 255, 0.4);
-      font-size: 20px;
-      cursor: pointer;
-    }
-    .btn-close-modal:hover { color: #fff; }
 
-    /* Inline Validation Text */
-    .validation-hint {
+    .sa-field-group {
+      margin-bottom: 16px;
+    }
+    .sa-label {
       display: block;
-      font-size: 10px;
-      color: #ff4d4f;
-      margin-top: 4px;
-      display: none;
+      font-size: 11px;
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.8);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 6px;
+    }
+    .sa-input {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--sa-border);
+      border-radius: 8px;
+      color: #fff;
+      font-size: 13px;
+      padding: 10px 14px;
+      outline: none;
+      font-family: inherit;
+      transition: all 0.2s ease;
+    }
+    .sa-input:focus {
+      border-color: var(--sa-gold);
+      background: rgba(0, 0, 0, 0.4);
+    }
+    
+    /* Real-time slug status indicator */
+    .slug-status-badge {
+      font-size: 11px;
+      font-weight: 600;
+      margin-top: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .slug-valid { color: #34d399; }
+    .slug-invalid { color: #f87171; }
+
+    /* Live Preview Card Box inside Modal */
+    .preview-card-box {
+      background: var(--sa-surface);
+      border: 1px dashed var(--sa-gold);
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 16px;
     }
 
-    /* Loader */
-    .loader-wrap {
+    /* Loader Spinner */
+    .sa-loader {
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 40px;
+      padding: 60px;
     }
-    .spinner {
-      width: 32px; height: 32px;
+    .sa-spinner {
+      width: 36px; height: 36px;
       border: 3px solid rgba(255,255,255,0.1);
-      border-top-color: #c9a227;
+      border-top-color: var(--sa-gold);
       border-radius: 50%;
-      animation: spin 0.8s linear infinite;
+      animation: saSpin 0.8s linear infinite;
     }
+    @keyframes saSpin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
 
-  <!-- Global header -->
-  <header class="top-bar">
-    <div class="top-bar-content">
-      <div class="logo-box" style="border: none; padding: 0;">
-        <img src="../nags.png" alt="NAGS Logo">
+  <!-- Top Glass Bar -->
+  <header class="sa-top-bar">
+    <div class="sa-top-content">
+      <div class="sa-brand">
+        <img src="../nags.png" class="sa-brand-logo" alt="NAGS Logo">
+        <div>
+          <div class="sa-brand-title">
+            NAGS GHANA <span class="sa-badge-crown">SUPER ADMIN</span>
+          </div>
+          <div class="sa-brand-sub">Central Multi-Tenant Platform Control Console</div>
+        </div>
       </div>
-      <div class="header-text">
-        <h1 class="header-title">National Association of Gonjaland Students</h1>
-        <div class="header-subtitle">Super Admin Console &middot; Platform Management</div>
+
+      <div class="sa-user-pill">
+        <div class="sa-avatar" id="sa-avatar-initials">MY</div>
+        <div class="sa-user-info">
+          <span class="sa-user-name" id="sa-user-display">Mahama Yakubu</span>
+          <span class="sa-user-role">Super Administrator</span>
+        </div>
+        <button id="btn-sa-logout" class="btn-sa-logout">Sign Out</button>
       </div>
     </div>
   </header>
 
-  <!-- Main container -->
+  <!-- Main Container -->
   <main class="admin-container">
 
-    <div class="dashboard-header">
-      <div class="header-left">
-        <div class="header-title-box">
-          <h1 id="admin-greeting">Welcome, Platform Admin</h1>
-          <p>National Portal Controller</p>
-        </div>
-      </div>
-      <button id="btn-logout" class="btn-logout">Sign Out</button>
-    </div>
-
-    <!-- Error Banner -->
+    <!-- Global Error Notice -->
     <div id="dashboard-error-box" class="message-box error" style="display:none; margin-bottom: 24px;"></div>
 
-    <!-- Stats Ribbon -->
-    <div class="stats-ribbon">
-      <div class="stat-card">
-        <span class="stat-label">Accredited Chapters</span>
-        <span class="stat-value" id="stat-chapters">—</span>
-        <span class="stat-desc">Active universities on platform</span>
-      </div>
-      <div class="stat-card">
-        <span class="stat-label">Registered Members</span>
-        <span class="stat-value" id="stat-members">—</span>
-        <span class="stat-desc">National aggregate index</span>
-      </div>
-      <div class="stat-card">
-        <span class="stat-label">Total Logs Logged</span>
-        <span class="stat-value" id="stat-logs">—</span>
-        <span class="stat-desc">SMS broadcasts sent</span>
-      </div>
-      <div class="stat-card">
-        <span class="stat-label">Aggregated Revenue</span>
-        <span class="stat-value" id="stat-revenue">—</span>
-        <span class="stat-desc">GHS total chapter funds</span>
-      </div>
-    </div>
-
-    <!-- Tab Bar navigation -->
-    <div class="tab-bar">
-      <button class="tab-button active" onclick="switchTab('universities')">University Chapters</button>
-      <button class="tab-button" onclick="switchTab('executives')">All Executives</button>
-      <button class="tab-button" onclick="switchTab('stats')">Platform Stats</button>
-    </div>
-
-    <!-- Loading screen -->
-    <div id="panel-loader" class="loader-wrap"><div class="spinner"></div></div>
-
-    <!-- ── TAB: UNIVERSITIES ── -->
-    <div id="tab-universities-section" class="tab-section">
-      <div class="filter-panel">
-        <div class="filter-group">
-          <input type="text" id="search-chapters" class="filter-input" placeholder="Search chapters..." oninput="filterChaptersTable()">
+    <!-- ── STATS RIBBON (Interactive Cards) ── -->
+    <div class="sa-stats-grid">
+      <div class="sa-stat-card active-card" onclick="switchTab('universities')">
+        <div class="sa-stat-header">
+          <span class="sa-stat-title">Accredited Chapters</span>
+          <span class="sa-stat-icon">🏛️</span>
         </div>
-        <button class="btn-create" onclick="openChapterModal()">+ Add New Chapter</button>
+        <div class="sa-stat-num" id="stat-chapters">0</div>
+        <div class="sa-stat-sub">
+          <span class="sa-pill-indicator sa-pill-green" id="stat-active-chapters-pill">0 Active</span>
+          <span>across public universities</span>
+        </div>
       </div>
 
-      <div class="table-container">
-        <table class="data-table" id="chapters-table">
+      <div class="sa-stat-card" onclick="switchTab('executives')">
+        <div class="sa-stat-header">
+          <span class="sa-stat-title">National Executives</span>
+          <span class="sa-stat-icon">🛡️</span>
+        </div>
+        <div class="sa-stat-num" id="stat-execs">0</div>
+        <div class="sa-stat-sub">
+          <span class="sa-pill-indicator sa-pill-gold">Seeded Leadership</span>
+          <span>registered officers</span>
+        </div>
+      </div>
+
+      <div class="sa-stat-card" onclick="switchTab('stats')">
+        <div class="sa-stat-header">
+          <span class="sa-stat-title">Total Registered Members</span>
+          <span class="sa-stat-icon">👥</span>
+        </div>
+        <div class="sa-stat-num" id="stat-members">0</div>
+        <div class="sa-stat-sub">
+          <span>National aggregate member index</span>
+        </div>
+      </div>
+
+      <div class="sa-stat-card" onclick="switchTab('stats')">
+        <div class="sa-stat-header">
+          <span class="sa-stat-title">Aggregated Funds</span>
+          <span class="sa-stat-icon">💰</span>
+        </div>
+        <div class="sa-stat-num" id="stat-revenue" style="color: var(--sa-gold);">GHS 0.00</div>
+        <div class="sa-stat-sub">
+          <span>Combined chapter balances</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── TABS NAVIGATION ROW ── -->
+    <div class="sa-tabs-row">
+      <div class="sa-tab-group">
+        <button class="sa-tab-btn active" id="tab-btn-universities" onclick="switchTab('universities')">
+          <span>🏛️ University Chapters</span>
+          <span class="sa-tab-count" id="badge-chapters-count">0</span>
+        </button>
+        <button class="sa-tab-btn" id="tab-btn-executives" onclick="switchTab('executives')">
+          <span>🛡️ All Executives</span>
+          <span class="sa-tab-count" id="badge-execs-count">0</span>
+        </button>
+        <button class="sa-tab-btn" id="tab-btn-stats" onclick="switchTab('stats')">
+          <span>📊 Platform Analytics</span>
+        </button>
+      </div>
+
+      <!-- Table / Grid Switcher for Universities -->
+      <div class="sa-view-switcher" id="view-toggle-container">
+        <button class="sa-view-btn active" id="btn-view-table" onclick="setUniversityView('table')">📋 Table</button>
+        <button class="sa-view-btn" id="btn-view-grid" onclick="setUniversityView('grid')">🎴 Cards</button>
+      </div>
+    </div>
+
+    <!-- Loading Screen -->
+    <div id="panel-loader" class="sa-loader"><div class="sa-spinner"></div></div>
+
+    <!-- ════════════ TAB 1: UNIVERSITIES ════════════ -->
+    <div id="tab-universities-section" class="tab-section">
+      <div class="sa-filter-bar">
+        <div class="sa-search-wrap">
+          <span class="sa-search-icon">🔍</span>
+          <input type="text" id="search-chapters" class="sa-search-input" placeholder="Search by name, acronym, campus, or slug..." oninput="filterChapters()">
+        </div>
+        
+        <div style="display:flex; gap:10px;">
+          <select id="filter-chapter-status" class="sa-select-input" onchange="filterChapters()">
+            <option value="all">All Statuses</option>
+            <option value="active" selected>Active Chapters Only</option>
+            <option value="archived">Archived Chapters Only</option>
+          </select>
+
+          <button class="btn-sa-primary" onclick="openChapterModal()">
+            <span>+ Add University Chapter</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 1A. Table View -->
+      <div class="sa-table-container" id="chapters-table-view">
+        <table class="sa-table" id="chapters-table">
           <thead>
             <tr>
               <th>Logo</th>
-              <th>Chapter Name</th>
+              <th>University Chapter</th>
               <th>Acronym</th>
-              <th>Slug</th>
-              <th>Location</th>
+              <th>Routing Slug</th>
+              <th>Campus Location</th>
               <th>Status</th>
               <th style="text-align: right;">Actions</th>
             </tr>
           </thead>
           <tbody id="chapters-tbody">
-            <!-- Populated dynamically -->
+            <!-- Rendered dynamically -->
           </tbody>
         </table>
       </div>
+
+      <!-- 1B. Grid Cards View -->
+      <div class="sa-grid-container" id="chapters-grid-view" style="display:none;">
+        <!-- Rendered dynamically -->
+      </div>
     </div>
 
-    <!-- ── TAB: EXECUTIVES ── -->
+    <!-- ════════════ TAB 2: EXECUTIVES ════════════ -->
     <div id="tab-executives-section" class="tab-section" style="display:none;">
-      <div class="filter-panel">
-        <div class="filter-group" style="gap:10px;">
-          <input type="text" id="search-execs" class="filter-input" placeholder="Search exec name..." oninput="filterExecsTable()">
-          <select id="filter-exec-univ" class="filter-select" onchange="filterExecsTable()">
-            <option value="">All Chapters</option>
+      <div class="sa-filter-bar">
+        <div class="sa-search-wrap">
+          <span class="sa-search-icon">🔍</span>
+          <input type="text" id="search-execs" class="sa-search-input" placeholder="Search by executive name or email address..." oninput="filterExecs()">
+        </div>
+
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <select id="filter-exec-univ" class="sa-select-input" onchange="filterExecs()">
+            <option value="">All University Chapters</option>
           </select>
-          <select id="filter-exec-role" class="filter-select" onchange="filterExecsTable()">
-            <option value="">All Roles</option>
+
+          <select id="filter-exec-role" class="sa-select-input" onchange="filterExecs()">
+            <option value="">All Designated Roles</option>
             <option value="super_admin">Super Admin</option>
             <option value="chapter_admin">Chapter Admin</option>
             <option value="president">President</option>
@@ -461,50 +886,59 @@
         </div>
       </div>
 
-      <div class="table-container">
-        <table class="data-table" id="execs-table">
+      <div class="sa-table-container">
+        <table class="sa-table" id="execs-table">
           <thead>
             <tr>
-              <th>Executive Name</th>
+              <th>Executive Officer</th>
               <th>Email Address</th>
-              <th>University / Chapter</th>
+              <th>University Chapter</th>
               <th>Designated Role</th>
               <th>Status</th>
-              <th style="text-align: right;">Access Controls</th>
+              <th style="text-align: right;">Actions</th>
             </tr>
           </thead>
           <tbody id="execs-tbody">
-            <!-- Populated dynamically -->
+            <!-- Rendered dynamically -->
           </tbody>
         </table>
       </div>
     </div>
 
-    <!-- ── TAB: PLATFORM STATS ── -->
+    <!-- ════════════ TAB 3: PLATFORM ANALYTICS ════════════ -->
     <div id="tab-stats-section" class="tab-section" style="display:none;">
-      <div class="page-panel" style="padding: 28px 24px; border: 1px solid rgba(255,255,255,0.06); background: rgba(255,255,255,0.01);">
-        <h2 class="section-title" style="color: #fff; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 10px; margin-bottom: 20px;">Platform Integration Aggregates</h2>
-        
-        <div class="details-list" style="margin-bottom: 30px;">
-          <div class="detail-row" style="border-bottom: 1px solid rgba(255,255,255,0.04); padding: 10px 0;">
-            <span class="detail-label" style="color: rgba(255,255,255,0.5);">Active Chapters:</span>
-            <span class="detail-val" id="stats-active-chapters" style="font-weight:700; color:#fff;">—</span>
+      <div class="page-panel" style="padding: 28px 24px; border: 1px solid var(--sa-border); background: var(--sa-surface);">
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid var(--sa-border); padding-bottom: 14px; margin-bottom: 24px;">
+          <div>
+            <h2 style="color: #fff; font-size:18px; font-weight:800; margin:0 0 4px;">National Integration Metrics</h2>
+            <div style="font-size:12px; color:var(--sa-muted);">Real-time metrics aggregated across all accredited Ghanaian university chapters</div>
           </div>
-          <div class="detail-row" style="border-bottom: 1px solid rgba(255,255,255,0.04); padding: 10px 0;">
-            <span class="detail-label" style="color: rgba(255,255,255,0.5);">National Executives Count:</span>
-            <span class="detail-val" id="stats-exec-count" style="font-weight:700; color:#fff;">—</span>
+          <button class="btn-sm-action" onclick="copyNationalReportText()">📋 Copy National Summary</button>
+        </div>
+
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+          <div style="background: rgba(0,0,0,0.3); border:1px solid var(--sa-border); padding:20px; border-radius:12px;">
+            <div style="font-size:11px; text-transform:uppercase; color:var(--sa-muted); font-weight:700;">Accreditation Status</div>
+            <div style="font-size:24px; font-weight:800; color:#fff; margin:6px 0;" id="stats-active-chapters">0 / 0</div>
+            <div style="font-size:12px; color:#34d399;">Active registered chapter portals</div>
           </div>
-          <div class="detail-row" style="border-bottom: 1px solid rgba(255,255,255,0.04); padding: 10px 0;">
-            <span class="detail-label" style="color: rgba(255,255,255,0.5);">SMS Logs Registered:</span>
-            <span class="detail-val" id="stats-sms-count" style="font-weight:700; color:#fff;">—</span>
+
+          <div style="background: rgba(0,0,0,0.3); border:1px solid var(--sa-border); padding:20px; border-radius:12px;">
+            <div style="font-size:11px; text-transform:uppercase; color:var(--sa-muted); font-weight:700;">National Executive Team</div>
+            <div style="font-size:24px; font-weight:800; color:#fff; margin:6px 0;" id="stats-exec-count">0</div>
+            <div style="font-size:12px; color:var(--sa-gold);">Configured executive officer accounts</div>
           </div>
-          <div class="detail-row" style="border-bottom: 1px solid rgba(255,255,255,0.04); padding: 10px 0;">
-            <span class="detail-label" style="color: rgba(255,255,255,0.5);">Aggregate Member Count:</span>
-            <span class="detail-val" id="stats-member-count" style="font-weight:700; color:#fff;">—</span>
+
+          <div style="background: rgba(0,0,0,0.3); border:1px solid var(--sa-border); padding:20px; border-radius:12px;">
+            <div style="font-size:11px; text-transform:uppercase; color:var(--sa-muted); font-weight:700;">SMS Broadcast Volume</div>
+            <div style="font-size:24px; font-weight:800; color:#fff; margin:6px 0;" id="stats-sms-count">0</div>
+            <div style="font-size:12px; color:var(--sa-muted);">Outbound SMS log entries</div>
           </div>
-          <div class="detail-row" style="border-bottom: 1px solid rgba(255,255,255,0.04); padding: 10px 0;">
-            <span class="detail-label" style="color: rgba(255,255,255,0.5);">National Chapter Balances Combined:</span>
-            <span class="detail-val" id="stats-total-balances" style="font-weight:700; color:#c9a227;">GHS 0.00</span>
+
+          <div style="background: rgba(0,0,0,0.3); border:1px solid var(--sa-border); padding:20px; border-radius:12px;">
+            <div style="font-size:11px; text-transform:uppercase; color:var(--sa-muted); font-weight:700;">National Chapter Reserves</div>
+            <div style="font-size:24px; font-weight:800; color:var(--sa-gold); margin:6px 0;" id="stats-total-balances">GHS 0.00</div>
+            <div style="font-size:12px; color:var(--sa-muted);">Combined liquidity across ledgers</div>
           </div>
         </div>
       </div>
@@ -512,58 +946,97 @@
 
   </main>
 
-  <!-- ── MODAL: CHAPTER CRUD ── -->
-  <div class="modal-overlay" id="chapter-modal">
-    <div class="modal-card">
-      <div class="modal-header">
-        <h2 class="modal-title" id="chapter-modal-title">Add New University Chapter</h2>
-        <button type="button" class="btn-close-modal" onclick="closeChapterModal()">&times;</button>
+  <!-- ── ADVANCED LIVE PREVIEW CHAPTER MODAL ── -->
+  <div class="sa-modal-overlay" id="chapter-modal">
+    <div class="sa-modal-grid">
+      <!-- Left: Input Form -->
+      <div class="sa-modal-main">
+        <h2 class="sa-modal-title" id="chapter-modal-title">Configure University Chapter</h2>
+        <div class="sa-modal-sub">Add or update an accredited institution chapter on the NAGS Ghana portal.</div>
+
+        <form id="chapter-form" onsubmit="handleChapterSubmit(event)">
+          <input type="hidden" id="modal-chapter-id">
+
+          <div class="sa-field-group">
+            <label class="sa-label" for="univ-name">Full University Name <span style="color:#ff6b6b;">*</span></label>
+            <input type="text" id="univ-name" class="sa-input" placeholder="e.g. University of Ghana" required oninput="updateLivePreview()">
+          </div>
+
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="sa-field-group">
+              <label class="sa-label" for="univ-short">Short Name / Acronym <span style="color:#ff6b6b;">*</span></label>
+              <input type="text" id="univ-short" class="sa-input" placeholder="e.g. UG" required oninput="updateLivePreview()">
+            </div>
+
+            <div class="sa-field-group">
+              <label class="sa-label" for="univ-slug">Routing Slug <span style="color:#ff6b6b;">*</span></label>
+              <input type="text" id="univ-slug" class="sa-input" placeholder="e.g. ug" required oninput="updateLivePreview()">
+            </div>
+          </div>
+
+          <!-- Real-time Validation Badge -->
+          <div class="slug-status-badge" id="slug-validation-box" style="margin-top: -8px; margin-bottom: 16px;">
+            <span id="slug-status-text">Slug format: <code>lowercase-and-hyphens-only</code></span>
+          </div>
+
+          <div class="sa-field-group">
+            <label class="sa-label" for="univ-location">Campus Location</label>
+            <input type="text" id="univ-location" class="sa-input" placeholder="e.g. Legon, Accra, Greater Accra Region" oninput="updateLivePreview()">
+          </div>
+
+          <div class="sa-field-group">
+            <label class="sa-label" for="univ-logo">Logo Image URL</label>
+            <input type="url" id="univ-logo" class="sa-input" placeholder="e.g. https://domain.com/logo.png" oninput="updateLivePreview()">
+          </div>
+
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="sa-field-group">
+              <label class="sa-label" for="univ-whatsapp">WhatsApp Invite Link</label>
+              <input type="url" id="univ-whatsapp" class="sa-input" placeholder="https://chat.whatsapp.com/...">
+            </div>
+
+            <div class="sa-field-group">
+              <label class="sa-label" for="univ-facebook">Facebook Page Link</label>
+              <input type="url" id="univ-facebook" class="sa-input" placeholder="https://facebook.com/...">
+            </div>
+          </div>
+
+          <div style="display:flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+            <button type="button" class="btn-sm-action" onclick="closeChapterModal()">Cancel</button>
+            <button type="submit" class="btn-sa-primary" id="btn-chapter-submit">Save Chapter</button>
+          </div>
+        </form>
       </div>
-      
-      <form id="chapter-form" onsubmit="handleChapterSubmit(event)">
-        <input type="hidden" id="modal-chapter-id">
-        
-        <div class="form-group">
-          <label class="form-label" for="univ-name">University Name <span class="required">*</span></label>
-          <input type="text" id="univ-name" class="form-input" placeholder="e.g. University of Ghana" required>
+
+      <!-- Right: Real-time Card Preview Column -->
+      <div class="sa-preview-col">
+        <div style="font-size:11px; font-weight:800; text-transform:uppercase; color:var(--sa-gold); letter-spacing:0.08em; margin-bottom:12px;">
+          👁️ Live Chapter Card Preview
+        </div>
+        <div style="font-size:12px; color:var(--sa-muted); margin-bottom:16px;">
+          This preview reflects how this chapter card will appear to students on the NAGS Ghana main landing page.
         </div>
 
-        <div class="form-group">
-          <label class="form-label" for="univ-short">Short Name / Acronym <span class="required">*</span></label>
-          <input type="text" id="univ-short" class="form-input" placeholder="e.g. UG" required>
-        </div>
+        <div class="preview-card-box">
+          <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
+            <div id="prev-logo-wrap">
+              <div class="sa-logo-initials" id="prev-initials">UG</div>
+            </div>
+            <div>
+              <div style="font-size:14px; font-weight:700; color:#fff; line-height:1.2;" id="prev-title">University of Ghana</div>
+              <div class="sa-badge sa-badge-active" id="prev-short" style="margin-top:4px;">UG</div>
+            </div>
+          </div>
 
-        <div class="form-group">
-          <label class="form-label" for="univ-slug">Routing Slug <span class="required">*</span></label>
-          <input type="text" id="univ-slug" class="form-input" placeholder="e.g. ug" required>
-          <span class="validation-hint" id="slug-validation-error">Slug can only contain lowercase letters and hyphens.</span>
-        </div>
+          <div style="font-size:11px; color:var(--sa-muted); border-top:1px solid rgba(255,255,255,0.06); padding-top:10px; margin-top:10px;" id="prev-location">
+            📍 Legon, Accra
+          </div>
 
-        <div class="form-group">
-          <label class="form-label" for="univ-location">Campus Location</label>
-          <input type="text" id="univ-location" class="form-input" placeholder="e.g. Legon, Accra">
+          <div style="font-size:11px; color:var(--sa-gold); margin-top:6px; font-family:monospace;" id="prev-url">
+            🔗 /register/?chapter=ug
+          </div>
         </div>
-
-        <div class="form-group">
-          <label class="form-label" for="univ-logo">Logo URL</label>
-          <input type="url" id="univ-logo" class="form-input" placeholder="e.g. https://domain.com/logo.png">
-        </div>
-
-        <div class="form-group">
-          <label class="form-label" for="univ-whatsapp">WhatsApp Invite Link</label>
-          <input type="url" id="univ-whatsapp" class="form-input" placeholder="e.g. https://chat.whatsapp.com/...">
-        </div>
-
-        <div class="form-group" style="margin-bottom: 24px;">
-          <label class="form-label" for="univ-facebook">Facebook Page Link</label>
-          <input type="url" id="univ-facebook" class="form-input" placeholder="e.g. https://facebook.com/...">
-        </div>
-
-        <div style="display:flex; justify-content: flex-end; gap: 10px;">
-          <button type="button" class="btn btn-secondary" style="margin:0; padding:8px 16px;" onclick="closeChapterModal()">Cancel</button>
-          <button type="submit" class="btn btn-primary" style="margin:0; padding:8px 16px;" id="btn-chapter-submit">Save Chapter</button>
-        </div>
-      </form>
+      </div>
     </div>
   </div>
 
