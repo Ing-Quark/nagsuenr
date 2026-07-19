@@ -3,277 +3,298 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Member Registration | NAGS-UENR</title>
-  <meta name="description" content="Official membership registration portal for the National Association of Gonjaland Students (NAGS) - University of Energy and Natural Resources (UENR) Chapter.">
+  <title>NAGS Ghana — Chapter Network</title>
+  <meta name="description" content="National Association of Gonjaland Students — Ghana Chapter Network. Select your university to register or access your chapter portal.">
   
-  <!-- CSS Link -->
   <link rel="stylesheet" href="style.css">
-  
-  <!-- Global Error Logger -->
-  <script>
-    window.onerror = function(message, source, lineno, colno, error) {
-      console.error("GLOBAL ERROR CAPTURED:", message, "at", source, "line", lineno, "col", colno);
-    };
-  </script>
-
-  <!-- Supabase CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  
-  <!-- Site Favicon -->
   <link rel="icon" type="image/png" href="nags.png">
+  
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    /* ── Platform Landing Specific Styles ── */
+    .platform-main {
+      background: linear-gradient(160deg, #1a3f72 0%, #0d2444 60%, #081830 100%);
+      min-height: calc(100vh - 120px);
+      padding: 32px 20px 48px;
+    }
+    .platform-section-label {
+      text-align: center;
+      color: rgba(255,255,255,0.55);
+      font-family: var(--ui-font, 'Segoe UI', sans-serif);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      margin-bottom: 24px;
+    }
+    .chapters-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .chapter-card {
+      background: #ffffff;
+      border-radius: 10px;
+      border: 1px solid #e6eaf0;
+      border-top: 3px solid #1a3f72;
+      padding: 24px 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      transition: box-shadow 0.25s ease, transform 0.2s ease;
+      cursor: default;
+    }
+    .chapter-card:hover {
+      box-shadow: 0 12px 32px rgba(0,0,0,0.18);
+      transform: translateY(-2px);
+    }
+    .chapter-card-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .chapter-logo-wrap {
+      width: 54px;
+      height: 54px;
+      flex-shrink: 0;
+      border-radius: 50%;
+      overflow: hidden;
+      background: #f0f4fb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .chapter-logo-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    .chapter-logo-initials {
+      font-size: 18px;
+      font-weight: 800;
+      color: #1a3f72;
+      font-family: var(--ui-font, 'Segoe UI', sans-serif);
+      letter-spacing: -0.5px;
+    }
+    .chapter-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: #1a1a2e;
+      line-height: 1.35;
+      font-family: var(--body-font, Georgia, serif);
+    }
+    .chapter-badge {
+      display: inline-block;
+      background: #1a3f72;
+      color: white;
+      font-size: 9px;
+      font-family: var(--ui-font, 'Segoe UI', sans-serif);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      padding: 2px 9px;
+      border-radius: 20px;
+      margin-top: 3px;
+    }
+    .chapter-location {
+      font-size: 11px;
+      color: #777;
+      font-family: var(--ui-font, 'Segoe UI', sans-serif);
+    }
+    .chapter-actions {
+      display: flex;
+      gap: 8px;
+      flex-direction: column;
+    }
+    .chapter-actions a {
+      display: block;
+      text-align: center;
+      text-decoration: none;
+      padding: 9px 14px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      font-family: var(--ui-font, 'Segoe UI', sans-serif);
+      transition: opacity 0.2s ease;
+      cursor: pointer;
+    }
+    .chapter-actions a:hover { opacity: 0.85; }
+    .chapter-btn-register {
+      background: #1a3f72;
+      color: white;
+    }
+    .chapter-btn-login {
+      background: transparent;
+      color: #1a3f72;
+      border: 1.5px solid #1a3f72;
+    }
+
+    /* Loading skeleton */
+    .skeleton-card {
+      background: rgba(255,255,255,0.07);
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.1);
+      padding: 24px 22px;
+      height: 220px;
+      animation: skeleton-pulse 1.5s ease-in-out infinite;
+    }
+    @keyframes skeleton-pulse {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; }
+    }
+    .platform-empty {
+      text-align: center;
+      padding: 60px 20px;
+      color: rgba(255,255,255,0.6);
+      font-family: var(--ui-font, 'Segoe UI', sans-serif);
+      max-width: 420px;
+      margin: 0 auto;
+    }
+    .platform-empty-icon { font-size: 42px; margin-bottom: 16px; }
+    .platform-empty-title { font-size: 16px; font-weight: 600; color: rgba(255,255,255,0.85); margin-bottom: 8px; }
+    .platform-empty-sub { font-size: 12px; line-height: 1.7; }
+
+    @media (max-width: 520px) {
+      .chapters-grid { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
 <body>
 
-  <!-- Top Bar / Institutional Header -->
+  <!-- Platform Header -->
   <header class="top-bar">
-    <div class="top-bar-content">
-      <div class="logo-box" id="logo-container" style="border: none; padding: 0;">
-        <img src="nags.png" alt="NAGS-UENR Logo">
-      </div>
-      <div class="header-text">
+    <div class="top-bar-content" style="justify-content: center;">
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center;">
+        <div class="logo-box" style="border: none; padding: 0; margin-bottom: 4px;">
+          <img src="nags.png" alt="NAGS Ghana Logo" style="width: 50px; height: 50px; object-fit: contain;">
+        </div>
         <h1 class="header-title">National Association of Gonjaland Students</h1>
-        <div class="header-subtitle">NAGS-UENR — University of Energy and Natural Resources Chapter</div>
-        <div class="header-motto">Sunyani, Bono Region, Ghana &middot; Motto: Kishilbi Konwule M'ata Kuyu</div>
+        <div class="header-subtitle">Ghana Chapter Network</div>
+        <div class="header-motto">Select your university to register or access your chapter portal</div>
       </div>
     </div>
   </header>
 
-  <!-- Main Content Container -->
-  <main class="container">
-    
-    <!-- Configuration warning alert (shown via js if default config remains) -->
-    <div id="config-warning" class="message-box error" style="display: none;"></div>
+  <!-- Main Platform Body -->
+  <main class="platform-main">
+    <p class="platform-section-label">Active Chapters</p>
 
-    <!-- Step Progress Indicator -->
-    <div class="step-indicator" aria-label="Registration Progress">
-      <div class="step-node active" id="node-1">
-        <div class="step-circle" aria-current="step">1</div>
-        <span class="step-label">Details</span>
-      </div>
-      <div class="step-connector" id="conn-1"></div>
-      <div class="step-node" id="node-2">
-        <div class="step-circle">2</div>
-        <span class="step-label">Confirm</span>
-      </div>
-      <div class="step-connector" id="conn-2"></div>
-      <div class="step-node" id="node-3">
-        <div class="step-circle">3</div>
-        <span class="step-label">Join</span>
-      </div>
-    </div>
-
-    <!-- Form Panel -->
-    <div class="page-panel">
-      
-      <!-- Error Message Container (Global for steps) -->
-      <div id="form-error-box" class="message-box" role="alert"></div>
-
-      <!-- STEP 1: YOUR DETAILS -->
-      <section id="step-1">
-        <div class="section-header">
-          <span>Step 1 — Your Details</span>
-          <span style="font-size: 9px; opacity: 0.8;">Section 1 of 3</span>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label" for="full_name">Full Name <span class="required">*</span></label>
-          <input type="text" id="full_name" class="form-input" placeholder="e.g. Mahama Haruna" required autocomplete="name">
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Gender <span class="required">*</span></label>
-          <input type="hidden" id="gender" name="gender" required>
-          <div class="gender-toggle-container">
-            <button type="button" class="gender-btn" id="btn-male" aria-label="Select Male">
-              <span class="symbol-male"></span> Male
-            </button>
-            <button type="button" class="gender-btn" id="btn-female" aria-label="Select Female">
-              <span class="symbol-female"></span> Female
-            </button>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label" for="hometown">Hometown / District</label>
-          <input type="text" id="hometown" class="form-input" list="hometown-list" placeholder="e.g. Bole / West Gonja">
-          <datalist id="hometown-list">
-            <option value="Bole"></option>
-            <option value="Damongo"></option>
-            <option value="Salaga"></option>
-            <option value="Buipe"></option>
-            <option value="Sawla"></option>
-            <option value="Tuna"></option>
-            <option value="Laribanga"></option>
-            <option value="Daboya"></option>
-            <option value="Mpaha"></option>
-            <option value="Busunu"></option>
-            <option value="Bamboi"></option>
-            <option value="Kpandai"></option>
-            <option value="Wasipe"></option>
-            <option value="Mankargu"></option>
-            <option value="Kalba"></option>
-          </datalist>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label" for="programme">Programme of Study</label>
-          <input type="text" id="programme" class="form-input" list="programme-list" placeholder="e.g. BSc. Electrical Engineering" autocomplete="organization">
-          <datalist id="programme-list">
-            <option value="BSc. Computer Engineering"></option>
-            <option value="BSc. Computer Science"></option>
-            <option value="BSc. Information Technology"></option>
-            <option value="BSc. Electrical and Electronic Engineering"></option>
-            <option value="BSc. Renewable Energy Engineering"></option>
-            <option value="BSc. Mechanical Engineering"></option>
-            <option value="BSc. Civil Engineering"></option>
-            <option value="BSc. Geomatic Engineering"></option>
-            <option value="BSc. Petroleum Engineering"></option>
-            <option value="BSc. Chemical Engineering"></option>
-            <option value="BSc. Agriculture"></option>
-            <option value="BSc. Natural Resources Management"></option>
-            <option value="BSc. Actuarial Science"></option>
-            <option value="BSc. Enterprise Science"></option>
-            <option value="BSc. Hospitality Management"></option>
-            <option value="BSc. Environmental Engineering"></option>
-            <option value="BSc. Environmental Science"></option>
-            <option value="BSc. Forest Resource Management"></option>
-            <option value="BSc. Climate Change and Sustainable Development"></option>
-            <option value="BSc. Planning and Land Management"></option>
-            <option value="BSc. Fire and Disaster Management"></option>
-            <option value="BSc. Biological Sciences"></option>
-            <option value="BSc. Mathematics"></option>
-            <option value="BSc. Chemistry"></option>
-            <option value="BSc. Physics"></option>
-            <option value="Diploma in Information Technology"></option>
-            <option value="Diploma in Computer Science"></option>
-            <option value="Diploma in Electrical and Electronic Engineering"></option>
-            <option value="Diploma in Renewable Energy Engineering"></option>
-            <option value="Diploma in Natural Resources Management"></option>
-          </datalist>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label" for="level">Level <span class="required">*</span></label>
-          <select id="level" class="form-select" required>
-            <option value="" disabled selected>Select your Level</option>
-            <option value="100">100</option>
-            <option value="200">200</option>
-            <option value="300">300</option>
-            <option value="400">400</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label" for="phone">Phone Number <span class="required">*</span></label>
-          <input type="tel" id="phone" class="form-input" value="+233" placeholder="e.g. 244123456" inputmode="numeric" required autocomplete="tel" maxlength="13">
-          <span class="form-note">Prefilled with +233. Please type the remaining 9 digits of your number (e.g. 244123456).</span>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label" for="whatsapp">WhatsApp Number</label>
-          <input type="tel" id="whatsapp" class="form-input" value="+233" placeholder="e.g. 244123456" inputmode="numeric" maxlength="13">
-          <span class="form-note">Automatically copied from your phone number. Change this only if your WhatsApp uses a different number.</span>
-        </div>
-
-        <button type="button" id="btn-continue" class="btn btn-primary" style="margin-top: 12px;">Continue</button>
-      </section>
-
-      <!-- STEP 2: CONFIRM YOUR DETAILS -->
-      <section id="step-2" class="hidden">
-        <div class="section-header">
-          <span>Step 2 — Confirm Your Details</span>
-          <span style="font-size: 9px; opacity: 0.8;">Section 2 of 3</span>
-        </div>
-
-        <p style="margin-bottom: 16px; font-size: 14px;">Please review your details carefully. Make sure your phone number is correct as it will be used to send you important association updates.</p>
-
-        <div class="card cream-card">
-          <div class="card-title">Membership Records Summary</div>
-          <div class="details-list">
-            <div class="detail-row">
-              <span class="detail-label">Name:</span>
-              <span class="detail-val" id="lbl-name">—</span>
-            </div>
-            <div class="detail-row">
-              <span class="detail-label">Gender:</span>
-              <span class="detail-val" id="lbl-gender">—</span>
-            </div>
-            <div class="detail-row">
-              <span class="detail-label">Hometown:</span>
-              <span class="detail-val" id="lbl-hometown">—</span>
-            </div>
-            <div class="detail-row">
-              <span class="detail-label">Programme:</span>
-              <span class="detail-val" id="lbl-programme">—</span>
-            </div>
-            <div class="detail-row">
-              <span class="detail-label">Level:</span>
-              <span class="detail-val" id="lbl-level">—</span>
-            </div>
-            <div class="detail-row">
-              <span class="detail-label">Phone:</span>
-              <span class="detail-val" id="lbl-phone">—</span>
-            </div>
-            <div class="detail-row">
-              <span class="detail-label">WhatsApp:</span>
-              <span class="detail-val" id="lbl-whatsapp">—</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="btn-group">
-          <button type="button" id="btn-edit" class="btn btn-secondary">Edit</button>
-          <button type="button" id="btn-confirm" class="btn btn-primary">Confirm &amp; Register</button>
-        </div>
-      </section>
-
-      <!-- STEP 3: JOIN THE WHATSAPP GROUP -->
-      <section id="step-3" class="hidden">
-        <div class="section-header success-header">
-          <span>Step 3 — Join the Group</span>
-          <span style="font-size: 9px; opacity: 0.8;">Section 3 of 3</span>
-        </div>
-
-        <div class="success-banner">
-          <div class="success-icon" aria-hidden="true">&#x2713;</div>
-          <h2 class="success-title">You're registered!</h2>
-          <p class="success-subtitle">Welcome to NAGS-UENR. You are now an official member.</p>
-        </div>
-
-        <div class="card whatsapp-box">
-          <div class="card-title" style="border-bottom-color: var(--green); color: var(--green);">Final Step — Join Our WhatsApp Group</div>
-          <p style="font-size: 13px; line-height: 1.7; color: #555555; margin-bottom: 16px;">
-            Tap the button below to join the official NAGS-UENR WhatsApp group and stay connected with announcements, events, and other members.
-          </p>
-          
-          <button type="button" id="btn-join-whatsapp" class="btn btn-whatsapp" style="margin-bottom: 8px;">
-            Join NAGS-UENR on WhatsApp &rarr;
-          </button>
-          
-          <span class="whatsapp-footer-note" style="margin-bottom: 20px; display: block;">Already in the group? You're all set. &#x2713;</span>
-
-          <div class="card-title" style="border-bottom-color: var(--blue); color: var(--blue); margin-top: 24px; padding-top: 10px;">Connect on Social Media</div>
-          <p style="font-size: 13px; line-height: 1.7; color: #555555; margin-bottom: 16px;">
-            Follow our official Facebook page to stay updated on all association events, announcements, and student highlights.
-          </p>
-          
-          <button type="button" id="btn-visit-facebook" class="btn btn-facebook">
-            Like Us on Facebook &rarr;
-          </button>
-        </div>
-      </section>
-
+    <!-- Loading skeletons shown initially -->
+    <div id="chapters-container" class="chapters-grid">
+      <div class="skeleton-card"></div>
+      <div class="skeleton-card"></div>
+      <div class="skeleton-card"></div>
     </div>
   </main>
 
-  <!-- Page Footer -->
+  <!-- Platform Footer -->
   <footer>
-    <div>&copy; 2026 NAGS-UENR. All rights reserved. Developed by Q-Nova GH</div>
-    <a href="/admin" class="admin-link" aria-label="Access Admin Portal" style="display: none;">Admin Portal</a>
+    <div>&copy; 2026 National Association of Gonjaland Students, Ghana. All rights reserved. Developed by Q-Nova GH</div>
   </footer>
 
-  <!-- Scripts -->
-  <script src="config.js?v=35"></script>
-  <script src="registration.js?v=35"></script>
+  <script src="config.js?v=36"></script>
+  <script>
+    let supabase;
+
+    async function loadChapters() {
+      const container = document.getElementById('chapters-container');
+
+      try {
+        if (!window.supabase || !CONFIG || !CONFIG.SUPABASE_URL) {
+          throw new Error('config_missing');
+        }
+
+        supabase = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
+
+        const { data, error } = await supabase
+          .from('universities')
+          .select('id, name, short_name, slug, location, logo_url')
+          .eq('is_active', true)
+          .order('name', { ascending: true });
+
+        if (error) {
+          // Table may not exist yet (Phase 2 not yet run) — show UENR fallback
+          if (error.code === '42P01' || error.message.includes('does not exist')) {
+            renderFallback(container);
+            return;
+          }
+          throw error;
+        }
+
+        if (!data || data.length === 0) {
+          container.outerHTML = `
+            <div class="platform-empty">
+              <div class="platform-empty-icon">🏛️</div>
+              <div class="platform-empty-title">No chapters registered yet</div>
+              <div class="platform-empty-sub">Chapters will appear here once added by the platform administrator.</div>
+            </div>`;
+          return;
+        }
+
+        renderChapters(container, data);
+
+      } catch (err) {
+        console.warn('Chapter load error:', err);
+        renderFallback(container);
+      }
+    }
+
+    function renderChapters(container, chapters) {
+      container.innerHTML = '';
+      chapters.forEach(ch => {
+        const logoContent = ch.logo_url
+          ? `<img src="${escapeAttr(ch.logo_url)}" alt="${escapeAttr(ch.short_name)} Logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+             <div class="chapter-logo-initials" style="display:none;">${ch.short_name.substring(0,2).toUpperCase()}</div>`
+          : `<div class="chapter-logo-initials">${ch.short_name.substring(0,2).toUpperCase()}</div>`;
+
+        const card = document.createElement('div');
+        card.className = 'chapter-card';
+        card.innerHTML = `
+          <div class="chapter-card-header">
+            <div class="chapter-logo-wrap">${logoContent}</div>
+            <div>
+              <div class="chapter-name">${escapeHTML(ch.name)}</div>
+              <div class="chapter-badge">${escapeHTML(ch.short_name)}</div>
+            </div>
+          </div>
+          ${ch.location ? `<div class="chapter-location">&#128205; ${escapeHTML(ch.location)}</div>` : ''}
+          <div class="chapter-actions">
+            <a href="/register/?chapter=${encodeURIComponent(ch.slug)}" class="chapter-btn-register">Register as Member &rarr;</a>
+            <a href="/login.html?chapter=${encodeURIComponent(ch.slug)}" class="chapter-btn-login">Executive Login</a>
+          </div>`;
+        container.appendChild(card);
+      });
+    }
+
+    function renderFallback(container) {
+      // Show UENR as a static fallback when the universities table does not exist yet
+      container.innerHTML = `
+        <div class="chapter-card">
+          <div class="chapter-card-header">
+            <div class="chapter-logo-wrap"><img src="nags.png" alt="NAGS-UENR Logo"></div>
+            <div>
+              <div class="chapter-name">University of Energy and Natural Resources</div>
+              <div class="chapter-badge">UENR</div>
+            </div>
+          </div>
+          <div class="chapter-location">&#128205; Sunyani, Bono Region, Ghana</div>
+          <div class="chapter-actions">
+            <a href="/register/?chapter=uenr" class="chapter-btn-register">Register as Member &rarr;</a>
+            <a href="/login.html?chapter=uenr" class="chapter-btn-login">Executive Login</a>
+          </div>
+        </div>`;
+    }
+
+    function escapeHTML(str) {
+      if (!str) return '';
+      return str.replace(/[&<>"']/g, t => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[t]||t));
+    }
+    function escapeAttr(str) { return escapeHTML(String(str || '')); }
+
+    document.addEventListener('DOMContentLoaded', loadChapters);
+  </script>
+
 </body>
 </html>

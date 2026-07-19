@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Super Admin | NAGS Ghana</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="icon" type="image/png" href="../nags.png">
+  <style>
+    body { display:flex; flex-direction:column; min-height:100vh; background:linear-gradient(160deg,#1a3f72,#0d2444); }
+    .stub-center { flex:1; display:flex; align-items:center; justify-content:center; padding:40px 20px; }
+    .stub-card { background:#fff; border-radius:12px; padding:40px 32px; max-width:480px; width:100%; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+    .stub-icon { font-size:42px; margin-bottom:16px; }
+    .stub-title { font-size:20px; font-weight:700; color:#1a3f72; margin-bottom:8px; font-family:var(--ui-font,'Segoe UI',sans-serif); }
+    .stub-sub { font-size:13px; color:#888; line-height:1.7; margin-bottom:24px; font-family:var(--ui-font,'Segoe UI',sans-serif); }
+    .stub-badge { display:inline-block; background:#1e5c2e; color:#fff; font-size:9px; font-family:var(--ui-font,'Segoe UI',sans-serif); font-weight:700; text-transform:uppercase; letter-spacing:0.1em; padding:3px 10px; border-radius:20px; margin-bottom:16px; }
+    .stub-phase { font-size:11px; color:#aaa; font-family:var(--ui-font,'Segoe UI',sans-serif); margin-top:16px; }
+  </style>
+</head>
+<body>
+  <div class="stub-center">
+    <div>
+      <div class="stub-card">
+        <div class="stub-icon">🛡️</div>
+        <div class="stub-badge">Super Admin</div>
+        <div class="stub-title">Super Admin Dashboard</div>
+        <div class="stub-sub">
+          Welcome, Platform Administrator.<br>
+          This dashboard is being built in <strong>Phase 4</strong>.<br>
+          It will include University Management, Platform Stats, and All Executives tabs.
+        </div>
+        <a href="/login.html" class="btn btn-primary" style="display:inline-block;text-decoration:none;padding:10px 24px;font-size:13px;">
+          Back to Login
+        </a>
+        <div class="stub-phase">Phase 1 of 5 complete — Phase 4 implements this dashboard</div>
+      </div>
+    </div>
+  </div>
+  <script src="../config.js?v=36"></script>
+  <script>
+    // Auth guard: must be super_admin
+    if (sessionStorage.getItem('nags_role') !== 'super_admin') {
+      window.location.href = '/login.html';
+    }
+  </script>
+</body>
+</html>

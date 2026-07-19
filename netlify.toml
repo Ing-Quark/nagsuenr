@@ -1,7 +1,33 @@
 [build]
   publish = "/"
 
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+# Old single-chapter admin (preserved for backward compatibility during migration)
 [[redirects]]
   from = "/admin"
   to = "/admin.html"
+  status = 200
+
+# New multi-tenant routes
+[[redirects]]
+  from = "/register"
+  to = "/register/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/login"
+  to = "/login.html"
+  status = 200
+
+[[redirects]]
+  from = "/dashboard"
+  to = "/dashboard/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/super-admin"
+  to = "/super-admin/index.html"
   status = 200

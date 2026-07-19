@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter Dashboard | NAGS Ghana</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="icon" type="image/png" href="../nags.png">
+  <style>
+    body { display:flex; flex-direction:column; min-height:100vh; background:linear-gradient(160deg,#1a3f72,#0d2444); }
+    .stub-center { flex:1; display:flex; align-items:center; justify-content:center; padding:40px 20px; }
+    .stub-card { background:#fff; border-radius:12px; padding:40px 32px; max-width:500px; width:100%; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+    .stub-icon { font-size:42px; margin-bottom:16px; }
+    .stub-title { font-size:20px; font-weight:700; color:#1a3f72; margin-bottom:8px; font-family:var(--ui-font,'Segoe UI',sans-serif); }
+    .stub-sub { font-size:13px; color:#888; line-height:1.7; margin-bottom:24px; font-family:var(--ui-font,'Segoe UI',sans-serif); }
+    .role-badge { display:inline-block; background:#1e5c2e; color:#fff; font-size:9px; font-family:var(--ui-font,'Segoe UI',sans-serif); font-weight:700; text-transform:uppercase; letter-spacing:0.1em; padding:3px 10px; border-radius:20px; margin-bottom:16px; }
+    .stub-phase { font-size:11px; color:#aaa; font-family:var(--ui-font,'Segoe UI',sans-serif); margin-top:16px; }
+    .tabs-preview { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin:16px 0; }
+    .tab-chip { background:#f0f4fb; color:#1a3f72; font-size:11px; font-family:var(--ui-font,'Segoe UI',sans-serif); padding:4px 12px; border-radius:20px; border:1px solid #d0dcf0; font-weight:600; }
+  </style>
+</head>
+<body>
+  <div class="stub-center">
+    <div>
+      <div class="stub-card">
+        <div class="stub-icon">📊</div>
+        <div class="role-badge" id="role-badge">Executive</div>
+        <div class="stub-title">Chapter Executive Dashboard</div>
+        <div class="stub-sub">
+          Welcome, <strong id="exec-name-display">—</strong>.<br>
+          The full chapter dashboard is being built in <strong>Phase 4</strong>.<br>
+          Your tabs will include:
+        </div>
+        <div class="tabs-preview" id="tabs-preview">
+          <div class="tab-chip">Members</div>
+          <div class="tab-chip">SMS</div>
+          <div class="tab-chip">Analytics</div>
+        </div>
+        <a href="/login.html" id="btn-logout" class="btn btn-secondary" style="display:inline-block;text-decoration:none;padding:10px 24px;font-size:13px;">
+          Logout
+        </a>
+        <div class="stub-phase">Phase 1 of 5 complete — Phase 4 implements this dashboard</div>
+      </div>
+    </div>
+  </div>
+  <script src="../config.js?v=36"></script>
+  <script>
+    // ── Auth Guard ──
+    const loggedIn = sessionStorage.getItem('nags_logged_in');
+    const role     = sessionStorage.getItem('nags_role');
+    const name     = sessionStorage.getItem('nags_exec_name');
+
+    if (!loggedIn) {
+      window.location.href = '/login.html';
+    }
+    if (role === 'super_admin') {
+      window.location.href = '/super-admin/';
+    }
+
+    // ── Populate stub with session data ──
+    if (name) document.getElementById('exec-name-display').textContent = name;
+    if (role) document.getElementById('role-badge').textContent = role.replace(/_/g,' ').toUpperCase();
+
+    // Show role-appropriate tabs in preview
+    const tabsByRole = {
+      chapter_admin:  ['Members','SMS','Analytics','Executives','Finance','Settings'],
+      president:      ['Members','SMS','Analytics','Executives','Finance','Settings'],
+      vice_president: ['Members','SMS','Analytics','Finance (read-only)'],
+      pro:            ['Members','SMS','Analytics'],
+      organizing_sec: ['Members','SMS'],
+      financial_sec:  ['Finance','Analytics (read-only)'],
+      secretary:      ['Members (read-only)','Analytics (read-only)'],
+      welfare:        ['Members (read-only)']
+    };
+    const tabs = tabsByRole[role] || ['Members'];
+    const preview = document.getElementById('tabs-preview');
+    preview.innerHTML = tabs.map(t => `<div class="tab-chip">${t}</div>`).join('');
+
+    // Logout clears session
+    document.getElementById('btn-logout').addEventListener('click', (e) => {
+      e.preventDefault();
+      sessionStorage.clear();
+      window.location.href = '/login.html';
+    });
+  </script>
+</body>
+</html>
