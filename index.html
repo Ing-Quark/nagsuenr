@@ -196,7 +196,7 @@
 
   <script src="config.js?v=36"></script>
   <script>
-    let supabase;
+    let supabaseClient;
 
     async function loadChapters() {
       const container = document.getElementById('chapters-container');
@@ -206,9 +206,9 @@
           throw new Error('config_missing');
         }
 
-        supabase = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
+        supabaseClient = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
 
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
           .from('universities')
           .select('id, name, short_name, slug, location, logo_url')
           .eq('is_active', true)
