@@ -1,5 +1,5 @@
-/* style.css - NAGS-UENR Global Styles */
-
+/* Design System Tokens */
+:root {
   /* Premium Multi-Tenant Glassmorphic Tokens */
   --bg-app-rgb: 6, 11, 20;
   --surface-01-rgb: 11, 20, 36;
@@ -26,6 +26,15 @@
   --emerald-muted: rgba(var(--emerald-active-rgb), 0.15);
   --crimson-alert: rgba(var(--crimson-alert-rgb), 1);
   --crimson-muted: rgba(var(--crimson-alert-rgb), 0.15);
+
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-pill: 9999px;
 }
 
 /* Lucide Vector Icon Utility Rules */
