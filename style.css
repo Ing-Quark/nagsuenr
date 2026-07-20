@@ -51,14 +51,20 @@
 }
 
 body {
-  font-family: var(--primary-font);
-  font-size: 15px;
-  line-height: 1.7;
-  color: var(--ink-mid);
-  background-color: var(--bg);
+  font-family: 'Plus Jakarta Sans', var(--ui-font, system-ui, sans-serif);
+  font-size: 14px;
+  line-height: 1.6;
+  color: #f8fafc;
+  background-color: #060b14;
+  background-image: 
+    radial-gradient(circle at 15% 15%, rgba(226, 180, 59, 0.06) 0%, transparent 40%),
+    radial-gradient(circle at 85% 85%, rgba(16, 185, 129, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 50% 50%, #060b14 0%, #040810 100%);
+  background-attachment: fixed;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  -webkit-font-smoothing: antialiased;
 }
 
 /* Container */
@@ -156,11 +162,14 @@ body {
 
 /* Page Background Panel (Institutional Document feel) */
 .page-panel {
-  background-color: var(--paper);
-  border: 1px solid var(--rule);
+  background-color: var(--surface-02);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
   margin-top: 16px;
   margin-bottom: 24px;
-  padding: 16px;
+  padding: 24px;
+  color: #f8fafc;
 }
 
 @media (min-width: 600px) {
