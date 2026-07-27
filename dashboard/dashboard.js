@@ -143,6 +143,18 @@ function renderRoleNavigation() {
     }
   });
 
+  // Append a print-ready poster lineup button at the right end of the navigation bar
+  const posterBtn = document.createElement('button');
+  posterBtn.className = 'tab-btn';
+  posterBtn.id = 'tab-btn-poster-link';
+  posterBtn.style.marginLeft = 'auto';
+  posterBtn.onclick = () => {
+    AudioEffects.playClick(); HapticEffects.tap();
+    window.open(`poster.html?chapter=${currentUniversitySlug || 'uenr'}`, '_blank');
+  };
+  posterBtn.innerHTML = `<i data-lucide="printer" class="lucide-icon" aria-hidden="true"></i> <span>Lineup Poster</span>`;
+  nav.appendChild(posterBtn);
+
   if (firstAvailableTab) switchTab(firstAvailableTab);
   refreshVectorIcons();
 }

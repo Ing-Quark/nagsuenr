@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Executive Lineup Poster &amp; Digital Portfolio Board | NAGS UENR</title>
+  <meta name="description" content="Official executive portfolio showcase for the National Association of Gonjaland Students (NAGS) UENR chapter.">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="poster.css">
+  <link rel="icon" type="image/png" href="../nags.png">
+
+  <!-- Supabase + Lucide Icons + QRCode Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body class="poster-body">
+
+  <!-- Main viewport displaying the poster canvas -->
+  <main class="poster-viewport" id="main-content">
+    <div class="poster-canvas theme-dark layout-portrait" id="poster-canvas">
+      
+      <!-- Poster Header -->
+      <header class="poster-header">
+        <div class="poster-crests-row">
+          <img src="../nags.png" class="poster-logo" alt="NAGS Ghana Crest">
+          <!-- Fallback or dynamic university logo -->
+          <img src="../nags.png" class="poster-logo" id="univ-crest" alt="University Crest" style="opacity: 0.85;">
+        </div>
+        <h1 class="poster-title" id="poster-header-title">National Association of Gonjaland Students</h1>
+        <div class="poster-subtitle" id="poster-header-chapter">UENR Chapter Leadership Registry</div>
+        <div class="poster-year" id="poster-header-year">Academic Year &middot; 2026/2027</div>
+        <hr class="poster-divider">
+      </header>
+
+      <!-- Executives Grid -->
+      <section class="poster-grid" id="poster-grid-container" aria-label="Executive Officers Council">
+        <!-- Rendered dynamically -->
+      </section>
+
+      <!-- Poster Footer -->
+      <footer class="poster-footer" role="contentinfo">
+        <div class="footer-motto-text">Motto: Kishilbi Konwule M'ata Kuyu</div>
+        <div class="footer-verification">
+          <div class="verification-text">
+            <strong>Scan to Register</strong><br>
+            <span>Verify Chapter Portal</span>
+          </div>
+          <div id="footer-qr-container" class="verification-qr"></div>
+        </div>
+      </footer>
+
+    </div>
+  </main>
+
+  <!-- Toggle Sidebar Button (floating) -->
+  <button class="btn-toggle-customizer" onclick="toggleSidebar()" aria-label="Toggle customizations panel">
+    <i data-lucide="sliders" class="lucide-icon" aria-hidden="true"></i>
+  </button>
+
+  <!-- Left: Sidebar Customizer Panel -->
+  <aside class="customizer-panel" id="customizer-sidebar" aria-label="Poster customizer settings">
+    <div class="customizer-header">
+      <h2 class="customizer-title">Poster Customizer</h2>
+      <button class="btn-sm-action" onclick="toggleSidebar()" aria-label="Close sidebar">
+        <i data-lucide="x" class="lucide-icon lucide-sm" aria-hidden="true"></i>
+      </button>
+    </div>
+
+    <!-- Controls Group -->
+    <section class="customizer-group">
+      <h3 class="customizer-section-title">Display Settings</h3>
+      
+      <div class="customizer-input-row">
+        <div style="flex:1;">
+          <label class="sa-label" style="font-size: 9px;">Theme Style</label>
+          <select id="setting-theme" class="sa-select-input" style="width:100%;" onchange="applyCustomizerSettings()">
+            <option value="theme-dark">Obsidian Digital Board</option>
+            <option value="theme-light">Heritage Light Print</option>
+          </select>
+        </div>
+        <div style="flex:1;">
+          <label class="sa-label" style="font-size: 9px;">Orientation</label>
+          <select id="setting-layout" class="sa-select-input" style="width:100%;" onchange="applyCustomizerSettings()">
+            <option value="layout-portrait">Portrait Poster</option>
+            <option value="layout-landscape">Landscape Board</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:10px; margin-top:12px;">
+        <button class="btn-sa-primary" style="flex:1; justify-content:center;" onclick="window.print()">
+          <i data-lucide="printer" class="lucide-icon" aria-hidden="true"></i>
+          <span>Print / Save PDF</span>
+        </button>
+        <button class="btn-sm-action" style="flex:none; padding:8px 12px;" onclick="resetToDatabaseDefaults()" title="Reset to database values">
+          <i data-lucide="rotate-ccw" class="lucide-icon lucide-sm" aria-hidden="true"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- Custom Executive Seeding Panel -->
+    <section class="customizer-group" style="flex:1; margin-top:12px;">
+      <h3 class="customizer-section-title" style="margin-bottom: 12px;">Edit Executive Information</h3>
+      <div id="customizer-execs-list" style="display:flex; flex-direction:column; gap:10px;">
+        <!-- Card editors rendered dynamically -->
+      </div>
+    </section>
+  </aside>
+
+  <script src="../config.js?v=36"></script>
+  <script src="poster.js?v=36"></script>
+</body>
+</html>
