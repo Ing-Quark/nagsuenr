@@ -1,29 +1,35 @@
-/* poster.css - Executive Lineup Poster & Digital Portfolio Board styles */
+/* poster.css — Executive Lineup Poster & Digital Portfolio Board
+   NAGS Ghana Multi-Tenant Platform — Premium Print + Screen Edition */
 
-/* Layout & Page Rules */
+/* ── Layout Shell ── */
 body.poster-body {
-  background-color: var(--bg-app);
+  background: var(--bg-app, #060b14);
+  background-image:
+    radial-gradient(circle at 15% 15%, rgba(226,180,59,0.05) 0%, transparent 40%),
+    radial-gradient(circle at 85% 85%, rgba(16,185,129,0.07) 0%, transparent 40%);
+  background-attachment: fixed;
   margin: 0;
   padding: 0;
-  font-family: var(--font-sans);
-  color: var(--text-primary);
+  font-family: var(--font-sans, 'Plus Jakarta Sans', system-ui, sans-serif);
+  color: var(--text-primary, #f8fafc);
   min-height: 100vh;
   display: flex;
   flex-direction: row;
   overflow-x: hidden;
 }
 
-/* Sidebar Customizer Styles */
+/* ── Customizer Sidebar ── */
 .customizer-panel {
-  width: 360px;
-  background: var(--surface-01);
-  border-left: 1px solid var(--border-subtle);
-  padding: 24px;
+  width: 320px;
+  min-width: 280px;
+  background: rgba(11, 20, 36, 0.97);
+  border-left: 1px solid rgba(255,255,255,0.07);
+  padding: 20px 18px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 14px;
   flex-shrink: 0;
-  box-shadow: -5px 0 25px rgba(0,0,0,0.3);
+  box-shadow: -6px 0 30px rgba(0,0,0,0.4);
   z-index: 10;
   overflow-y: auto;
   height: 100vh;
@@ -36,31 +42,33 @@ body.poster-body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid var(--border-subtle);
-  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  padding-bottom: 10px;
 }
 
 .customizer-title {
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 800;
   color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
   margin: 0;
 }
 
 .customizer-section-title {
-  font-size: 11px;
+  font-size: 9.5px;
   font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--gold-primary);
-  margin-top: 14px;
-  margin-bottom: 8px;
+  letter-spacing: 0.1em;
+  color: rgba(226,180,59,0.9);
+  margin-top: 6px;
+  margin-bottom: 6px;
 }
 
 .customizer-group {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 .customizer-input-row {
@@ -69,94 +77,81 @@ body.poster-body {
 }
 
 .exec-edit-card {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  padding: 12px;
-  margin-bottom: 10px;
+  background: rgba(255,255,255,0.025);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 8px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 .exec-edit-card label {
-  font-size: 10px;
-  font-weight: 700;
-  color: var(--text-secondary);
+  font-size: 9px;
+  font-weight: 800;
+  color: rgba(170,196,232,0.9);
   text-transform: uppercase;
+  letter-spacing: 0.06em;
 }
 
-/* Poster Frame Area */
+/* ── Poster Viewport (scroll area) ── */
 .poster-viewport {
   flex: 1;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  padding: 32px;
+  padding: 36px 28px;
   overflow-y: auto;
-  background-color: rgba(0,0,0,0.2);
+  background: rgba(0,0,0,0.25);
 }
 
+/* ── Poster Canvas (the printable frame) ── */
 .poster-canvas {
   width: 100%;
-  max-width: 840px; /* Letter / A4 Proportional default */
-  min-height: 1100px;
-  background: var(--surface-02);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
-  box-shadow: 0 20px 50px rgba(0,0,0,0.4);
-  padding: 48px;
+  max-width: 800px;
+  background: rgba(17, 31, 56, 0.95);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 18px;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(226,180,59,0.08);
+  padding: 44px 40px 36px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  gap: 0;
   box-sizing: border-box;
-  transition: all 0.25s ease;
+  transition: all 0.3s ease;
   position: relative;
 }
 
-/* Theme Variant Overrides */
+/* ── Theme: Heritage Light (print-friendly) ── */
 .poster-canvas.theme-light {
   background: #ffffff !important;
   color: #060b14 !important;
-  border-color: #e2e8f0 !important;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.1) !important;
+  border: 1px solid #dee5ee !important;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08) !important;
 }
+.poster-canvas.theme-light .poster-title    { color: #060b14 !important; }
+.poster-canvas.theme-light .poster-subtitle { color: #c49918 !important; }
+.poster-canvas.theme-light .poster-year     { color: #64748b !important; }
+.poster-canvas.theme-light .poster-divider  { background: #c49918 !important; }
+.poster-canvas.theme-light .exec-name       { color: #0f172a !important; }
+.poster-canvas.theme-light .exec-quote      { color: #64748b !important; border-color: #e2e8f0 !important; }
+.poster-canvas.theme-light .exec-card       { background: #f6f9fc !important; border-color: #dde5f0 !important; }
+.poster-canvas.theme-light .exec-img-wrap   { border-color: #c49918 !important; }
+.poster-canvas.theme-light .exec-img-placeholder { background: #eef2f7 !important; color: #94a3b8 !important; }
+.poster-canvas.theme-light .poster-footer   { border-color: #e2e8f0 !important; }
+.poster-canvas.theme-light .footer-motto-text { color: #64748b !important; }
+.poster-canvas.theme-light .verification-text { color: #94a3b8 !important; }
 
-.poster-canvas.theme-light .poster-title {
-  color: #060b14 !important;
-}
-.poster-canvas.theme-light .poster-subtitle {
-  color: #475569 !important;
-}
-.poster-canvas.theme-light .exec-name {
-  color: #0f172a !important;
-}
-.poster-canvas.theme-light .exec-quote {
-  color: #64748b !important;
-  border-color: #cbd5e1 !important;
-}
-.poster-canvas.theme-light .exec-card {
-  background: #f8fafc !important;
-  border-color: #e2e8f0 !important;
-}
-.poster-canvas.theme-light .exec-img-placeholder {
-  background: #edf2f7 !important;
-  color: #94a3b8 !important;
-}
-.poster-canvas.theme-light .poster-divider {
-  border-color: #e2e8f0 !important;
-}
-
-/* Orientation Modifiers */
+/* ── Orientation Modifiers ── */
 .poster-canvas.layout-landscape {
-  max-width: 1100px;
-  min-height: 780px;
+  max-width: 1080px;
 }
 
-/* Poster Branding Elements */
+/* ── Poster Branding Header ── */
 .poster-header {
   text-align: center;
-  margin-bottom: 36px;
+  margin-bottom: 28px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -166,104 +161,109 @@ body.poster-body {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 20px;
-  margin-bottom: 16px;
+  gap: 18px;
+  margin-bottom: 14px;
 }
 
 .poster-logo {
-  height: 64px;
-  width: 64px;
+  height: 62px;
+  width: 62px;
   object-fit: contain;
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.3));
 }
 
 .poster-title {
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 800;
-  color: #fff;
+  color: #f8fafc;
   letter-spacing: -0.02em;
   margin: 0;
-  line-height: 1.25;
+  line-height: 1.2;
 }
 
 .poster-subtitle {
-  font-size: 13px;
-  color: var(--gold-primary);
+  font-size: 11px;
+  color: rgba(226,180,59,1);
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin-top: 6px;
-  margin-bottom: 4px;
+  letter-spacing: 0.12em;
+  margin-top: 5px;
+  margin-bottom: 3px;
 }
 
 .poster-year {
-  font-size: 11px;
-  color: var(--text-secondary);
+  font-size: 10px;
+  color: rgba(170,196,232,0.8);
   font-weight: 600;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
   margin: 0;
 }
 
 .poster-divider {
-  width: 80px;
-  height: 3px;
-  background: var(--gold-primary);
-  margin: 20px auto;
+  width: 64px;
+  height: 2px;
+  background: rgba(226,180,59,0.9);
+  margin: 16px auto 0;
   border: none;
+  border-radius: 2px;
 }
 
-/* Grid Layout Matrix */
+/* ── Executive Grid ── */
 .poster-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
+  gap: 16px;
   align-items: start;
+  margin-top: 24px;
   margin-bottom: 24px;
 }
 
-/* Landscape grid handles 4 columns or specific placement */
 .layout-landscape .poster-grid {
   grid-template-columns: repeat(4, 1fr);
 }
 
+/* ── Executive Card ── */
 .exec-card {
-  background: var(--surface-03);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
-  padding: 16px 14px;
+  background: rgba(26, 44, 76, 0.85);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 14px;
+  padding: 18px 14px 16px;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  transition: all 0.2s ease;
-  position: relative;
   box-sizing: border-box;
   width: 100%;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* Card hierarchy styles */
+/* President: featured top-center spanning all columns */
 .exec-card-tier1 {
   grid-column: span 3;
   width: 100%;
-  max-width: 260px;
+  max-width: 250px;
   margin: 0 auto;
-  border-top: 3px solid var(--gold-primary);
-  box-shadow: 0 8px 24px rgba(var(--gold-primary-rgb), 0.15);
+  border-top: 3px solid rgba(226,180,59,0.9);
+  background: rgba(226,180,59,0.06) !important;
+  box-shadow: 0 6px 24px rgba(226,180,59,0.12);
 }
 .layout-landscape .exec-card-tier1 {
   grid-column: span 4;
 }
 
+/* ── Photo Circle ── */
 .exec-img-wrap {
-  width: 110px;
-  height: 110px;
+  width: 90px;
+  height: 90px;
   border-radius: 50%;
   overflow: hidden;
-  border: 3px solid var(--gold-primary);
-  margin-bottom: 14px;
-  background: rgba(0,0,0,0.2);
+  border: 2.5px solid rgba(226,180,59,0.85);
+  margin-bottom: 12px;
+  background: rgba(0,0,0,0.25);
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
 .exec-img {
@@ -276,215 +276,244 @@ body.poster-body {
   width: 100%;
   height: 100%;
   background: rgba(255,255,255,0.03);
-  color: var(--text-muted);
+  color: rgba(170,196,232,0.6);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
+/* ── Text Elements ── */
 .exec-name {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
-  color: #fff;
-  margin: 0 0 6px;
+  color: #f1f5f9;
+  margin: 0 0 5px;
+  line-height: 1.3;
 }
 
 .exec-role-badge {
-  font-size: 9px;
+  font-size: 8.5px;
   font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
   padding: 3px 8px;
-  border-radius: var(--radius-sm);
+  border-radius: 20px;
   margin-bottom: 10px;
+  white-space: nowrap;
 }
 
-.exec-role-president     { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); }
-.exec-role-vice-president{ background: rgba(6, 182, 212, 0.2); color: #22d3ee; border: 1px solid rgba(6, 182, 212, 0.4); }
-.exec-role-secretary     { background: rgba(99, 102, 241, 0.2); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.4); }
-.exec-role-financial-sec { background: rgba(217, 119, 6, 0.2); color: #fbbf24; border: 1px solid rgba(217, 119, 6, 0.4); }
-.exec-role-pro           { background: rgba(168, 85, 247, 0.2); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.4); }
-.exec-role-welfare       { background: rgba(244, 63, 94, 0.2); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.4); }
-.exec-role-organizing-sec{ background: rgba(20, 184, 166, 0.2); color: #2dd4bf; border: 1px solid rgba(20, 184, 166, 0.4); }
+/* Role colour palette */
+.exec-role-president      { background: rgba(245,158,11,0.18); color: #fbbf24; border: 1px solid rgba(245,158,11,0.4); }
+.exec-role-vice-president { background: rgba(6,182,212,0.18);  color: #22d3ee; border: 1px solid rgba(6,182,212,0.4);  }
+.exec-role-secretary      { background: rgba(99,102,241,0.18); color: #818cf8; border: 1px solid rgba(99,102,241,0.4); }
+.exec-role-financial-sec  { background: rgba(217,119,6,0.18);  color: #fbbf24; border: 1px solid rgba(217,119,6,0.4);  }
+.exec-role-pro            { background: rgba(168,85,247,0.18); color: #c084fc; border: 1px solid rgba(168,85,247,0.4); }
+.exec-role-welfare        { background: rgba(244,63,94,0.18);  color: #fb7185; border: 1px solid rgba(244,63,94,0.4);  }
+.exec-role-organizing-sec { background: rgba(20,184,166,0.18); color: #2dd4bf; border: 1px solid rgba(20,184,166,0.4); }
 
 .exec-quote {
-  font-size: 11px;
+  font-size: 10.5px;
   font-style: italic;
-  color: var(--text-secondary);
-  line-height: 1.4;
-  border-top: 1px dashed var(--border-subtle);
+  color: rgba(170,196,232,0.75);
+  line-height: 1.45;
+  border-top: 1px dashed rgba(255,255,255,0.08);
   padding-top: 8px;
   margin: 0;
   width: 100%;
 }
 
-/* Poster Footer */
+/* ── Poster Footer ── */
 .poster-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-top: 1px solid var(--border-subtle);
-  padding-top: 24px;
-  margin-top: auto;
+  border-top: 1px solid rgba(255,255,255,0.07);
+  padding-top: 18px;
+  margin-top: 4px;
 }
 
 .footer-motto-text {
-  font-size: 11px;
+  font-size: 10px;
   font-style: italic;
-  color: var(--text-secondary);
+  color: rgba(170,196,232,0.65);
+  max-width: 220px;
+  line-height: 1.4;
 }
 
 .footer-verification {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
 .verification-text {
   text-align: right;
-  font-size: 10px;
-  color: var(--text-muted);
-  line-height: 1.3;
+  font-size: 9px;
+  color: rgba(170,196,232,0.55);
+  line-height: 1.4;
 }
 
 .verification-qr {
-  width: 50px;
-  height: 50px;
-  border-radius: 4px;
+  width: 48px;
+  height: 48px;
+  border-radius: 5px;
   background: #fff;
   padding: 2px;
+  flex-shrink: 0;
 }
 
-/* Hide toggle customizer button on screen */
 .btn-toggle-customizer {
   position: fixed;
-  bottom: 24px;
-  right: 24px;
-  background: var(--gold-primary);
+  bottom: 22px;
+  right: 22px;
+  background: rgba(226,180,59,1);
   color: #070e1b;
   border: none;
-  width: 46px;
-  height: 46px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   cursor: pointer;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+  box-shadow: 0 4px 18px rgba(0,0,0,0.4), 0 0 0 2px rgba(226,180,59,0.2);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 100;
-  transition: transform 0.2s ease;
+  z-index: 200;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 .btn-toggle-customizer:hover {
-  transform: scale(1.05);
+  transform: scale(1.08);
+  box-shadow: 0 6px 24px rgba(226,180,59,0.4);
 }
 
-/* Print Rules - Hide Sidebars & Toolbars, format poster cleanly on A4/Letter page */
+/* Small action buttons (close, reset) inside the sidebar */
+.btn-sm-action {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(170,196,232,0.85);
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 8px;
+  font-size: 12px;
+  font-family: inherit;
+  transition: background 0.15s ease;
+}
+.btn-sm-action:hover {
+  background: rgba(255,255,255,0.12);
+  color: #fff;
+}
+
+/* Sidebar label above select inputs */
+.sa-label {
+  display: block;
+  font-size: 9px;
+  font-weight: 700;
+  color: rgba(170,196,232,0.7);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin-bottom: 4px;
+}
+
+/* ── Print Styles ── */
 @media print {
   @page {
-    margin: 0.2in;
+    margin: 0.15in;
     size: A4 portrait;
   }
 
   html, body.poster-body {
-    background: #ffffff !important;
-    color: #060b14 !important;
+    background: transparent !important;
     display: block !important;
-    height: 100% !important;
     overflow: hidden !important;
+    height: 100% !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
 
-  /* Only hide sidebar tools and top bars, NEVER hide poster header or footer */
-  .customizer-panel, 
+  .customizer-panel,
   .btn-toggle-customizer,
-  .top-bar, 
+  .top-bar,
   .stats-bar,
   .tabs-nav {
     display: none !important;
   }
 
   .poster-viewport {
+    display: block !important;
     padding: 0 !important;
     margin: 0 !important;
     background: transparent !important;
-    display: block !important;
     overflow: visible !important;
   }
 
   .poster-canvas {
     max-width: 100% !important;
     width: 100% !important;
-    height: 98vh !important;
+    height: auto !important;
     min-height: 0 !important;
     border: none !important;
+    border-radius: 0 !important;
     box-shadow: none !important;
-    padding: 0.15in 0.25in !important;
-    margin: 0 auto !important;
+    padding: 0.2in 0.25in !important;
+    margin: 0 !important;
     box-sizing: border-box !important;
     display: flex !important;
     flex-direction: column !important;
-    justify-content: space-between !important;
+    gap: 0 !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
     page-break-inside: avoid !important;
   }
 
+  .poster-canvas.theme-dark {
+    background: #0c1728 !important;
+    color: #f8fafc !important;
+  }
   .poster-canvas.theme-light {
     background: #ffffff !important;
     color: #060b14 !important;
   }
 
-  .poster-canvas.theme-dark {
-    background: #0b1424 !important;
-    color: #ffffff !important;
-  }
-
   .poster-header {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
     margin-bottom: 10px !important;
   }
-
   .poster-crests-row {
     gap: 12px !important;
     margin-bottom: 8px !important;
   }
-
   .poster-logo {
-    height: 44px !important;
-    width: 44px !important;
+    height: 42px !important;
+    width: 42px !important;
   }
-
   .poster-title {
-    font-size: 16px !important;
+    font-size: 14px !important;
     line-height: 1.2 !important;
   }
-
   .poster-subtitle {
-    font-size: 10px !important;
+    font-size: 9px !important;
     margin-top: 2px !important;
   }
-
   .poster-year {
-    font-size: 9px !important;
+    font-size: 8px !important;
   }
-
   .poster-divider {
-    margin: 8px auto !important;
-    width: 50px !important;
+    margin: 8px auto 0 !important;
+    width: 44px !important;
     height: 2px !important;
   }
 
   .poster-grid {
-    gap: 10px !important;
-    margin-bottom: 10px !important;
+    gap: 9px !important;
+    margin-top: 14px !important;
+    margin-bottom: 12px !important;
     align-items: start !important;
   }
 
   .exec-card {
-    padding: 8px 6px !important;
+    padding: 8px 7px 7px !important;
+    border-radius: 8px !important;
     height: auto !important;
     min-height: 0 !important;
     page-break-inside: avoid !important;
@@ -493,52 +522,53 @@ body.poster-body {
   }
 
   .exec-card-tier1 {
-    max-width: 220px !important;
+    max-width: 200px !important;
+    padding: 10px 8px !important;
   }
 
   .exec-img-wrap {
-    width: 64px !important;
-    height: 64px !important;
+    width: 58px !important;
+    height: 58px !important;
     margin-bottom: 6px !important;
     border-width: 2px !important;
   }
 
   .exec-name {
-    font-size: 11px !important;
-    margin-bottom: 2px !important;
+    font-size: 10.5px !important;
+    margin-bottom: 3px !important;
     font-weight: 700 !important;
   }
 
   .exec-role-badge {
-    font-size: 7.5px !important;
+    font-size: 7px !important;
     padding: 1px 5px !important;
-    margin-bottom: 4px !important;
+    margin-bottom: 5px !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
 
   .exec-quote {
-    font-size: 8.5px !important;
-    padding-top: 4px !important;
+    font-size: 8px !important;
+    padding-top: 5px !important;
     line-height: 1.25 !important;
   }
 
   .poster-footer {
-    display: flex !important;
     padding-top: 8px !important;
-    border-top: 1px solid rgba(128,128,128,0.2) !important;
+    margin-top: 4px !important;
+    border-top: 1px solid rgba(128,128,128,0.25) !important;
   }
 
   .footer-motto-text {
-    font-size: 9px !important;
-  }
-
-  .verification-text {
     font-size: 8px !important;
   }
 
+  .verification-text {
+    font-size: 7.5px !important;
+  }
+
   .verification-qr {
-    width: 36px !important;
-    height: 36px !important;
+    width: 34px !important;
+    height: 34px !important;
   }
 }
