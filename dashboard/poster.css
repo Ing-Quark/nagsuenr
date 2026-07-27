@@ -378,13 +378,15 @@ body.poster-body {
 @media print {
   @page {
     margin: 0.2in;
-    size: auto;
+    size: A4 portrait;
   }
 
-  body.poster-body {
-    background: transparent !important;
-    color: inherit !important;
+  html, body.poster-body {
+    background: #ffffff !important;
+    color: #060b14 !important;
     display: block !important;
+    height: 100% !important;
+    overflow: hidden !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
@@ -409,13 +411,16 @@ body.poster-body {
   .poster-canvas {
     max-width: 100% !important;
     width: 100% !important;
-    height: auto !important;
+    height: 98vh !important;
     min-height: 0 !important;
     border: none !important;
     box-shadow: none !important;
-    padding: 0.3in !important;
+    padding: 0.15in 0.25in !important;
     margin: 0 auto !important;
     box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
     page-break-inside: avoid !important;
@@ -435,51 +440,98 @@ body.poster-body {
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-    margin-bottom: 20px !important;
+    margin-bottom: 10px !important;
+  }
+
+  .poster-crests-row {
+    gap: 12px !important;
+    margin-bottom: 8px !important;
+  }
+
+  .poster-logo {
+    height: 44px !important;
+    width: 44px !important;
   }
 
   .poster-title {
-    font-size: 20px !important;
+    font-size: 16px !important;
+    line-height: 1.2 !important;
+  }
+
+  .poster-subtitle {
+    font-size: 10px !important;
+    margin-top: 2px !important;
+  }
+
+  .poster-year {
+    font-size: 9px !important;
+  }
+
+  .poster-divider {
+    margin: 8px auto !important;
+    width: 50px !important;
+    height: 2px !important;
   }
 
   .poster-grid {
-    gap: 16px !important;
-    margin-bottom: 20px !important;
+    gap: 10px !important;
+    margin-bottom: 10px !important;
   }
 
   .exec-card {
-    padding: 14px 10px !important;
+    padding: 8px 6px !important;
     page-break-inside: avoid !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
 
+  .exec-card-tier1 {
+    max-width: 220px !important;
+  }
+
   .exec-img-wrap {
-    width: 80px !important;
-    height: 80px !important;
-    margin-bottom: 8px !important;
+    width: 64px !important;
+    height: 64px !important;
+    margin-bottom: 6px !important;
+    border-width: 2px !important;
   }
 
   .exec-name {
-    font-size: 13px !important;
-    margin-bottom: 4px !important;
+    font-size: 11px !important;
+    margin-bottom: 2px !important;
+    font-weight: 700 !important;
   }
 
   .exec-role-badge {
-    font-size: 8px !important;
-    padding: 2px 6px !important;
-    margin-bottom: 6px !important;
+    font-size: 7.5px !important;
+    padding: 1px 5px !important;
+    margin-bottom: 4px !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
 
   .exec-quote {
-    font-size: 10px !important;
-    padding-top: 6px !important;
+    font-size: 8.5px !important;
+    padding-top: 4px !important;
+    line-height: 1.25 !important;
   }
 
   .poster-footer {
     display: flex !important;
-    padding-top: 14px !important;
+    padding-top: 8px !important;
+    border-top: 1px solid rgba(128,128,128,0.2) !important;
+  }
+
+  .footer-motto-text {
+    font-size: 9px !important;
+  }
+
+  .verification-text {
+    font-size: 8px !important;
+  }
+
+  .verification-qr {
+    width: 36px !important;
+    height: 36px !important;
   }
 }
