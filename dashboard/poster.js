@@ -88,9 +88,14 @@ async function loadPosterData() {
         chapterId = univData.id;
         const chapEl = document.getElementById('poster-header-chapter');
         if (chapEl) chapEl.textContent = `NAGS ${univData.short_name || chapterSlug.toUpperCase()} — ${univData.name} Chapter`;
-        if (univData.logo_url) {
-          const univCrest = document.getElementById('univ-crest');
-          if (univCrest) univCrest.src = univData.logo_url;
+        const univCrest = document.getElementById('univ-crest');
+        if (univCrest) {
+          if (univData.logo_url && univData.logo_url !== '../nags.png') {
+            univCrest.src = univData.logo_url;
+            univCrest.style.display = 'inline-block';
+          } else {
+            univCrest.style.display = 'none';
+          }
         }
       }
     } catch (err) {

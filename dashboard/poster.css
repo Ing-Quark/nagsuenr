@@ -215,9 +215,9 @@ body.poster-body {
 .poster-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
-  flex: 1;
-  margin-bottom: 36px;
+  gap: 20px;
+  align-items: start;
+  margin-bottom: 24px;
 }
 
 /* Landscape grid handles 4 columns or specific placement */
@@ -229,7 +229,7 @@ body.poster-body {
   background: var(--surface-03);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
-  padding: 20px;
+  padding: 16px 14px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -237,13 +237,17 @@ body.poster-body {
   transition: all 0.2s ease;
   position: relative;
   box-sizing: border-box;
+  width: 100%;
 }
 
 /* Card hierarchy styles */
 .exec-card-tier1 {
   grid-column: span 3;
-  max-width: 280px;
+  width: 100%;
+  max-width: 260px;
   margin: 0 auto;
+  border-top: 3px solid var(--gold-primary);
+  box-shadow: 0 8px 24px rgba(var(--gold-primary-rgb), 0.15);
 }
 .layout-landscape .exec-card-tier1 {
   grid-column: span 4;
@@ -476,10 +480,13 @@ body.poster-body {
   .poster-grid {
     gap: 10px !important;
     margin-bottom: 10px !important;
+    align-items: start !important;
   }
 
   .exec-card {
     padding: 8px 6px !important;
+    height: auto !important;
+    min-height: 0 !important;
     page-break-inside: avoid !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
